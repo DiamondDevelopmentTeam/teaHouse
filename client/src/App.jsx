@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import './App.css';
 
 import building from './assets/images/building.webp';
@@ -47,35 +48,103 @@ const traditionItems = [
   { icon: '▱', text: 'Reserve Your Private Tea Room Experience' },
 ];
 
-const footerLinksOne = ['Home', 'About', 'Menus'];
+const footerLinksOne = [
+  { label: 'Home', id: 'home' },
+  { label: 'About', id: 'about' },
+  { label: 'Menus', id: 'menus' },
+];
+
 const footerLinksTwo = [
-  'Events',
-  'Reservations',
-  'Tea Rooms',
-  'News',
-  'Gallery',
-  'FAQ’s',
-  'Blog',
-  'Contact',
+  { label: 'Events', id: 'events' },
+  { label: 'Reservations', id: 'reservations' },
+  { label: 'Tea Rooms', id: 'tea-rooms' },
+  { label: 'News', id: 'news' },
+  { label: 'Gallery', id: 'gallery' },
+  { label: 'FAQ’s', id: 'faq' },
+  { label: 'Blog', id: 'blog' },
+  { label: 'Contact', id: 'contact' },
 ];
 
 function App() {
+  const [isScrolled, setIsScrolled] = useState(false);
+
   const scrollToSection = (id) => {
     document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
   };
 
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 24);
+    };
+
+    handleScroll();
+    window.addEventListener('scroll', handleScroll);
+
+    const animatedElements = document.querySelectorAll(
+      [
+        '.hero-copy',
+        '.hero-bottom',
+        '.about-image',
+        '.about-copy',
+        '.weather-card',
+        '.favorites-section h2',
+        '.favorites-grid article',
+        '.media-mosaic > div',
+        '.tradition-images',
+        '.tradition-copy',
+        '.placeholder-section > div',
+        '.faq-grid article',
+        '.contact-intro',
+        '.contact-details article',
+        '.gallery-strip img',
+        '.footer > *',
+      ].join(',')
+    );
+
+    animatedElements.forEach((element) => {
+      element.classList.add('animate-on-scroll');
+    });
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-visible');
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      {
+        threshold: 0.14,
+        rootMargin: '0px 0px -70px 0px',
+      }
+    );
+
+    animatedElements.forEach((element) => observer.observe(element));
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      observer.disconnect();
+    };
+  }, []);
+
   return (
     <main className="site">
-      <header className="floating-header">
-        <nav className="nav-left">
+      <header className={`floating-header ${isScrolled ? 'is-scrolled' : ''}`}>
+        <nav className="nav-left" aria-label="Main navigation">
           {navLinks.map((link) => (
-            <button key={link.id} onClick={() => scrollToSection(link.id)}>
+            <button key={link.id} type="button" onClick={() => scrollToSection(link.id)}>
               {link.label}
             </button>
           ))}
         </nav>
 
-        <button className="center-logo" onClick={() => scrollToSection('home')}>
+        <button
+          className="center-logo"
+          type="button"
+          onClick={() => scrollToSection('home')}
+          aria-label="Go to homepage"
+        >
           <img src={teaHouseLogo} alt="1890 Tea House logo" />
         </button>
 
@@ -94,7 +163,7 @@ function App() {
             </a>
           </div>
 
-          <button onClick={() => scrollToSection('contact')}>
+          <button type="button" onClick={() => scrollToSection('contact')}>
             Make a Reservation
             <span>(12 + Guests)</span>
           </button>
@@ -104,11 +173,11 @@ function App() {
       <section id="home" className="hero">
         <img src={teaHouseBanner} alt="Tea house charcuterie spread" />
 
-        <button className="hero-arrow left" aria-label="Previous slide">
+        <button className="hero-arrow left" type="button" aria-label="Previous slide">
           ‹
         </button>
 
-        <button className="hero-arrow right" aria-label="Next slide">
+        <button className="hero-arrow right" type="button" aria-label="Next slide">
           ›
         </button>
 
@@ -118,14 +187,15 @@ function App() {
             <span>Slow Down.</span>
           </h1>
 
-          <button onClick={() => scrollToSection('tea-rooms')}>
+          <button type="button" onClick={() => scrollToSection('tea-rooms')}>
             Reserve Your Tea Room
           </button>
         </div>
 
         <div className="hero-bottom">
           <h2>Come Join Us!</h2>
-          <div className="slider-dots">
+
+          <div className="slider-dots" aria-hidden="true">
             <span />
             <span className="active" />
             <span />
@@ -156,7 +226,9 @@ function App() {
             and warm conversation.
           </p>
 
-          <button onClick={() => scrollToSection('menus')}>View Our Menus</button>
+          <button type="button" onClick={() => scrollToSection('menus')}>
+            View Our Menus
+          </button>
 
           <div className="weather-card">
             <h3>Cold Or Rainy Day? We’ve Got You Covered</h3>
@@ -195,7 +267,9 @@ function App() {
           </article>
         </div>
 
-        <button onClick={() => scrollToSection('contact')}>View Our Menus</button>
+        <button type="button" onClick={() => scrollToSection('contact')}>
+          View Our Menus
+        </button>
       </section>
 
       <section id="events" className="media-mosaic">
@@ -237,32 +311,53 @@ function App() {
             ))}
           </ul>
 
-          <button onClick={() => scrollToSection('menus')}>View Our Menus</button>
+          <button type="button" onClick={() => scrollToSection('menus')}>
+            View Our Menus
+          </button>
         </div>
       </section>
 
       <section id="news" className="placeholder-section">
         <div>
           <h2>News</h2>
-          <p>Black boxes are temporary image placeholders for future content.</p>
+          <p>
+            Add seasonal announcements, private event updates, new menu items,
+            and special tea room moments here.
+          </p>
         </div>
 
         <div className="placeholder-grid">
-          <div className="black-placeholder" />
-          <div className="black-placeholder" />
-          <div className="black-placeholder" />
+          <div className="black-placeholder">
+            <span>Image Coming Soon</span>
+          </div>
+          <div className="black-placeholder">
+            <span>Image Coming Soon</span>
+          </div>
+          <div className="black-placeholder">
+            <span>Image Coming Soon</span>
+          </div>
         </div>
       </section>
 
       <section id="gallery" className="gallery-strip">
-        <button className="gallery-arrow">‹</button>
+        <button className="gallery-arrow left" type="button" aria-label="Previous gallery item">
+          ‹
+        </button>
+
         <img src={cupOfFruits} alt="Tea cup and sandwiches" />
         <img src={teaHouseBanner} alt="Charcuterie spread" />
         <img src={tableOfTeaHouse} alt="Tea room" />
-        <div className="black-placeholder" />
+
+        <div className="black-placeholder">
+          <span>Image Coming Soon</span>
+        </div>
+
         <img src={teaTime} alt="Tea time seating" />
         <img src={building} alt="1890 Tea House exterior" />
-        <button className="gallery-arrow">›</button>
+
+        <button className="gallery-arrow right" type="button" aria-label="Next gallery item">
+          ›
+        </button>
       </section>
 
       <section id="faq" className="faq-section">
@@ -304,9 +399,13 @@ function App() {
           </p>
         </div>
 
-        <div className="placeholder-grid">
-          <div className="black-placeholder" />
-          <div className="black-placeholder" />
+        <div className="placeholder-grid two">
+          <div className="black-placeholder">
+            <span>Blog Image Coming Soon</span>
+          </div>
+          <div className="black-placeholder">
+            <span>Blog Image Coming Soon</span>
+          </div>
         </div>
       </section>
 
@@ -369,90 +468,76 @@ function App() {
       </section>
 
       <footer className="footer">
-  <div className="footer-logo-area">
-    <img
-      className="footer-tea-logo"
-      src={teaHouseLogo}
-      alt="1890 Tea House logo"
-    />
+        <div className="footer-logo-area">
+          <img
+            className="footer-tea-logo"
+            src={teaHouseLogo}
+            alt="1890 Tea House logo"
+          />
 
-    <img
-      className="footer-diamond-logo"
-      src={diamondSuites}
-      alt="Diamond Suites Downtown Ocala"
-    />
+          <img
+            className="footer-diamond-logo"
+            src={diamondSuites}
+            alt="Diamond Suites Downtown Ocala"
+          />
 
-    <p>Copyright © 2026. All Rights Reserved.</p>
-  </div>
+          <p>Copyright © 2026. All Rights Reserved.</p>
+        </div>
 
-  <div className="footer-column">
-    {footerLinksOne.map((item) => (
-      <button
-        key={item}
-        onClick={() => scrollToSection(item.toLowerCase().replace('’', ''))}
-      >
-        {item}
-      </button>
-    ))}
+        <div className="footer-column">
+          {footerLinksOne.map((item) => (
+            <button key={item.id} type="button" onClick={() => scrollToSection(item.id)}>
+              {item.label}
+            </button>
+          ))}
 
-    <div className="footer-hours">
-      <p>Hours:</p>
-      <p>Mon-Thurs: 11:00am – 7:00pm</p>
-      <p>Fri-Sat: 11:00am – 9:00pm</p>
-      <p>Sun: 11:00am – 4:00pm</p>
-    </div>
+          <div className="footer-hours">
+            <p>Hours:</p>
+            <p>Mon-Thurs: 11:00am – 7:00pm</p>
+            <p>Fri-Sat: 11:00am – 9:00pm</p>
+            <p>Sun: 11:00am – 4:00pm</p>
+          </div>
 
-    <a href="#privacy">Privacy Policy</a>
-    <a href="#terms">Terms and Conditions</a>
-  </div>
+          <a href="#privacy">Privacy Policy</a>
+          <a href="#terms">Terms and Conditions</a>
+        </div>
 
-  <div className="footer-column">
-    {footerLinksTwo.map((item) => (
-      <button
-        key={item}
-        onClick={() =>
-          scrollToSection(
-            item
-              .toLowerCase()
-              .replace(' ', '-')
-              .replace('’', '')
-              .replace('faq’s', 'faq')
-          )
-        }
-      >
-        {item}
-      </button>
-    ))}
-  </div>
+        <div className="footer-column">
+          {footerLinksTwo.map((item) => (
+            <button key={item.id} type="button" onClick={() => scrollToSection(item.id)}>
+              {item.label}
+            </button>
+          ))}
+        </div>
 
-  <div className="footer-contact">
-    <h3>Contact</h3>
+        <div className="footer-contact">
+          <h3>Contact</h3>
 
-    <p>
-      <strong>Location:</strong>
-      917 E Silver Springs Blvd
-      <span>Ocala, FL 34470</span>
-    </p>
+          <p>
+            <strong>Location:</strong>
+            917 E Silver Springs Blvd
+            <span>Ocala, FL 34470</span>
+          </p>
 
-    <p>
-      <strong>Phone:</strong>
-      <a href="tel:3522448368">352-244-8368</a>
-    </p>
+          <p>
+            <strong>Phone:</strong>
+            <a href="tel:3522448368">352-244-8368</a>
+          </p>
 
-    <p>
-      <a href="mailto:ashley@1890teahouse.com">
-        ashley@1890teahouse.com
-      </a>
-    </p>
+          <p>
+            <a href="mailto:ashley@1890teahouse.com">
+              ashley@1890teahouse.com
+            </a>
+          </p>
 
-    <div className="socials">
-      <span>f</span>
-      <span>◎</span>
-      <span>✹</span>
-      <span>♪</span>
-    </div>
-  </div>
-</footer>
+          <div className="socials" aria-label="Social links">
+            <span>f</span>
+            <span>◎</span>
+            <span>✹</span>
+            <span>♪</span>
+          </div>
+        </div>
+      </footer>
     </main>
   );
 }
