@@ -2,9 +2,38 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>client</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#14130f" />
+    <meta
+      name="description"
+      content="Visit 1890 Tea House in downtown Ocala for curated teas, artful bites, private tea rooms, catering, and memorable gatherings."
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="1890 Tea House | Tea Room, Restaurant & Catering" />
+    <meta
+      property="og:description"
+      content="A beautiful reason to linger in downtown Ocala: curated teas, artful bites, private rooms, and gracious gatherings."
+    />
+    <meta property="og:url" content="https://diamonddevelopmentteam.github.io/teaHouse/" />
+    <meta property="og:image" content="https://diamonddevelopmentteam.github.io/teaHouse/og.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="1890 Tea House | Downtown Ocala" />
+    <meta
+      name="twitter:description"
+      content="Curated teas, artful bites, private rooms, and memorable gatherings in downtown Ocala."
+    />
+    <meta name="twitter:image" content="https://diamonddevelopmentteam.github.io/teaHouse/og.png" />
+    <link rel="icon" type="image/png" href="%BASE_URL%favicon.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <title>1890 Tea House | Tea Room, Restaurant & Catering</title>
+    <script>
+      (function (location) {
+        var redirect = new URLSearchParams(location.search).get('redirect');
+        if (!redirect) return;
+        window.history.replaceState(null, '', redirect + location.hash);
+      })(window.location);
+    </script>
   </head>
   <body>
     <div id="root"></div>

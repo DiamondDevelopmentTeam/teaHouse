@@ -1,0 +1,16 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>1890 Tea House</title>
+    <script>
+      (function (location) {
+        var base = '/teaHouse/';
+        var destination = location.pathname + location.search;
+        location.replace(base + '?redirect=' + encodeURIComponent(destination) + location.hash);
+      })(window.location);
+    </script>
+  </head>
+  <body></body>
+</html>
