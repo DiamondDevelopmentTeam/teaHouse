@@ -1,51 +1,34 @@
 import { useEffect, useRef, useState } from 'react';
+import { Link, NavLink } from 'react-router-dom';
 import './App.css';
+import { business, navigation } from './data/business.js';
+import { Meta } from './Pages.jsx';
 
 import building from './assets/images/building.webp';
-import charcuterieBoard from './assets/images/charcuterie-board.webp';
-import charcuterieCloseup from './assets/images/charcuterie-closeup.webp';
 import cupOfFruits from './assets/images/cupOfFruits.jpg';
 import diamondSuites from './assets/images/DiamondSuitesDownTownOcala.webp';
 import tableOfTeaHouse from './assets/images/tableOfTeaHouse.jpg';
 import teaHouseBanner from './assets/images/teaHouseBanner.webp';
 import teaHouseLogo from './assets/images/TeaHouseLogo.webp';
-import teaSandwiches from './assets/images/tea-sandwiches.webp';
 import teaService from './assets/images/tea-service.webp';
 import teaTime from './assets/images/teaTime.jpg';
 
-const reservationLink =
-  'https://tables.toasttab.com/restaurants/d470b089-02bc-4930-8828-ada15babda58/findTime';
-const applicationLink = 'https://1890teahouse.com/server-application/';
-const menuLink = 'https://1890teahouse.com/menus/';
-const largePartyLink =
-  'mailto:ashley@1890teahouse.com?subject=Large%20party%20or%20event%20inquiry';
-const directionsLink =
-  'https://www.google.com/maps/search/?api=1&query=1890+Tea+House+917+E+Silver+Springs+Blvd+Ocala+FL+34470';
+const reservationLink = business.reservationUrl;
+const menuLink = '/menus';
+const largePartyLink = '/reservations#large-party';
+const directionsLink = business.directionsUrl;
 
 const primaryNav = [
-  { label: 'About', href: '#about' },
-  { label: 'Menus', href: '#menus' },
-  { label: 'Tea Rooms', href: '#tea-rooms' },
-  { label: 'Gallery', href: '#gallery' },
-  { label: 'Visit', href: '#contact' },
+  { label: 'About', to: '/about' },
+  { label: 'Menus', to: '/menus' },
+  { label: 'Tea Rooms', to: '/tea-rooms' },
+  { label: 'Visit', to: '/contact' },
 ];
 
-const fullNav = [
-  { label: 'Home', href: '#home' },
-  { label: 'About', href: '#about' },
-  { label: 'Menus', href: '#menus' },
-  { label: 'Events', href: '#events' },
-  { label: 'Reservations', href: reservationLink, external: true },
-  { label: 'Tea Rooms', href: '#tea-rooms' },
-  { label: 'News', href: '#news' },
-  { label: 'Gallery', href: '#gallery' },
-  { label: 'FAQ’s', href: '#faq' },
-  { label: 'Blog', href: '#journal' },
-  { label: 'Contact', href: '#contact' },
-];
+const fullNav = [{ label: 'Home', to: '/' }, ...navigation];
 
 const allDayFavorites = [
-  { name: 'Cucumber Sando', price: '$7' },
+  { name: 'Cucumber Sando', price: '$9' },
   { name: 'Hummus-Stuffed Mini Peppers', price: '$7' },
   { name: 'Turkey & Cheese Croissant or Muffin', price: '$11' },
 ];
@@ -61,51 +44,6 @@ const services = [
   ['02', 'Tea sandwiches & bites', 'Fresh, elegant plates for a light lunch or a leisurely afternoon.'],
   ['03', 'Charcuterie', 'Signature cups and boards sized for solo visits or shared tables.'],
   ['04', 'Pastries & desserts', 'A sweet finish, prepared with a little ceremony.'],
-];
-
-const galleryItems = [
-  {
-    src: teaTime,
-    alt: 'A private tea room with pink velvet chairs and a set tea table',
-    caption: 'Private rooms with personality',
-    width: 750,
-    height: 1000,
-  },
-  {
-    src: cupOfFruits,
-    alt: 'A 1890 Tea House charcuterie cup filled with fruit, cheese, and salami',
-    caption: 'A signature charcuterie cup',
-    width: 667,
-    height: 1000,
-  },
-  {
-    src: charcuterieCloseup,
-    alt: 'Close view of a charcuterie board with cured meats and cheeses',
-    caption: 'Artfully layered bites',
-    width: 721,
-    height: 789,
-  },
-  {
-    src: teaService,
-    alt: 'Floral teapot and cups arranged on a tea stand',
-    caption: 'A little ceremony in every pour',
-    width: 361,
-    height: 395,
-  },
-  {
-    src: charcuterieBoard,
-    alt: 'An overhead charcuterie board with cheese, fruit, crackers, and cured meats',
-    caption: 'A board for the whole table',
-    width: 361,
-    height: 395,
-  },
-  {
-    src: teaSandwiches,
-    alt: 'A plate of classic tea sandwiches beside a teapot and cup',
-    caption: 'Classic tea sandwiches',
-    width: 376,
-    height: 265,
-  },
 ];
 
 const faqs = [
@@ -136,41 +74,24 @@ const faqs = [
   },
 ];
 
-const socialLinks = [
-  {
-    label: 'Instagram',
-    href: 'https://www.instagram.com/1890teahouse/',
-  },
-  {
-    label: 'Facebook',
-    href: 'https://www.facebook.com/profile.php?id=61582592901231',
-  },
-  {
-    label: 'TikTok',
-    href: 'https://www.tiktok.com/@1890.tea.house',
-  },
-  {
-    label: 'Yelp',
-    href: 'https://www.yelp.com/biz/1890-tea-house-ocala?osq=1890+Tea+House',
-  },
-];
+const socialLinks = business.socials;
 
 function BrandMark({ compact = false, onClick }) {
   return (
-    <a
+    <Link
       className={`brand-mark ${compact ? 'brand-mark--compact' : ''}`}
-      href="#home"
+      to="/"
       onClick={onClick}
       aria-label="1890 Tea House home"
     >
       <img src={teaHouseLogo} alt="1890 Tea House" width="820" height="402" />
-    </a>
+    </Link>
   );
 }
 
-function Arrow({ direction = 'right' }) {
+function Arrow() {
   return (
-    <span className={`arrow arrow--${direction}`} aria-hidden="true">
+    <span className="arrow" aria-hidden="true">
       <span />
     </span>
   );
@@ -179,7 +100,6 @@ function Arrow({ direction = 'right' }) {
 function App() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
-  const [galleryIndex, setGalleryIndex] = useState(0);
   const menuCloseRef = useRef(null);
 
   useEffect(() => {
@@ -249,19 +169,14 @@ function App() {
   }, [menuOpen]);
 
   const closeMenu = () => setMenuOpen(false);
-  const changeGallery = (direction) => {
-    setGalleryIndex((current) => {
-      const next = current + direction;
-      if (next < 0) return galleryItems.length - 1;
-      if (next >= galleryItems.length) return 0;
-      return next;
-    });
-  };
-
-  const activeGalleryItem = galleryItems[galleryIndex];
-
   return (
     <div className="site-shell">
+      <Meta
+        title="1890 Tea House | Tea Room, Restaurant & Catering"
+        description="Visit 1890 Tea House in downtown Ocala for curated teas, artful bites, private Tea Rooms, catering, and memorable gatherings."
+        path="/"
+        image={teaHouseBanner}
+      />
       <a className="skip-link" href="#main-content">
         Skip to content
       </a>
@@ -272,22 +187,23 @@ function App() {
 
           <nav className="primary-nav" aria-label="Primary navigation">
             {primaryNav.map((item) => (
-              <a key={item.href} href={item.href}>
+              <NavLink key={item.to} to={item.to}>
                 {item.label}
-              </a>
+              </NavLink>
             ))}
           </nav>
 
           <div className="header-actions">
-            <a className="header-reserve" href={reservationLink} target="_blank" rel="noreferrer">
+            <Link className="header-reserve" to="/reservations">
               Reserve
-            </a>
+            </Link>
             <button
               className="menu-toggle"
               type="button"
               onClick={() => setMenuOpen((open) => !open)}
               aria-expanded={menuOpen}
               aria-controls="site-menu"
+              aria-label="Open site menu"
             >
               <span>Menu</span>
               <span className="menu-toggle-lines" aria-hidden="true">
@@ -318,22 +234,16 @@ function App() {
           <p className="eyebrow">Explore 1890</p>
           <nav aria-label="Full navigation">
             {fullNav.map((item, index) => (
-              <a
-                key={item.label}
-                href={item.href}
-                target={item.external ? '_blank' : undefined}
-                rel={item.external ? 'noreferrer' : undefined}
-                onClick={closeMenu}
-              >
+              <NavLink key={item.label} to={item.to} onClick={closeMenu}>
                 <span>{String(index + 1).padStart(2, '0')}</span>
                 {item.label}
-              </a>
+              </NavLink>
             ))}
           </nav>
 
           <div className="menu-panel-details">
-            <p>917 E Silver Springs Blvd<br />Ocala, FL 34470</p>
-            <p>Wednesday–Sunday<br /><a href="tel:3522448368">352-244-8368</a></p>
+            <p>{business.address.street}<br />{business.address.locality}, {business.address.region} {business.address.postalCode}</p>
+            <p>Wednesday–Sunday<br /><a href={business.phoneHref}>{business.phone}</a></p>
           </div>
         </div>
       </div>
@@ -468,9 +378,9 @@ function App() {
               </article>
 
               <p className="menu-note">Selections and pricing may change with the season.</p>
-              <a className="button button--outline-light" href={menuLink} target="_blank" rel="noreferrer">
+              <Link className="button button--outline-light" to={menuLink}>
                 View all menus <Arrow />
-              </a>
+              </Link>
             </div>
 
             <figure className="menu-image image-reveal" data-reveal>
@@ -539,9 +449,9 @@ function App() {
               <a className="button button--ink" href={reservationLink} target="_blank" rel="noreferrer">
                 Reserve for 1–11 guests <Arrow />
               </a>
-              <a className="text-link" href={largePartyLink}>
+              <Link className="text-link" to={largePartyLink}>
                 Planning for 12+? <Arrow />
-              </a>
+              </Link>
             </div>
           </div>
         </section>
@@ -576,9 +486,9 @@ function App() {
               </article>
             </div>
             <div className="events-actions">
-              <a className="button button--gold" href={largePartyLink}>
+              <Link className="button button--gold" to={largePartyLink}>
                 Start planning <Arrow />
-              </a>
+              </Link>
               <a
                 className="text-link text-link--light"
                 href="https://www.facebook.com/profile.php?id=61582592901231"
@@ -587,64 +497,6 @@ function App() {
               >
                 See public event news <Arrow />
               </a>
-            </div>
-          </div>
-        </section>
-
-        <section id="gallery" className="gallery section-pad" aria-labelledby="gallery-title">
-          <div className="gallery-heading" data-reveal>
-            <div>
-              <p className="eyebrow">Inside 1890</p>
-              <h2 id="gallery-title">A look around.</h2>
-            </div>
-            <div className="gallery-controls">
-              <button type="button" onClick={() => changeGallery(-1)} aria-label="Previous gallery image">
-                <Arrow direction="left" />
-              </button>
-              <span aria-live="polite">
-                {String(galleryIndex + 1).padStart(2, '0')} / {String(galleryItems.length).padStart(2, '0')}
-              </span>
-              <button type="button" onClick={() => changeGallery(1)} aria-label="Next gallery image">
-                <Arrow />
-              </button>
-            </div>
-          </div>
-
-          <div className="gallery-stage" data-reveal>
-            <figure className="gallery-feature">
-              <img
-                key={activeGalleryItem.src}
-                src={activeGalleryItem.src}
-                alt={activeGalleryItem.alt}
-                width={activeGalleryItem.width}
-                height={activeGalleryItem.height}
-                loading="lazy"
-                decoding="async"
-              />
-              <figcaption>{activeGalleryItem.caption}</figcaption>
-            </figure>
-
-            <div className="gallery-thumbs" aria-label="Choose a gallery image">
-              {galleryItems.map((item, index) => (
-                <button
-                  key={item.src}
-                  className={index === galleryIndex ? 'is-active' : ''}
-                  type="button"
-                  onClick={() => setGalleryIndex(index)}
-                  aria-label={`Show ${item.caption}`}
-                  aria-pressed={index === galleryIndex}
-                >
-                  <img
-                    src={item.src}
-                    alt=""
-                    width={item.width}
-                    height={item.height}
-                    loading="lazy"
-                    decoding="async"
-                  />
-                  <span>{String(index + 1).padStart(2, '0')}</span>
-                </button>
-              ))}
             </div>
           </div>
         </section>
@@ -690,24 +542,16 @@ function App() {
               <p className="eyebrow">From the blog</p>
               <h3>Stories steeped in tradition.</h3>
             </div>
-            <a
-              href="https://1890teahouse.com/why-tea-houses-are-having-a-moment-and-why-it-makes-perfect-sense/"
-              target="_blank"
-              rel="noreferrer"
-            >
+            <Link to="/journal/why-tea-houses-are-having-a-moment-and-why-it-makes-perfect-sense">
               <span>June 29, 2026</span>
               <strong>Why Tea Houses Are Having a Moment</strong>
               <Arrow />
-            </a>
-            <a
-              href="https://1890teahouse.com/scones-clotted-cream-the-delicious-story-behind-a-timeless-pairing/"
-              target="_blank"
-              rel="noreferrer"
-            >
+            </Link>
+            <Link to="/journal/scones-clotted-cream-the-delicious-story-behind-a-timeless-pairing">
               <span>April 22, 2026</span>
               <strong>Scones & Clotted Cream: A Timeless Pairing</strong>
               <Arrow />
-            </a>
+            </Link>
           </div>
         </section>
 
@@ -716,7 +560,7 @@ function App() {
             <p className="eyebrow">Good to know</p>
             <h2 id="faq-title">Before you visit.</h2>
             <p>Need something else? Call or email the tea house and the team will be happy to help.</p>
-            <a className="text-link" href="mailto:ashley@1890teahouse.com">
+            <a className="text-link" href={`mailto:${business.email}`}>
               Ask a question <Arrow />
             </a>
           </div>
@@ -746,7 +590,7 @@ function App() {
             />
             <div className="visit-address">
               <span>Find us</span>
-              <p>917 E Silver Springs Blvd<br />Ocala, FL 34470</p>
+              <p>{business.address.street}<br />{business.address.locality}, {business.address.region} {business.address.postalCode}</p>
             </div>
           </div>
 
@@ -758,16 +602,15 @@ function App() {
               <article>
                 <span>Hours</span>
                 <dl>
-                  <div><dt>Mon–Tue</dt><dd>Closed</dd></div>
-                  <div><dt>Wed–Thu</dt><dd>11am–7pm</dd></div>
-                  <div><dt>Fri–Sat</dt><dd>11am–9pm</dd></div>
-                  <div><dt>Sunday</dt><dd>11am–4pm</dd></div>
+                  {business.hours.map(({ label, display }) => (
+                    <div key={label}><dt>{label}</dt><dd>{display}</dd></div>
+                  ))}
                 </dl>
               </article>
               <article>
                 <span>Contact</span>
-                <a href="tel:3522448368">352-244-8368</a>
-                <a href="mailto:ashley@1890teahouse.com">ashley@1890teahouse.com</a>
+                <a href={business.phoneHref}>{business.phone}</a>
+                <a href={`mailto:${business.email}`}>{business.email}</a>
               </article>
             </div>
 
@@ -775,9 +618,9 @@ function App() {
               <a className="button button--gold" href={directionsLink} target="_blank" rel="noreferrer">
                 Get directions <Arrow />
               </a>
-              <a className="button button--outline-light" href={reservationLink} target="_blank" rel="noreferrer">
+              <Link className="button button--outline-light" to="/reservations">
                 Make a reservation <Arrow />
-              </a>
+              </Link>
             </div>
           </div>
         </section>
@@ -800,33 +643,31 @@ function App() {
         <div className="footer-nav">
           <p>Explore</p>
           {fullNav.slice(0, 6).map((item) => (
-            <a
-              key={item.label}
-              href={item.href}
-              target={item.external ? '_blank' : undefined}
-              rel={item.external ? 'noreferrer' : undefined}
-            >
-              {item.label}
-            </a>
+            item.external ? (
+              <a key={item.label} href={item.href} target="_blank" rel="noreferrer">
+                {item.label}
+              </a>
+            ) : (
+              <Link key={item.label} to={item.to}>{item.label}</Link>
+            )
           ))}
         </div>
 
         <div className="footer-nav">
           <p>More</p>
           {fullNav.slice(6).map((item) => (
-            <a key={item.label} href={item.href}>{item.label}</a>
+            <Link key={item.label} to={item.to}>{item.label}</Link>
           ))}
-          <a href={applicationLink} target="_blank" rel="noreferrer">Join our team</a>
         </div>
 
         <div className="footer-visit">
           <p>Visit</p>
           <address>
-            917 E Silver Springs Blvd<br />
-            Ocala, FL 34470
+            {business.address.street}<br />
+            {business.address.locality}, {business.address.region} {business.address.postalCode}
           </address>
-          <a href="tel:3522448368">352-244-8368</a>
-          <a href="mailto:ashley@1890teahouse.com">ashley@1890teahouse.com</a>
+          <a href={business.phoneHref}>{business.phone}</a>
+          <a href={`mailto:${business.email}`}>{business.email}</a>
           <div className="footer-socials" aria-label="Social media">
             {socialLinks.map((item) => (
               <a key={item.label} href={item.href} target="_blank" rel="noreferrer">

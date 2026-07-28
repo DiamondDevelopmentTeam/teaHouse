@@ -27,12 +27,15 @@
 html {
   scroll-behavior: smooth;
   scroll-padding-top: 5.75rem;
+  overflow-y: scroll;
+  scrollbar-gutter: stable;
   background: var(--ink);
 }
 
 body {
   margin: 0;
   min-width: 320px;
+  overflow-x: clip;
   color: var(--ink);
   background: var(--paper-light);
   font-family: var(--sans);
@@ -62,6 +65,10 @@ a {
   text-decoration: none;
 }
 
+a:visited {
+  color: inherit;
+}
+
 img {
   display: block;
   max-width: 100%;
@@ -89,7 +96,7 @@ address {
 
 :focus-visible {
   outline: 2px solid var(--gold-bright);
-  outline-offset: 5px;
+  outline-offset: 3px;
 }
 
 .site-shell {
@@ -235,6 +242,11 @@ address {
   transition: transform 220ms ease;
 }
 
+.primary-nav a.active::after,
+.primary-nav a[aria-current='page']::after {
+  transform: scaleX(1);
+}
+
 .header-actions {
   display: flex;
   align-items: center;
@@ -297,6 +309,7 @@ address {
   padding: clamp(1.4rem, 3vw, 3rem) clamp(1.4rem, 5vw, 5.5rem);
   color: var(--white);
   background: var(--ink);
+  overflow-x: hidden;
   overflow-y: auto;
   visibility: hidden;
   transform: translateY(-100%);
@@ -318,6 +331,11 @@ address {
 .menu-panel.is-open {
   visibility: visible;
   transform: translateY(0);
+}
+
+.menu-panel a.active,
+.menu-panel a[aria-current='page'] {
+  color: var(--gold-bright);
 }
 
 .menu-panel-top {
@@ -570,10 +588,6 @@ address {
   transform: rotate(-38deg);
 }
 
-.arrow--left {
-  transform: rotate(180deg);
-}
-
 .hero-facts {
   margin-top: clamp(3rem, 7vh, 5.5rem);
   padding-top: 1.4rem;
@@ -696,7 +710,6 @@ address {
 .rooms h2,
 .menu-heading h2,
 .events-copy h2,
-.gallery-heading h2,
 .notes-heading h2,
 .faq h2,
 .visit-details h2 {
@@ -1079,133 +1092,6 @@ address {
   margin-top: 0.75rem;
   color: rgba(255, 254, 249, 0.62);
   font-size: 0.78rem;
-}
-
-.gallery {
-  padding-top: clamp(6rem, 10vw, 9rem);
-  padding-bottom: clamp(6rem, 10vw, 9rem);
-  background: var(--paper-light);
-}
-
-.gallery-heading {
-  display: flex;
-  align-items: end;
-  justify-content: space-between;
-  gap: 2rem;
-}
-
-.gallery-heading h2 {
-  font-size: clamp(3.8rem, 6vw, 7rem);
-}
-
-.gallery-controls {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
-
-.gallery-controls button {
-  width: 3.2rem;
-  height: 3.2rem;
-  display: grid;
-  place-items: center;
-  color: var(--ink);
-  background: transparent;
-  border: 1px solid var(--line);
-  transition: color 180ms ease, background 180ms ease;
-}
-
-.gallery-controls > span {
-  min-width: 4rem;
-  text-align: center;
-  color: var(--muted);
-  font-size: 0.64rem;
-  font-weight: 700;
-  letter-spacing: 0.1em;
-}
-
-.gallery-stage {
-  margin-top: 3.2rem;
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(10rem, 15rem);
-  gap: 1rem;
-}
-
-.gallery-feature {
-  position: relative;
-  height: clamp(31rem, 57vw, 47rem);
-  overflow: hidden;
-  background: var(--ink-soft);
-}
-
-.gallery-feature img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  animation: galleryIn 560ms ease both;
-}
-
-.gallery-feature figcaption {
-  position: absolute;
-  left: 0;
-  bottom: 0;
-  min-width: min(24rem, 80%);
-  padding: 1rem 1.4rem;
-  color: var(--white);
-  background: var(--pink-dark);
-  font-family: var(--serif);
-  font-size: 1.25rem;
-}
-
-.gallery-thumbs {
-  display: grid;
-  grid-template-rows: repeat(6, minmax(0, 1fr));
-  gap: 0.55rem;
-}
-
-.gallery-thumbs button {
-  position: relative;
-  min-height: 0;
-  padding: 0;
-  overflow: hidden;
-  background: var(--ink);
-  border: 0;
-  opacity: 0.58;
-  transition: opacity 180ms ease;
-}
-
-.gallery-thumbs button::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border: 3px solid transparent;
-  transition: border-color 180ms ease;
-}
-
-.gallery-thumbs button.is-active {
-  opacity: 1;
-}
-
-.gallery-thumbs button.is-active::after {
-  border-color: var(--gold-bright);
-}
-
-.gallery-thumbs img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: transform 400ms ease;
-}
-
-.gallery-thumbs span {
-  position: absolute;
-  left: 0.4rem;
-  bottom: 0.3rem;
-  z-index: 1;
-  color: var(--white);
-  font-size: 0.55rem;
-  font-weight: 700;
-  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.8);
 }
 
 .notes {
@@ -1647,17 +1533,6 @@ address {
   }
 }
 
-@keyframes galleryIn {
-  from {
-    opacity: 0;
-    transform: scale(1.035);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-
 @keyframes lineBreathe {
   0%,
   100% { transform: scaleY(0.58); transform-origin: top; }
@@ -1699,11 +1574,6 @@ address {
     transform: translateX(0.25rem);
   }
 
-  .text-link:hover .arrow--left,
-  .gallery-controls button:hover .arrow--left {
-    transform: rotate(180deg) translateX(0.25rem);
-  }
-
   .arrow {
     transition: transform 180ms ease;
   }
@@ -1717,7 +1587,6 @@ address {
   }
 
   .menu-panel nav a:hover {
-    padding-left: 0.4rem;
     color: var(--gold-bright);
   }
 
@@ -1738,19 +1607,6 @@ address {
   .service-ledger article:hover > span,
   .service-ledger article:hover p {
     color: var(--ink);
-  }
-
-  .gallery-controls button:hover {
-    color: var(--white);
-    background: var(--ink);
-  }
-
-  .gallery-thumbs button:hover {
-    opacity: 1;
-  }
-
-  .gallery-thumbs button:hover img {
-    transform: scale(1.055);
   }
 
   .journal > a:hover {
@@ -1921,16 +1777,6 @@ address {
     max-width: 44rem;
   }
 
-  .gallery-stage {
-    grid-template-columns: 1fr;
-  }
-
-  .gallery-thumbs {
-    height: 7rem;
-    grid-template-columns: repeat(6, 1fr);
-    grid-template-rows: 1fr;
-  }
-
   .notes-grid {
     grid-template-columns: 1fr;
   }
@@ -2060,7 +1906,6 @@ address {
   .rooms h2,
   .menu-heading h2,
   .events-copy h2,
-  .gallery-heading h2,
   .notes-heading h2,
   .faq h2,
   .visit-details h2 {
@@ -2142,26 +1987,6 @@ address {
 
   .events-image {
     min-height: 110vw;
-  }
-
-  .gallery-heading {
-    align-items: flex-start;
-    flex-direction: column;
-  }
-
-  .gallery-feature {
-    height: 110vw;
-    max-height: 35rem;
-  }
-
-  .gallery-feature figcaption {
-    min-width: 85%;
-    font-size: 1rem;
-  }
-
-  .gallery-thumbs {
-    height: 5rem;
-    gap: 0.3rem;
   }
 
   .press-feature {

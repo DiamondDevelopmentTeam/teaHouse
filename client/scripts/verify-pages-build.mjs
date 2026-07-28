@@ -22,20 +22,16 @@ if (!indexHtml.includes(`${expectedBase}assets/`)) {
   fail(`built assets do not use the expected base path ${expectedBase}`);
 }
 
-if (!indexHtml.includes(`${expectedBase}favicon.png`)) {
-  fail('the favicon is not using the GitHub Pages base path');
-}
-
-if (!indexHtml.includes('https://diamonddevelopmentteam.github.io/teaHouse/og.png')) {
-  fail('the social preview image does not use an absolute GitHub Pages URL');
-}
-
-if (!existsSync(join(distRoot, 'og.png'))) {
-  fail('the social preview image is missing');
+if (!indexHtml.includes("name=\"theme-color\"")) {
+  fail('theme color metadata is missing');
 }
 
 if (!fallbackHtml.includes(`var base = '${expectedBase}'`)) {
   fail('404.html does not redirect through the repository base path');
+}
+
+if (!indexHtml.includes("get('redirect')")) {
+  fail('index.html does not restore redirected client routes');
 }
 
 const localAssets = [
@@ -51,4 +47,4 @@ for (const match of localAssets) {
   }
 }
 
-console.log('GitHub Pages build verified: base path, assets, router fallback, and favicon are present.');
+console.log('GitHub Pages build verified: base path, assets, router fallback, and metadata are present.');
