@@ -550,6 +550,19 @@
   justify-self: start;
 }
 
+.page-form-honeypot {
+  position: absolute;
+  left: -10000px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+.page-form-recaptcha {
+  grid-column: 1 / -1;
+  min-height: 78px;
+}
+
 .page-form-status {
   align-self: center;
   margin: 0;
@@ -683,6 +696,17 @@
 
   .page-faq-list details p {
     margin-left: 3.5rem;
+  }
+}
+
+@media (max-width: 380px) {
+  .page-form-recaptcha > div {
+    transform: scale(0.86);
+    transform-origin: left top;
+  }
+
+  .page-form-recaptcha {
+    min-height: 68px;
   }
 }
 

@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
+import ReCAPTCHA from 'react-google-recaptcha';
 import PageShell from './components/PageShell.jsx';
 import OptimizedImage from './components/OptimizedImage.jsx';
 import { business, businessAddress } from './data/business.js';
@@ -530,28 +531,107 @@ export function GalleryPage() {
 }
 
 function ContactForm() {
+  const recaptchaRef = useRef(null);
+  const apiEnabled = inquiryService.isApiConfigured();
+  const recaptchaSiteKey = (import.meta.env.VITE_RECAPTCHA_SITE_KEY || '').trim();
   const [status, setStatus] = useState({ type: '', message: '' });
+  const [recaptchaToken, setRecaptchaToken] = useState('');
+  const configurationMissing = apiEnabled && !recaptchaSiteKey;
+
+  const resetRecaptcha = () => {
+    recaptchaRef.current?.reset();
+    setRecaptchaToken('');
+  };
+
+  const handleRecaptchaExpired = () => {
+    resetRecaptcha();
+    setStatus({ type: 'error', message: 'Verification expired. Please complete it again.' });
+  };
+
+  const handleRecaptchaError = () => {
+    resetRecaptcha();
+    setStatus({ type: 'error', message: 'Verification could not load. Please try again.' });
+  };
+
   const handleSubmit = async (event) => {
     event.preventDefault();
     const form = event.currentTarget;
+
+    if (configurationMissing) {
+      setStatus({ type: 'error', message: 'The contact form is temporarily unavailable. Please email or call us.' });
+      return;
+    }
+
+    if (apiEnabled && !recaptchaToken) {
+      setStatus({ type: 'error', message: 'Please complete the verification before sending.' });
+      return;
+    }
+
     setStatus({ type: 'pending', message: 'Preparing your message…' });
     try {
-      const result = await inquiryService.submitContact(Object.fromEntries(new FormData(form)));
+      const payload = Object.fromEntries(new FormData(form));
+      if (apiEnabled) payload.recaptchaToken = recaptchaToken;
+      const result = await inquiryService.submitContact(payload);
       if (result.mode === 'mailto') window.location.href = result.href;
-      setStatus({ type: 'success', message: result.mode === 'api' ? 'Thank you. Your message has been sent.' : 'Your email app has been opened.' });
+      setStatus({
+        type: 'success',
+        message: result.mode === 'api'
+          ? (typeof result.data.message === 'string'
+            ? result.data.message
+            : 'Thank you. Your message has been sent.')
+          : 'Your email app has been opened.',
+      });
       form.reset();
+      if (apiEnabled) resetRecaptcha();
     } catch (error) {
-      setStatus({ type: 'error', message: error.message });
+      if (apiEnabled) resetRecaptcha();
+      setStatus({
+        type: 'error',
+        message: error instanceof Error
+          ? error.message
+          : 'We could not send your request. Please call or email the Tea House.',
+      });
     }
   };
   return <form className="page-form" onSubmit={handleSubmit}>
-    <label>Name<input name="name" autoComplete="name" required /></label>
-    <label>Email<input type="email" name="email" autoComplete="email" required /></label>
-    <label>Phone<input type="tel" name="phone" autoComplete="tel" /></label>
+    <label>Name<input name="name" autoComplete="name" maxLength="120" required /></label>
+    <label>Email<input type="email" name="email" autoComplete="email" maxLength="254" required /></label>
+    <label>Phone<input type="tel" name="phone" autoComplete="tel" maxLength="40" /></label>
     <label>What can we help with?<select name="topic" defaultValue="General question"><option>General question</option><option>Large party</option><option>Private event</option><option>Catering</option><option>Media inquiry</option></select></label>
-    <label className="page-form-wide">Message<textarea name="message" rows="6" required /></label>
-    <button className="page-button" type="submit" disabled={status.type === 'pending'}>Send inquiry</button>
-    <p className={`page-form-status is-${status.type}`} aria-live="polite">{status.message}</p>
+    <label className="page-form-wide">Message<textarea name="message" rows="6" maxLength="5000" required /></label>
+    <div className="page-form-honeypot" aria-hidden="true">
+      <label>Website<input name="website" type="text" tabIndex="-1" autoComplete="off" /></label>
+    </div>
+    {apiEnabled && recaptchaSiteKey ? (
+      <div className="page-form-recaptcha">
+        <ReCAPTCHA
+          ref={recaptchaRef}
+          sitekey={recaptchaSiteKey}
+          onChange={(token) => {
+            setRecaptchaToken(token || '');
+            if (token) setStatus({ type: '', message: '' });
+          }}
+          onExpired={handleRecaptchaExpired}
+          onErrored={handleRecaptchaError}
+        />
+      </div>
+    ) : null}
+    <button
+      className="page-button"
+      type="submit"
+      disabled={status.type === 'pending' || configurationMissing || (apiEnabled && !recaptchaToken)}
+    >
+      {status.type === 'pending' ? 'Sending…' : 'Send inquiry'}
+    </button>
+    <p
+      className={`page-form-status is-${configurationMissing ? 'error' : status.type}`}
+      role={status.type === 'error' || configurationMissing ? 'alert' : 'status'}
+      aria-live="polite"
+    >
+      {configurationMissing
+        ? 'The contact form is temporarily unavailable. Please email or call us.'
+        : status.message}
+    </p>
   </form>;
 }
 

@@ -17,6 +17,8 @@ concurrency:
 
 env:
   VITE_BASE_PATH: /teaHouse/
+  VITE_CONTENT_API_BASE_URL: ${{ vars.VITE_CONTENT_API_BASE_URL }}
+  VITE_RECAPTCHA_SITE_KEY: ${{ vars.VITE_RECAPTCHA_SITE_KEY }}
 
 jobs:
   build:

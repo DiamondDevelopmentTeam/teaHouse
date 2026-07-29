@@ -43,6 +43,44 @@ The API should return the same shapes as the corresponding files in `client/src/
 
 Validate and sanitize every payload on the server. Use a restricted write-only workflow for inquiries and never return private list fields to the public client. Without an API URL, contact and large-party forms create a pre-addressed email instead.
 
+## Secure contact email function
+
+The `api` project implements `POST /api/inquiries/contact` as an Azure Function. It validates and normalizes the request, checks the reCAPTCHA token and hostname with Google, and then uses app-only Microsoft Graph `Mail.Send` authentication to send from the configured mailbox. The public request cannot select the sender, recipient, or Graph endpoint.
+
+### Local development
+
+1. Copy `api/local.settings.example.json` to `api/local.settings.json`.
+2. Fill in the local file manually and never commit it.
+3. Install and run [Azure Functions Core Tools](https://learn.microsoft.com/azure/azure-functions/functions-run-local), then start the API on port 7071:
+
+   ```sh
+   cd api
+   npm ci
+   npm start
+   ```
+
+4. Create `client/.env.local` containing public browser configuration only:
+
+   ```env
+   VITE_CONTENT_API_BASE_URL=http://localhost:7071/api
+   VITE_RECAPTCHA_SITE_KEY=
+   ```
+
+5. Start the frontend with `npm run dev` from `client`.
+
+`api/local.settings.json` is for local development only. Do not publish it or put its values in frontend variables, logs, tests, documentation, or GitHub Pages.
+
+### Azure deployment
+
+1. Create or select a Microsoft Entra app registration and grant Microsoft Graph `Mail.Send` application permission with administrator consent.
+2. Add `AZURE_TENANT_ID`, `AZURE_CLIENT_ID`, `AZURE_CLIENT_SECRET`, `GRAPH_SENDER_EMAIL`, `INQUIRY_RECIPIENT_EMAIL`, `RECAPTCHA_SECRET_KEY`, `ALLOWED_ORIGINS`, and `ALLOWED_RECAPTCHA_HOSTNAMES` to the Function App Configuration / environment variables.
+3. Add `https://diamonddevelopmentteam.github.io` to the Function App CORS settings. Origins do not include a path, so do not add `/teaHouse/`.
+4. Register the production hostname with the reCAPTCHA v2 checkbox configuration.
+5. Set the public GitHub repository variables `VITE_CONTENT_API_BASE_URL` and `VITE_RECAPTCHA_SITE_KEY` for the Pages build.
+6. Deploy the `api` project separately from the static GitHub Pages site.
+
+Do not publish `local.settings.json`, place backend secrets in GitHub Pages, or use `VITE_*` variables for confidential values. The Graph `Mail.Send` application permission is powerful; restrict the app to the intended sender mailbox through the organization’s Microsoft 365 administration process as a follow-up security measure.
+
 ## Suggested Lists and libraries
 
 - `TeaHouseSettings`: address, phone, email, hours, social and reservation links

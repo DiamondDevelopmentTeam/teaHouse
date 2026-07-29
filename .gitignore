@@ -1,0 +1,8 @@
+api/local.settings.json
+api/node_modules/
+.env
+.env.local
+.env.*.local
+client/.env.local
+api/local.settings.json
+client/.env.local

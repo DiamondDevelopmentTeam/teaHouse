@@ -1,0 +1,19 @@
+{
+  "name": "tea-house-contact-api",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "main": "src/functions/*.js",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "start": "func start",
+    "test": "node --test",
+    "check": "node --check src/functions/contactInquiry.js && node --check src/lib/config.js && node --check src/lib/cors.js && node --check src/lib/graphMail.js && node --check src/lib/recaptcha.js && node --check src/lib/validation.js"
+  },
+  "dependencies": {
+    "@azure/functions": "^4.16.2",
+    "@azure/identity": "^4.13.1"
+  }
+}
