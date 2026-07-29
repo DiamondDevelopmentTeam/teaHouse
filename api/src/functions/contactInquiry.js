@@ -2,7 +2,7 @@ import { randomUUID } from 'node:crypto';
 import { app } from '@azure/functions';
 import { ConfigurationError, loadConfig } from '../lib/config.js';
 import { corsHeaders, isOriginAllowed } from '../lib/cors.js';
-import { sendInquiryEmail } from '../lib/graphMail.js';
+import { GraphMailError, sendInquiryEmail } from '../lib/graphMail.js';
 import { RecaptchaError, verifyRecaptcha } from '../lib/recaptcha.js';
 import { ValidationError, validateContactInquiry } from '../lib/validation.js';
 
@@ -116,13 +116,16 @@ export function createContactInquiryHandler({
       safeLog(context, 'log', requestId, 'sent');
       return jsonResponse(
         202,
-        { message: 'Thank you. Your message has been sent.', requestId },
+        {
+          message: 'Thank you! Your inquiry has been sent to the Tea House team.',
+          requestId,
+        },
         responseCorsHeaders,
         requestId,
       );
     } catch (error) {
       if (error instanceof ValidationError) {
-        safeLog(context, 'warn', requestId, 'validation_rejected');
+        safeLog(context, 'warn', requestId, `validation_${error.code}`);
         return jsonResponse(
           error.code === 'unsupported_content_type' ? 415 : error.code === 'body_too_large' ? 413 : 400,
           { message: 'Please check your submission and try again.', requestId },
@@ -132,7 +135,7 @@ export function createContactInquiryHandler({
       }
 
       if (error instanceof RecaptchaError) {
-        safeLog(context, 'warn', requestId, 'recaptcha_rejected');
+        safeLog(context, 'warn', requestId, `recaptcha_${error.code}`);
         return jsonResponse(
           400,
           { message: 'We could not verify your submission. Please try again.', requestId },
@@ -141,7 +144,10 @@ export function createContactInquiryHandler({
         );
       }
 
-      safeLog(context, 'error', requestId, 'delivery_failed');
+      const deliveryCode = error instanceof GraphMailError
+        ? `delivery_${error.code}`
+        : 'delivery_failed';
+      safeLog(context, 'error', requestId, deliveryCode);
       return jsonResponse(
         502,
         { message: 'We could not send your message. Please try again later.', requestId },

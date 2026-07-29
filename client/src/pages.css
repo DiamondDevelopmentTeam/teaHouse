@@ -524,8 +524,8 @@
   text-transform: uppercase;
 }
 
-.page-form label:nth-of-type(4),
-.page-form label:nth-of-type(5) {
+.page-form--large > label:nth-of-type(4),
+.page-form--large > label:nth-of-type(5) {
   grid-column: 1 / -1;
 }
 
@@ -668,10 +668,11 @@
     grid-template-columns: 1fr;
   }
 
-  .page-form label:nth-of-type(4),
-  .page-form label:nth-of-type(5) {
+  .page-form--large > label:nth-of-type(4),
+  .page-form--large > label:nth-of-type(5) {
     grid-column: auto;
   }
+
 }
 
 @media (max-width: 620px) {

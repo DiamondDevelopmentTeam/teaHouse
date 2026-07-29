@@ -9,6 +9,8 @@ const REQUIRED_SETTINGS = [
   'ALLOWED_RECAPTCHA_HOSTNAMES',
 ];
 
+export const INQUIRY_RECIPIENT_EMAIL = 'beatriz@diamondpeo.com';
+
 export class ConfigurationError extends Error {
   constructor(missingSettings) {
     super('The contact service is not configured.');
@@ -33,12 +35,22 @@ export function loadConfig(environment = process.env) {
     throw new ConfigurationError(missingSettings);
   }
 
+  const configuredRecipient = environment.INQUIRY_RECIPIENT_EMAIL.trim().toLowerCase();
+  if (configuredRecipient !== INQUIRY_RECIPIENT_EMAIL) {
+    throw new ConfigurationError(['INQUIRY_RECIPIENT_EMAIL']);
+  }
+
+  const graphSenderEmail = environment.GRAPH_SENDER_EMAIL.trim();
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(graphSenderEmail)) {
+    throw new ConfigurationError(['GRAPH_SENDER_EMAIL']);
+  }
+
   return {
     tenantId: environment.AZURE_TENANT_ID.trim(),
     clientId: environment.AZURE_CLIENT_ID.trim(),
     clientSecret: environment.AZURE_CLIENT_SECRET,
-    graphSenderEmail: environment.GRAPH_SENDER_EMAIL.trim(),
-    inquiryRecipientEmail: environment.INQUIRY_RECIPIENT_EMAIL.trim(),
+    graphSenderEmail,
+    inquiryRecipientEmail: INQUIRY_RECIPIENT_EMAIL,
     recaptchaSecretKey: environment.RECAPTCHA_SECRET_KEY,
     allowedOrigins: parseList(environment.ALLOWED_ORIGINS),
     allowedRecaptchaHostnames: parseList(environment.ALLOWED_RECAPTCHA_HOSTNAMES).map(
@@ -46,4 +58,3 @@ export function loadConfig(environment = process.env) {
     ),
   };
 }
-

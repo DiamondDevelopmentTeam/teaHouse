@@ -328,11 +328,10 @@ function LargePartyForm() {
     const payload = Object.fromEntries(formData);
     payload.preOrders = formData.getAll('preOrders');
     try {
-      const result = await inquiryService.submitLargeParty(payload);
-      if (result.mode === 'mailto') window.location.href = result.href;
+      await inquiryService.submitLargeParty(payload);
       setStatus({
         type: 'success',
-        message: result.mode === 'api' ? 'Thank you. Your request has been sent.' : 'Your email app has been opened with the request details.',
+        message: 'Thank you. Your request has been sent.',
       });
       form.reset();
     } catch (error) {
@@ -532,11 +531,13 @@ export function GalleryPage() {
 
 function ContactForm() {
   const recaptchaRef = useRef(null);
+  const submittingRef = useRef(false);
   const apiEnabled = inquiryService.isApiConfigured();
   const recaptchaSiteKey = (import.meta.env.VITE_RECAPTCHA_SITE_KEY || '').trim();
   const [status, setStatus] = useState({ type: '', message: '' });
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [recaptchaToken, setRecaptchaToken] = useState('');
-  const configurationMissing = apiEnabled && !recaptchaSiteKey;
+  const configurationMissing = !apiEnabled || !recaptchaSiteKey;
 
   const resetRecaptcha = () => {
     recaptchaRef.current?.reset();
@@ -557,52 +558,82 @@ function ContactForm() {
     event.preventDefault();
     const form = event.currentTarget;
 
+    if (submittingRef.current || isSubmitting) return;
+    if (!form.reportValidity()) return;
+
     if (configurationMissing) {
-      setStatus({ type: 'error', message: 'The contact form is temporarily unavailable. Please email or call us.' });
+      setStatus({ type: 'error', message: 'The online inquiry form is temporarily unavailable. Please try again later.' });
       return;
     }
 
-    if (apiEnabled && !recaptchaToken) {
+    if (!recaptchaToken) {
       setStatus({ type: 'error', message: 'Please complete the verification before sending.' });
       return;
     }
 
-    setStatus({ type: 'pending', message: 'Preparing your message…' });
+    const formData = new FormData(form);
+    const payload = {
+      name: String(formData.get('name') || '').trim(),
+      email: String(formData.get('email') || '').trim(),
+      phone: String(formData.get('phone') || '').trim(),
+      inquiryType: String(formData.get('inquiryType') || '').trim(),
+      preferredDate: String(formData.get('preferredDate') || '').trim(),
+      guestCount: String(formData.get('guestCount') || '').trim(),
+      message: String(formData.get('message') || '').trim(),
+      website: String(formData.get('website') || '').trim(),
+      recaptchaToken,
+    };
+
+    if (!payload.name || !payload.email || !payload.inquiryType || !payload.message) {
+      setStatus({ type: 'error', message: 'Please complete all required fields.' });
+      return;
+    }
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(payload.email)) {
+      setStatus({ type: 'error', message: 'Please enter a valid email address.' });
+      return;
+    }
+
+    submittingRef.current = true;
+    setIsSubmitting(true);
+    setStatus({ type: 'pending', message: 'Sending your inquiry…' });
+
     try {
-      const payload = Object.fromEntries(new FormData(form));
-      if (apiEnabled) payload.recaptchaToken = recaptchaToken;
       const result = await inquiryService.submitContact(payload);
-      if (result.mode === 'mailto') window.location.href = result.href;
       setStatus({
         type: 'success',
-        message: result.mode === 'api'
-          ? (typeof result.data.message === 'string'
-            ? result.data.message
-            : 'Thank you. Your message has been sent.')
-          : 'Your email app has been opened.',
+        message: typeof result.message === 'string'
+          ? result.message
+          : 'Thank you! Your inquiry has been sent to the Tea House team.',
       });
       form.reset();
-      if (apiEnabled) resetRecaptcha();
+      resetRecaptcha();
     } catch (error) {
-      if (apiEnabled) resetRecaptcha();
+      resetRecaptcha();
       setStatus({
         type: 'error',
         message: error instanceof Error
           ? error.message
-          : 'We could not send your request. Please call or email the Tea House.',
+          : 'Your inquiry could not be submitted. Please try again.',
       });
+    } finally {
+      submittingRef.current = false;
+      setIsSubmitting(false);
     }
   };
+
   return <form className="page-form" onSubmit={handleSubmit}>
     <label>Name<input name="name" autoComplete="name" maxLength="120" required /></label>
     <label>Email<input type="email" name="email" autoComplete="email" maxLength="254" required /></label>
     <label>Phone<input type="tel" name="phone" autoComplete="tel" maxLength="40" /></label>
-    <label>What can we help with?<select name="topic" defaultValue="General question"><option>General question</option><option>Large party</option><option>Private event</option><option>Catering</option><option>Media inquiry</option></select></label>
+    <label>Preferred date<input type="date" name="preferredDate" /></label>
+    <label>Guest count<input type="number" name="guestCount" min="1" max="500" inputMode="numeric" /></label>
+    <label className="page-form-wide">What can we help with?<select name="inquiryType" defaultValue="General question" required><option>General question</option><option>Large party</option><option>Private event</option><option>Catering</option><option>Media inquiry</option></select></label>
     <label className="page-form-wide">Message<textarea name="message" rows="6" maxLength="5000" required /></label>
     <div className="page-form-honeypot" aria-hidden="true">
       <label>Website<input name="website" type="text" tabIndex="-1" autoComplete="off" /></label>
     </div>
-    {apiEnabled && recaptchaSiteKey ? (
+    {!configurationMissing ? (
       <div className="page-form-recaptcha">
         <ReCAPTCHA
           ref={recaptchaRef}
@@ -619,9 +650,9 @@ function ContactForm() {
     <button
       className="page-button"
       type="submit"
-      disabled={status.type === 'pending' || configurationMissing || (apiEnabled && !recaptchaToken)}
+      disabled={isSubmitting || configurationMissing || !recaptchaToken}
     >
-      {status.type === 'pending' ? 'Sending…' : 'Send inquiry'}
+      {isSubmitting ? 'Sending…' : 'Send Inquiry'}
     </button>
     <p
       className={`page-form-status is-${configurationMissing ? 'error' : status.type}`}
@@ -629,7 +660,7 @@ function ContactForm() {
       aria-live="polite"
     >
       {configurationMissing
-        ? 'The contact form is temporarily unavailable. Please email or call us.'
+        ? 'The online inquiry form is temporarily unavailable. Please try again later.'
         : status.message}
     </p>
   </form>;

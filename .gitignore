@@ -4,5 +4,3 @@ api/node_modules/
 .env.local
 .env.*.local
 client/.env.local
-api/local.settings.json
-client/.env.local

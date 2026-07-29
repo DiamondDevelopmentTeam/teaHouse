@@ -41,11 +41,11 @@ The API should return the same shapes as the corresponding files in `client/src/
 - `POST /inquiries/large-parties`
 - `POST /inquiries/employment`
 
-Validate and sanitize every payload on the server. Use a restricted write-only workflow for inquiries and never return private list fields to the public client. Without an API URL, contact and large-party forms create a pre-addressed email instead.
+Validate and sanitize every payload on the server. Use a restricted write-only workflow for inquiries and never return private list fields to the public client. Inquiry forms require the API URL and show an inline unavailable message when it is not configured; they never open an email application.
 
 ## Secure contact email function
 
-The `api` project implements `POST /api/inquiries/contact` as an Azure Function. It validates and normalizes the request, checks the reCAPTCHA token and hostname with Google, and then uses app-only Microsoft Graph `Mail.Send` authentication to send from the configured mailbox. The public request cannot select the sender, recipient, or Graph endpoint.
+The `api` project implements `POST /api/inquiries/contact` as an Azure Function. It validates and normalizes the request, checks the reCAPTCHA token and hostname with Google, and then uses app-only Microsoft Graph `Mail.Send` authentication to send from the configured mailbox. The public request cannot select the sender, recipient, or Graph endpoint. The server enforces `INQUIRY_RECIPIENT_EMAIL=beatriz@diamondpeo.com`; `GRAPH_SENDER_EMAIL` must be the real Microsoft 365 mailbox authorized to send.
 
 ### Local development
 
@@ -73,7 +73,7 @@ The `api` project implements `POST /api/inquiries/contact` as an Azure Function.
 ### Azure deployment
 
 1. Create or select a Microsoft Entra app registration and grant Microsoft Graph `Mail.Send` application permission with administrator consent.
-2. Add `AZURE_TENANT_ID`, `AZURE_CLIENT_ID`, `AZURE_CLIENT_SECRET`, `GRAPH_SENDER_EMAIL`, `INQUIRY_RECIPIENT_EMAIL`, `RECAPTCHA_SECRET_KEY`, `ALLOWED_ORIGINS`, and `ALLOWED_RECAPTCHA_HOSTNAMES` to the Function App Configuration / environment variables.
+2. Add `AZURE_TENANT_ID`, `AZURE_CLIENT_ID`, `AZURE_CLIENT_SECRET`, `GRAPH_SENDER_EMAIL`, `INQUIRY_RECIPIENT_EMAIL=beatriz@diamondpeo.com`, `RECAPTCHA_SECRET_KEY`, `ALLOWED_ORIGINS`, and `ALLOWED_RECAPTCHA_HOSTNAMES` to the Function App Configuration / environment variables.
 3. Add `https://diamonddevelopmentteam.github.io` to the Function App CORS settings. Origins do not include a path, so do not add `/teaHouse/`.
 4. Register the production hostname with the reCAPTCHA v2 checkbox configuration.
 5. Set the public GitHub repository variables `VITE_CONTENT_API_BASE_URL` and `VITE_RECAPTCHA_SITE_KEY` for the Pages build.

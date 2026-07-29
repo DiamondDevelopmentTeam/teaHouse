@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import { loadConfig } from '../src/lib/config.js';
 import { createContactInquiryHandler } from '../src/functions/contactInquiry.js';
-import { sendInquiryEmail } from '../src/lib/graphMail.js';
+import { buildInquiryEmailContent, sendInquiryEmail } from '../src/lib/graphMail.js';
 import { RecaptchaError, verifyRecaptcha } from '../src/lib/recaptcha.js';
 import { ValidationError, validateContactInquiry } from '../src/lib/validation.js';
 
@@ -11,7 +11,7 @@ const config = Object.freeze({
   clientId: 'client-placeholder',
   clientSecret: 'secret-placeholder',
   graphSenderEmail: 'sender@example.test',
-  inquiryRecipientEmail: 'recipient@example.test',
+  inquiryRecipientEmail: 'beatriz@diamondpeo.com',
   recaptchaSecretKey: 'recaptcha-placeholder',
   allowedOrigins: ['http://localhost:5173', 'https://diamonddevelopmentteam.github.io'],
   allowedRecaptchaHostnames: ['localhost', 'diamonddevelopmentteam.github.io'],
@@ -21,7 +21,9 @@ const validBody = Object.freeze({
   name: 'Visitor Name',
   email: 'visitor@example.com',
   phone: '',
-  topic: 'General question',
+  inquiryType: 'General question',
+  preferredDate: '2026-08-15',
+  guestCount: '8',
   message: 'Could you tell me about afternoon tea?',
   recaptchaToken: 'browser-token',
   website: '',
@@ -81,14 +83,25 @@ test('an overly long message is rejected', () => {
   );
 });
 
-test('topics are trimmed but values outside the allowlist are rejected', () => {
+test('inquiry types are trimmed but values outside the allowlist are rejected', () => {
   assert.equal(
-    validateContactInquiry({ ...validBody, topic: '  General question  ' }).topic,
+    validateContactInquiry({ ...validBody, inquiryType: '  General question  ' }).inquiryType,
     'General question',
   );
   assert.throws(
-    () => validateContactInquiry({ ...validBody, topic: 'Billing' }),
-    (error) => error instanceof ValidationError && error.code === 'topic_invalid',
+    () => validateContactInquiry({ ...validBody, inquiryType: 'Billing' }),
+    (error) => error instanceof ValidationError && error.code === 'inquiryType_invalid',
+  );
+});
+
+test('preferred date and guest count are validated', () => {
+  assert.throws(
+    () => validateContactInquiry({ ...validBody, preferredDate: '2026-02-30' }),
+    (error) => error instanceof ValidationError && error.code === 'preferredDate_invalid',
+  );
+  assert.throws(
+    () => validateContactInquiry({ ...validBody, guestCount: '501' }),
+    (error) => error instanceof ValidationError && error.code === 'guestCount_invalid',
   );
 });
 
@@ -144,13 +157,17 @@ test('Graph is not called when reCAPTCHA fails', async () => {
   assert.equal(graphCalls, 0);
 });
 
-test('Graph receives a normalized plain-text payload with fixed sender and recipient', async () => {
+test('Graph receives a sanitized multipart email with fixed sender and recipient', async () => {
   let credentialArguments;
   let graphRequest;
   const inquiry = validateContactInquiry({
     ...validBody,
-    name: '  Visitor Name  ',
+    name: '  Visitor\nName  ',
     message: 'Hello\u0000 <script>alert("no")</script>',
+  });
+  const emailContent = buildInquiryEmailContent(inquiry, {
+    submittedAt: '2026-07-29T20:00:00.000Z',
+    requestId: 'request-id',
   });
 
   await sendInquiryEmail({
@@ -168,7 +185,7 @@ test('Graph receives a normalized plain-text payload with fixed sender and recip
     },
   });
 
-  const payload = JSON.parse(graphRequest.options.body);
+  const mimeMessage = Buffer.from(graphRequest.options.body, 'base64').toString('utf8');
   assert.deepEqual(credentialArguments, [
     config.tenantId,
     config.clientId,
@@ -178,15 +195,33 @@ test('Graph receives a normalized plain-text payload with fixed sender and recip
     graphRequest.url,
     'https://graph.microsoft.com/v1.0/users/sender%40example.test/sendMail',
   );
-  assert.equal(payload.message.body.contentType, 'Text');
-  assert.equal(payload.message.body.content.includes('\u0000'), false);
-  assert.match(payload.message.body.content, /Hello <script>alert\("no"\)<\/script>/);
-  assert.equal(
-    payload.message.toRecipients[0].emailAddress.address,
-    config.inquiryRecipientEmail,
-  );
-  assert.equal(payload.message.replyTo[0].emailAddress.address, validBody.email);
-  assert.equal(payload.saveToSentItems, true);
+  assert.equal(graphRequest.options.headers['Content-Type'], 'text/plain');
+  assert.match(mimeMessage, /^From: Tea House Inquiry <sender@example\.test>\r?$/m);
+  assert.match(mimeMessage, /^To: beatriz@diamondpeo\.com\r?$/m);
+  assert.match(mimeMessage, /^Reply-To: .+ <visitor@example\.com>\r?$/m);
+  assert.match(mimeMessage, /Content-Type: multipart\/alternative/);
+  assert.match(mimeMessage, /Content-Type: text\/plain; charset="UTF-8"/);
+  assert.match(mimeMessage, /Content-Type: text\/html; charset="UTF-8"/);
+  assert.equal(inquiry.name, 'Visitor Name');
+  assert.equal(emailContent.plainText.includes('\u0000'), false);
+  assert.match(emailContent.plainText, /Website source: 1890 Tea House website contact form/);
+  assert.match(emailContent.html, /Hello &lt;script&gt;alert\(&quot;no&quot;\)&lt;\/script&gt;/);
+  assert.doesNotMatch(emailContent.html, /<script>/);
+});
+
+test('configuration enforces the server-side inquiry recipient', () => {
+  const environment = {
+    AZURE_TENANT_ID: 'tenant-placeholder',
+    AZURE_CLIENT_ID: 'client-placeholder',
+    AZURE_CLIENT_SECRET: 'secret-placeholder',
+    GRAPH_SENDER_EMAIL: 'sender@example.test',
+    INQUIRY_RECIPIENT_EMAIL: 'different@example.test',
+    RECAPTCHA_SECRET_KEY: 'recaptcha-placeholder',
+    ALLOWED_ORIGINS: 'http://localhost:5173',
+    ALLOWED_RECAPTCHA_HOSTNAMES: 'localhost',
+  };
+
+  assert.throws(() => loadConfig(environment), /contact service is not configured/i);
 });
 
 test('a disallowed CORS origin receives no allow-origin header', async () => {
