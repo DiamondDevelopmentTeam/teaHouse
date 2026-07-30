@@ -1,6 +1,10 @@
 import { randomUUID } from 'node:crypto';
 import { app } from '@azure/functions';
-import { ConfigurationError, loadConfig } from '../lib/config.js';
+import {
+  ConfigurationError,
+  DEFAULT_ALLOWED_ORIGINS,
+  loadConfig,
+} from '../lib/config.js';
 import { corsHeaders, isOriginAllowed } from '../lib/cors.js';
 import { GraphMailError, sendInquiryEmail } from '../lib/graphMail.js';
 import { RecaptchaError, verifyRecaptcha } from '../lib/recaptcha.js';
@@ -20,9 +24,18 @@ function jsonResponse(status, body, headers, requestId) {
   };
 }
 
-function safeLog(context, level, requestId, code) {
+function safeLog(context, level, requestId, code, detail = '') {
   const logger = typeof context?.[level] === 'function' ? context[level].bind(context) : null;
-  logger?.(`[${requestId}] Contact inquiry ${code}.`);
+  logger?.(`[${requestId}] Contact inquiry ${code}${detail ? ` (${detail})` : ''}.`);
+}
+
+function errorBody(code, message, requestId) {
+  return {
+    ok: false,
+    error: { code, message },
+    message,
+    requestId,
+  };
 }
 
 async function readJsonBody(request) {
@@ -66,11 +79,19 @@ export function createContactInquiryHandler({
       const code = error instanceof ConfigurationError
         ? 'configuration_error'
         : 'configuration_load_failed';
-      safeLog(context, 'error', requestId, code);
+      const missing = error instanceof ConfigurationError
+        ? `settings=${error.missingSettings.join(',')}`
+        : '';
+      safeLog(context, 'error', requestId, code, missing);
+      const responseCorsHeaders = corsHeaders(origin, DEFAULT_ALLOWED_ORIGINS);
       return jsonResponse(
         503,
-        { message: 'The contact service is temporarily unavailable.' },
-        { Vary: 'Origin' },
+        errorBody(
+          'service_unavailable',
+          'The contact service is temporarily unavailable.',
+          requestId,
+        ),
+        responseCorsHeaders,
         requestId,
       );
     }
@@ -80,7 +101,7 @@ export function createContactInquiryHandler({
       safeLog(context, 'warn', requestId, 'origin_rejected');
       return jsonResponse(
         403,
-        { message: 'This request is not allowed.' },
+        errorBody('origin_not_allowed', 'This request is not allowed.', requestId),
         responseCorsHeaders,
         requestId,
       );
@@ -100,11 +121,14 @@ export function createContactInquiryHandler({
       const body = await readJsonBody(request);
       const inquiry = validateContactInquiry(body);
 
-      await verifyRecaptchaFn({
-        token: inquiry.recaptchaToken,
-        secret: config.recaptchaSecretKey,
-        allowedHostnames: config.allowedRecaptchaHostnames,
-      });
+      if (config.recaptchaSecretKey) {
+        if (!inquiry.recaptchaToken) throw new RecaptchaError('missing');
+        await verifyRecaptchaFn({
+          token: inquiry.recaptchaToken,
+          secret: config.recaptchaSecretKey,
+          allowedHostnames: config.allowedRecaptchaHostnames,
+        });
+      }
 
       await sendInquiryEmailFn({
         inquiry,
@@ -117,6 +141,7 @@ export function createContactInquiryHandler({
       return jsonResponse(
         202,
         {
+          ok: true,
           message: 'Thank you! Your inquiry has been sent to the Tea House team.',
           requestId,
         },
@@ -128,7 +153,11 @@ export function createContactInquiryHandler({
         safeLog(context, 'warn', requestId, `validation_${error.code}`);
         return jsonResponse(
           error.code === 'unsupported_content_type' ? 415 : error.code === 'body_too_large' ? 413 : 400,
-          { message: 'Please check your submission and try again.', requestId },
+          errorBody(
+            'validation_failed',
+            'Please check your submission and try again.',
+            requestId,
+          ),
           responseCorsHeaders,
           requestId,
         );
@@ -138,7 +167,11 @@ export function createContactInquiryHandler({
         safeLog(context, 'warn', requestId, `recaptcha_${error.code}`);
         return jsonResponse(
           400,
-          { message: 'We could not verify your submission. Please try again.', requestId },
+          errorBody(
+            'verification_failed',
+            'We could not verify your submission. Please try again.',
+            requestId,
+          ),
           responseCorsHeaders,
           requestId,
         );
@@ -147,10 +180,17 @@ export function createContactInquiryHandler({
       const deliveryCode = error instanceof GraphMailError
         ? `delivery_${error.code}`
         : 'delivery_failed';
-      safeLog(context, 'error', requestId, deliveryCode);
+      const deliveryDetail = error instanceof GraphMailError && error.status
+        ? `graph_status=${error.status}`
+        : '';
+      safeLog(context, 'error', requestId, deliveryCode, deliveryDetail);
       return jsonResponse(
         502,
-        { message: 'We could not send your message. Please try again later.', requestId },
+        errorBody(
+          'delivery_failed',
+          'We could not send your message. Please try again later.',
+          requestId,
+        ),
         responseCorsHeaders,
         requestId,
       );
@@ -160,9 +200,9 @@ export function createContactInquiryHandler({
 
 export const contactInquiry = createContactInquiryHandler();
 
-app.http('contactInquiry', {
+app.http('sendInquiry', {
   methods: ['POST', 'OPTIONS'],
   authLevel: 'anonymous',
-  route: 'inquiries/contact',
+  route: 'send-inquiry',
   handler: contactInquiry,
 });

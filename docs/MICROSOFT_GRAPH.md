@@ -1,108 +1,255 @@
-# Microsoft Graph integration path
+# Secure inquiry delivery with Microsoft Graph
 
-The public site remains deployable as a static GitHub Pages application. Each content type has a focused module under `client/src/data`, and the page components read through `client/src/services/contentService.js`. Form submissions use `client/src/services/inquiryService.js`.
+The React/Vite website remains a static GitHub Pages application. Inquiry email is
+sent by the separate Azure Function in `api`; the browser never calls Microsoft
+Graph and visitors never sign in to Microsoft.
 
-This adapter boundary lets the site move to Microsoft Lists or SharePoint without rewriting the route components.
+## Why the Function is required
 
-## Recommended architecture
+GitHub Pages serves static files and cannot execute server-side code. Vite also
+replaces every `VITE_*` value at build time and ships it in the public JavaScript
+bundle. A Microsoft Entra client secret in a `VITE_*` variable would therefore be
+available to every visitor and must never be used.
 
-Do not call Microsoft Graph from the browser with an application secret.
+The safe request path is:
 
-1. Store public business content in SharePoint Lists or Microsoft Lists.
-2. Store menu, event, gallery, and journal files in a SharePoint document library.
-3. Register a Microsoft Entra ID application for a server-side Azure Function or Azure App Service.
-4. Keep the tenant ID, client ID, certificate or secret in server-side application settings or Azure Key Vault.
-5. Grant only the least-privilege Microsoft Graph permissions needed for the selected site, lists, and library.
-6. Expose a small public, validated API to the website.
-
-The browser receives only the API base URL:
-
-```env
-VITE_CONTENT_API_BASE_URL=https://your-api.azurewebsites.net/api
+```text
+GitHub Pages form
+  -> POST Azure Function /api/send-inquiry
+  -> Microsoft Entra app-only token
+  -> Microsoft Graph /users/{sender}/sendMail
+  -> ashley@1890teahouse.com
 ```
 
-## Suggested read endpoints
+The only inquiry setting in the Pages build is the public Function endpoint:
 
-- `GET /business`
-- `GET /menus`
-- `GET /events`
-- `GET /news`
-- `GET /journal`
-- `GET /journal/:slug`
-- `GET /faqs`
-- `GET /gallery`
-- `GET /tea-rooms`
+```env
+VITE_INQUIRY_API_URL=https://<function-app-name>.azurewebsites.net/api/send-inquiry
+```
 
-The API should return the same shapes as the corresponding files in `client/src/data`. If the remote service is unavailable, `contentService.refresh()` falls back to the bundled content.
+## Endpoint behavior
 
-## Suggested submission endpoints
+`POST /api/send-inquiry` accepts JSON containing:
 
-- `POST /inquiries/contact`
-- `POST /inquiries/large-parties`
-- `POST /inquiries/employment`
+- `name`
+- `email`
+- `phone`
+- `preferredDate` in `YYYY-MM-DD` format
+- `guestCount` from 1 through 500
+- `inquiryType` from the options displayed by the form
+- `message`
+- `website`, an empty spam honeypot
+- `recaptchaToken`, only when optional reCAPTCHA is enabled
 
-Validate and sanitize every payload on the server. Use a restricted write-only workflow for inquiries and never return private list fields to the public client. Inquiry forms require the API URL and show an inline unavailable message when it is not configured; they never open an email application.
+The Function normalizes line endings and whitespace, strips control characters,
+checks types and length limits, validates email, phone, date, guest count, and
+inquiry type, and HTML-escapes visitor content before placing it in the email.
+Malformed requests receive a generic structured error. Internal Graph responses
+and credentials are never returned.
 
-## Secure contact email function
+Every response includes an `X-Request-ID` header and JSON `requestId`. Successful
+responses use this shape:
 
-The `api` project implements `POST /api/inquiries/contact` as an Azure Function. It validates and normalizes the request, checks the reCAPTCHA token and hostname with Google, and then uses app-only Microsoft Graph `Mail.Send` authentication to send from the configured mailbox. The public request cannot select the sender, recipient, or Graph endpoint. The server enforces `INQUIRY_RECIPIENT_EMAIL=beatriz@diamondpeo.com`; `GRAPH_SENDER_EMAIL` must be the real Microsoft 365 mailbox authorized to send.
+```json
+{
+  "ok": true,
+  "message": "Thank you! Your inquiry has been sent to the Tea House team.",
+  "requestId": "..."
+}
+```
 
-### Local development
+Errors use this shape:
 
-1. Copy `api/local.settings.example.json` to `api/local.settings.json`.
-2. Fill in the local file manually and never commit it.
-3. Install and run [Azure Functions Core Tools](https://learn.microsoft.com/azure/azure-functions/functions-run-local), then start the API on port 7071:
+```json
+{
+  "ok": false,
+  "error": {
+    "code": "validation_failed",
+    "message": "Please check your submission and try again."
+  },
+  "message": "Please check your submission and try again.",
+  "requestId": "..."
+}
+```
+
+Azure logs record the request ID, a safe failure category, missing setting names,
+and a Graph HTTP status when available. They do not record secrets, access tokens,
+Graph response bodies, or inquiry contents.
+
+## Microsoft Entra and Graph configuration
+
+1. Create a Microsoft Entra app registration for the Function.
+2. Under **API permissions**, add Microsoft Graph **Application** permission
+   `Mail.Send`. Do not select the delegated permission.
+3. A tenant administrator must grant admin consent. `Mail.Send` application
+   permission requires it.
+4. Create a client secret and copy it directly to the Function App configuration
+   or, preferably, reference it from Azure Key Vault. Never place it in this
+   repository, GitHub Pages variables, or a `VITE_*` variable.
+5. Ensure `GRAPH_SENDER_EMAIL` is a real Microsoft 365 mailbox that the app may
+   send as.
+6. Because application `Mail.Send` is powerful, use Exchange Online
+   [Application RBAC](https://learn.microsoft.com/exchange/permissions-exo/application-rbac)
+   to scope the service principal to the sender mailbox.
+
+The Function uses the documented MIME form of
+[`POST /users/{id}/sendMail`](https://learn.microsoft.com/graph/api/user-sendmail)
+so the message can contain both plain-text and HTML alternatives plus a real
+`Reply-To` header.
+
+## Required Azure Function settings
+
+Configure these server-only application settings:
+
+| Setting | Required | Purpose |
+| --- | --- | --- |
+| `AZURE_TENANT_ID` | Yes | Microsoft Entra tenant ID |
+| `AZURE_CLIENT_ID` | Yes | App registration client ID |
+| `AZURE_CLIENT_SECRET` | Yes | App credential; server only |
+| `GRAPH_SENDER_EMAIL` | Yes | Authorized Microsoft 365 sender mailbox |
+| `INQUIRY_RECIPIENT_EMAIL` | Yes | Must be `ashley@1890teahouse.com` |
+| `ADDITIONAL_ALLOWED_ORIGINS` | No | Comma-separated future custom origins |
+| `RECAPTCHA_SECRET_KEY` | No | Optional reCAPTCHA v2 server secret |
+| `ALLOWED_RECAPTCHA_HOSTNAMES` | With reCAPTCHA | Comma-separated accepted hostnames |
+
+The Function always permits only these built-in browser origins:
+
+```text
+https://diamonddevelopmentteam.github.io
+http://localhost:5173
+http://localhost:5174
+```
+
+Add a future custom domain as an origin, without a path:
+
+```text
+ADDITIONAL_ALLOWED_ORIGINS=https://www.1890teahouse.com
+```
+
+Also add the same origins under the Function App's **API > CORS** settings. Do not
+use `*`. Azure documents the portal and CLI CORS options in
+[Configure function app settings](https://learn.microsoft.com/azure/azure-functions/functions-how-to-use-azure-function-app-settings#cors).
+
+reCAPTCHA is optional. If enabled, configure both `RECAPTCHA_SECRET_KEY` and
+`ALLOWED_RECAPTCHA_HOSTNAMES` on the Function and set
+`VITE_RECAPTCHA_SITE_KEY` in GitHub. If it is not enabled, leave all three empty.
+
+## Run locally
+
+Prerequisites are Node.js 22 or later, Azure Functions Core Tools v4, and Azurite
+when using `UseDevelopmentStorage=true`.
+
+1. Install and test both projects:
 
    ```sh
    cd api
-   npm ci
+   npm install
+   npm run lint
+   npm run build
+   npm run test
+
+   cd ../client
+   npm install
+   npm run lint
+   npm run build
+   npm run test
+   ```
+
+2. Copy `api/local.settings.example.json` to `api/local.settings.json`, fill in
+   the five required server settings, and keep the file uncommitted.
+3. Start the Function:
+
+   ```sh
+   cd api
    npm start
    ```
 
-4. Create `client/.env.local` containing public browser configuration only:
+4. Create `client/.env.local` with public values only:
 
    ```env
-   VITE_CONTENT_API_BASE_URL=http://localhost:7071/api
+   VITE_INQUIRY_API_URL=http://localhost:7071/api/send-inquiry
    VITE_RECAPTCHA_SITE_KEY=
    ```
 
-5. Start the frontend with `npm run dev` from `client`.
+5. Start the frontend on an allowed origin:
 
-`api/local.settings.json` is for local development only. Do not publish it or put its values in frontend variables, logs, tests, documentation, or GitHub Pages.
+   ```sh
+   cd client
+   npm run dev -- --port 5173
+   ```
 
-### Azure deployment
+Use the Visit form for an end-to-end test. A `202` response and request ID mean
+Graph accepted the message; they do not by themselves prove mailbox delivery.
 
-1. Create or select a Microsoft Entra app registration and grant Microsoft Graph `Mail.Send` application permission with administrator consent.
-2. Add `AZURE_TENANT_ID`, `AZURE_CLIENT_ID`, `AZURE_CLIENT_SECRET`, `GRAPH_SENDER_EMAIL`, `INQUIRY_RECIPIENT_EMAIL=beatriz@diamondpeo.com`, `RECAPTCHA_SECRET_KEY`, `ALLOWED_ORIGINS`, and `ALLOWED_RECAPTCHA_HOSTNAMES` to the Function App Configuration / environment variables.
-3. Add `https://diamonddevelopmentteam.github.io` to the Function App CORS settings. Origins do not include a path, so do not add `/teaHouse/`.
-4. Register the production hostname with the reCAPTCHA v2 checkbox configuration.
-5. Set the public GitHub repository variables `VITE_CONTENT_API_BASE_URL` and `VITE_RECAPTCHA_SITE_KEY` for the Pages build.
-6. Deploy the `api` project separately from the static GitHub Pages site.
+## Deploy the Azure Function
 
-Do not publish `local.settings.json`, place backend secrets in GitHub Pages, or use `VITE_*` variables for confidential values. The Graph `Mail.Send` application permission is powerful; restrict the app to the intended sender mailbox through the organization’s Microsoft 365 administration process as a follow-up security measure.
+1. Create a Node.js 22 Azure Function App using Functions runtime v4, or select
+   the existing Function App.
+2. Add the required application settings above in Azure Portal. Restart the app
+   after changing settings.
+3. Add each approved origin to the Function App CORS allowlist. The CLI form is:
 
-## Suggested Lists and libraries
+   ```sh
+   az functionapp cors add \
+     --resource-group <resource-group> \
+     --name <function-app-name> \
+     --allowed-origins https://diamonddevelopmentteam.github.io
+   ```
 
-- `TeaHouseSettings`: address, phone, email, hours, social and reservation links
-- `TeaHouseMenus`: title, description, image, PDF, active date, sort order
-- `TeaHouseEvents`: start/end, description, location, offer, status, image
-- `TeaHouseNews`: publication, date, headline, summary, image, article URL
-- `TeaHouseJournal`: slug, title, date, excerpt, sections, image, status
-- `TeaHouseFAQs`: question, answer, sort order, active
-- `TeaHouseGallery`: image, alt text, caption, category, sort order
-- `TeaHouseRooms`: label, description, uses, image, sort order
-- `TeaHouseInquiries`: type, contact fields, message, created date, status
-- SharePoint document library: menu PDFs, menu images, event artwork, gallery, and journal media
+   Repeat for the localhost origins and any configured custom origin.
+4. From the `api` directory, validate and deploy:
 
-## Migration sequence
+   ```sh
+   npm install
+   npm run lint
+   npm run build
+   npm run test
+   func azure functionapp publish <function-app-name>
+   ```
 
-1. Create the Lists, library, columns, indexes, and retention rules.
-2. Register the Microsoft Entra application for the server-side API.
-3. Use Sites.Selected or another least-privilege Graph model where practical.
-4. Store credentials in Azure configuration or Key Vault.
-5. Implement and validate the read and submission endpoints.
-6. Add rate limiting, spam protection, logging, and alerting.
-7. Set `VITE_CONTENT_API_BASE_URL` for the production build.
-8. Test remote reads, form writes, and the static fallback independently.
+   Azure Functions Core Tools uses zip deployment for this command. See
+   [Develop Azure Functions locally using Core Tools](https://learn.microsoft.com/azure/azure-functions/functions-run-local).
+5. Send an `OPTIONS` preflight from an approved origin and confirm the response
+   includes `Access-Control-Allow-Origin` for that exact origin.
 
-The same server can later create Outlook calendar items, post Teams notifications, or trigger Power Automate without exposing Microsoft 365 credentials to the React application.
+## Configure and test GitHub Pages
+
+In the `diamonddevelopmentteam/teaHouse` repository, add this **Actions
+repository variable**:
+
+```text
+VITE_INQUIRY_API_URL=https://<function-app-name>.azurewebsites.net/api/send-inquiry
+```
+
+The Pages workflow injects it during `npm run build` and now fails rather than
+publishing a bundle when it is missing or is not an HTTPS `/api/send-inquiry`
+URL. Do not add any Microsoft credential as a repository variable or secret for
+the Pages job.
+
+To reproduce a production Pages build locally in PowerShell:
+
+```powershell
+cd client
+$env:VITE_BASE_PATH = '/teaHouse/'
+$env:VITE_INQUIRY_API_URL = 'https://<function-app-name>.azurewebsites.net/api/send-inquiry'
+npm run build
+npm run verify:pages
+npm run preview -- --port 5174
+```
+
+Open `http://localhost:5174/teaHouse/contact`, submit a real test inquiry, and
+confirm the browser receives `202` with a request ID.
+
+For production verification:
+
+1. Deploy the Function and add the GitHub repository variable.
+2. Re-run the GitHub Pages workflow or push to `main`.
+3. Open `https://diamonddevelopmentteam.github.io/teaHouse/contact`.
+4. Submit a uniquely identifiable test message.
+5. Record the request ID shown in the response/network panel.
+6. Confirm the message arrived at `ashley@1890teahouse.com`, the From address is
+   `GRAPH_SENDER_EMAIL`, Reply-To is the visitor's address, and the name, phone,
+   date, guest count, inquiry type, message, timestamp, and request ID are present.
+7. If mail is missing, search Application Insights/Function logs by request ID
+   and then check the sender mailbox's Sent Items, Exchange message trace, and
+   junk/quarantine handling.

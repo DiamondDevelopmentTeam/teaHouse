@@ -53,20 +53,28 @@ export function validateContactInquiry(body) {
 
   const name = normalizeText(body.name, 'name', { required: true, maximum: 120 });
   const email = normalizeText(body.email, 'email', { required: true, maximum: 254 });
-  const phone = normalizeText(body.phone, 'phone', { maximum: 40 });
+  const phone = normalizeText(body.phone, 'phone', {
+    required: true,
+    maximum: 40,
+  });
   const inquiryType = normalizeText(body.inquiryType, 'inquiryType', {
     required: true,
     maximum: 80,
   });
-  const preferredDate = normalizeText(body.preferredDate, 'preferredDate', { maximum: 10 });
-  const guestCount = normalizeText(body.guestCount, 'guestCount', { maximum: 3 });
+  const preferredDate = normalizeText(body.preferredDate, 'preferredDate', {
+    required: true,
+    maximum: 10,
+  });
+  const guestCount = normalizeText(body.guestCount, 'guestCount', {
+    required: true,
+    maximum: 3,
+  });
   const message = normalizeText(body.message, 'message', {
     required: true,
     maximum: 5000,
     multiline: true,
   });
   const recaptchaToken = normalizeText(body.recaptchaToken, 'recaptchaToken', {
-    required: true,
     maximum: 4096,
   });
 
@@ -78,11 +86,15 @@ export function validateContactInquiry(body) {
     throw new ValidationError('inquiryType_invalid');
   }
 
-  if (preferredDate && !isValidIsoDate(preferredDate)) {
+  if (!/^[+()\-.\sx0-9]{7,40}$/i.test(phone) || !/\d{7}/.test(phone.replace(/\D/g, ''))) {
+    throw new ValidationError('phone_invalid');
+  }
+
+  if (!isValidIsoDate(preferredDate)) {
     throw new ValidationError('preferredDate_invalid');
   }
 
-  if (guestCount && (!/^[1-9]\d{0,2}$/.test(guestCount) || Number(guestCount) > 500)) {
+  if (!/^[1-9]\d{0,2}$/.test(guestCount) || Number(guestCount) > 500) {
     throw new ValidationError('guestCount_invalid');
   }
 

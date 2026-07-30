@@ -6,7 +6,10 @@ import OptimizedImage from './components/OptimizedImage.jsx';
 import { business, businessAddress } from './data/business.js';
 import { eventStatus } from './data/events.js';
 import { contentService } from './services/contentService.js';
-import { inquiryService } from './services/inquiryService.js';
+import {
+  InquirySubmissionError,
+  inquiryService,
+} from './services/inquiryService.js';
 
 import building from './assets/images/building.webp';
 import charcuterieBoard from './assets/images/charcuterie-board.webp';
@@ -534,10 +537,13 @@ function ContactForm() {
   const submittingRef = useRef(false);
   const apiEnabled = inquiryService.isApiConfigured();
   const recaptchaSiteKey = (import.meta.env.VITE_RECAPTCHA_SITE_KEY || '').trim();
-  const [status, setStatus] = useState({ type: '', message: '' });
+  const [status, setStatus] = useState(
+    apiEnabled
+      ? { type: 'ready', message: '', requestId: '' }
+      : { type: 'unavailable', message: '', requestId: '' },
+  );
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [recaptchaToken, setRecaptchaToken] = useState('');
-  const configurationMissing = !apiEnabled || !recaptchaSiteKey;
 
   const resetRecaptcha = () => {
     recaptchaRef.current?.reset();
@@ -546,12 +552,20 @@ function ContactForm() {
 
   const handleRecaptchaExpired = () => {
     resetRecaptcha();
-    setStatus({ type: 'error', message: 'Verification expired. Please complete it again.' });
+    setStatus({
+      type: 'validation',
+      message: 'Verification expired. Please complete it again.',
+      requestId: '',
+    });
   };
 
   const handleRecaptchaError = () => {
     resetRecaptcha();
-    setStatus({ type: 'error', message: 'Verification could not load. Please try again.' });
+    setStatus({
+      type: 'validation',
+      message: 'Verification could not load. Please try again.',
+      requestId: '',
+    });
   };
 
   const handleSubmit = async (event) => {
@@ -561,13 +575,17 @@ function ContactForm() {
     if (submittingRef.current || isSubmitting) return;
     if (!form.reportValidity()) return;
 
-    if (configurationMissing) {
-      setStatus({ type: 'error', message: 'The online inquiry form is temporarily unavailable. Please try again later.' });
+    if (!apiEnabled) {
+      setStatus({ type: 'unavailable', message: '', requestId: '' });
       return;
     }
 
-    if (!recaptchaToken) {
-      setStatus({ type: 'error', message: 'Please complete the verification before sending.' });
+    if (recaptchaSiteKey && !recaptchaToken) {
+      setStatus({
+        type: 'validation',
+        message: 'Please complete the verification before sending.',
+        requestId: '',
+      });
       return;
     }
 
@@ -584,19 +602,35 @@ function ContactForm() {
       recaptchaToken,
     };
 
-    if (!payload.name || !payload.email || !payload.inquiryType || !payload.message) {
-      setStatus({ type: 'error', message: 'Please complete all required fields.' });
+    if (
+      !payload.name
+      || !payload.email
+      || !payload.phone
+      || !payload.preferredDate
+      || !payload.guestCount
+      || !payload.inquiryType
+      || !payload.message
+    ) {
+      setStatus({
+        type: 'validation',
+        message: 'Please complete all required fields.',
+        requestId: '',
+      });
       return;
     }
 
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(payload.email)) {
-      setStatus({ type: 'error', message: 'Please enter a valid email address.' });
+      setStatus({
+        type: 'validation',
+        message: 'Please enter a valid email address.',
+        requestId: '',
+      });
       return;
     }
 
     submittingRef.current = true;
     setIsSubmitting(true);
-    setStatus({ type: 'pending', message: 'Sending your inquiry…' });
+    setStatus({ type: 'submitting', message: 'Sending your inquiry…', requestId: '' });
 
     try {
       const result = await inquiryService.submitContact(payload);
@@ -605,16 +639,20 @@ function ContactForm() {
         message: typeof result.message === 'string'
           ? result.message
           : 'Thank you! Your inquiry has been sent to the Tea House team.',
+        requestId: typeof result.requestId === 'string' ? result.requestId : '',
       });
       form.reset();
       resetRecaptcha();
     } catch (error) {
       resetRecaptcha();
+      const isValidationError = error instanceof InquirySubmissionError
+        && error.kind === 'validation';
       setStatus({
-        type: 'error',
+        type: isValidationError ? 'validation' : 'unavailable',
         message: error instanceof Error
           ? error.message
           : 'Your inquiry could not be submitted. Please try again.',
+        requestId: error instanceof InquirySubmissionError ? error.requestId : '',
       });
     } finally {
       submittingRef.current = false;
@@ -625,22 +663,22 @@ function ContactForm() {
   return <form className="page-form" onSubmit={handleSubmit}>
     <label>Name<input name="name" autoComplete="name" maxLength="120" required /></label>
     <label>Email<input type="email" name="email" autoComplete="email" maxLength="254" required /></label>
-    <label>Phone<input type="tel" name="phone" autoComplete="tel" maxLength="40" /></label>
-    <label>Preferred date<input type="date" name="preferredDate" /></label>
-    <label>Guest count<input type="number" name="guestCount" min="1" max="500" inputMode="numeric" /></label>
+    <label>Phone<input type="tel" name="phone" autoComplete="tel" minLength="7" maxLength="40" required /></label>
+    <label>Preferred date<input type="date" name="preferredDate" required /></label>
+    <label>Guest count<input type="number" name="guestCount" min="1" max="500" inputMode="numeric" required /></label>
     <label className="page-form-wide">What can we help with?<select name="inquiryType" defaultValue="General question" required><option>General question</option><option>Large party</option><option>Private event</option><option>Catering</option><option>Media inquiry</option></select></label>
     <label className="page-form-wide">Message<textarea name="message" rows="6" maxLength="5000" required /></label>
     <div className="page-form-honeypot" aria-hidden="true">
       <label>Website<input name="website" type="text" tabIndex="-1" autoComplete="off" /></label>
     </div>
-    {!configurationMissing ? (
+    {recaptchaSiteKey ? (
       <div className="page-form-recaptcha">
         <ReCAPTCHA
           ref={recaptchaRef}
           sitekey={recaptchaSiteKey}
           onChange={(token) => {
             setRecaptchaToken(token || '');
-            if (token) setStatus({ type: '', message: '' });
+            if (token) setStatus({ type: 'ready', message: '', requestId: '' });
           }}
           onExpired={handleRecaptchaExpired}
           onErrored={handleRecaptchaError}
@@ -650,18 +688,30 @@ function ContactForm() {
     <button
       className="page-button"
       type="submit"
-      disabled={isSubmitting || configurationMissing || !recaptchaToken}
+      disabled={isSubmitting}
     >
       {isSubmitting ? 'Sending…' : 'Send Inquiry'}
     </button>
     <p
-      className={`page-form-status is-${configurationMissing ? 'error' : status.type}`}
-      role={status.type === 'error' || configurationMissing ? 'alert' : 'status'}
+      className={`page-form-status is-${status.type}`}
+      role={status.type === 'validation' || status.type === 'unavailable' ? 'alert' : 'status'}
       aria-live="polite"
     >
-      {configurationMissing
-        ? 'The online inquiry form is temporarily unavailable. Please try again later.'
-        : status.message}
+      {status.type === 'unavailable' ? (
+        <>
+          The online form is temporarily unavailable. Please call{' '}
+          <a href={business.phoneHref}>{business.phone}</a> or email{' '}
+          <a href={`mailto:${business.email}`}>{business.email}</a>.
+          {status.requestId ? ` Reference: ${status.requestId}.` : ''}
+        </>
+      ) : (
+        <>
+          {status.message}
+          {status.type === 'success' && status.requestId
+            ? ` Reference: ${status.requestId}.`
+            : ''}
+        </>
+      )}
     </p>
   </form>;
 }

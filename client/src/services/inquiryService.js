@@ -1,6 +1,27 @@
-const apiBase = (import.meta.env.VITE_CONTENT_API_BASE_URL || '').trim().replace(/\/$/, '');
 const submissionError = 'Your inquiry could not be submitted. Please try again.';
-const configurationError = 'The online inquiry form is temporarily unavailable. Please try again later.';
+const configurationError = 'The online inquiry service is not configured.';
+
+export class InquirySubmissionError extends Error {
+  constructor(message, { kind = 'unavailable', requestId = '' } = {}) {
+    super(message);
+    this.name = 'InquirySubmissionError';
+    this.kind = kind;
+    this.requestId = requestId;
+  }
+}
+
+function contactApiUrl() {
+  return (import.meta.env.VITE_INQUIRY_API_URL || '').trim();
+}
+
+function legacyApiBase() {
+  return (import.meta.env.VITE_CONTENT_API_BASE_URL || '').trim().replace(/\/$/, '');
+}
+
+function legacyApiUrl(path) {
+  const base = legacyApiBase();
+  return base ? `${base}${path}` : '';
+}
 
 async function responseData(response) {
   try {
@@ -10,38 +31,49 @@ async function responseData(response) {
   }
 }
 
-async function submit(path, payload) {
-  if (!apiBase) throw new Error(configurationError);
+function publicMessage(data, fallback) {
+  const message = typeof data?.error?.message === 'string'
+    ? data.error.message
+    : data?.message;
+  return typeof message === 'string' && message.length <= 240 ? message : fallback;
+}
+
+async function submit(url, payload) {
+  if (!url) throw new InquirySubmissionError(configurationError);
 
   let response;
   try {
-    response = await fetch(`${apiBase}${path}`, {
+    response = await fetch(url, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
       body: JSON.stringify(payload),
     });
   } catch {
-    throw new Error(submissionError);
+    throw new InquirySubmissionError(submissionError);
   }
 
   const data = await responseData(response);
   if (!response.ok) {
-    const message = typeof data.message === 'string' && data.message.length <= 240
-      ? data.message
-      : submissionError;
-    throw new Error(message);
+    const kind = [400, 413, 415].includes(response.status) ? 'validation' : 'unavailable';
+    throw new InquirySubmissionError(publicMessage(data, submissionError), {
+      kind,
+      requestId: typeof data.requestId === 'string' ? data.requestId : '',
+    });
   }
 
   return data;
 }
 
-export const submitInquiry = (payload) => submit('/inquiries/contact', payload);
+export const submitInquiry = (payload) => submit(contactApiUrl(), payload);
 
 export const inquiryService = {
-  isApiConfigured: () => Boolean(apiBase),
+  isApiConfigured: () => Boolean(contactApiUrl()),
   submitContact: submitInquiry,
   submitLargeParty: (payload) =>
-    submit('/inquiries/large-parties', payload),
+    submit(legacyApiUrl('/inquiries/large-parties'), payload),
   submitEmployment: (payload) =>
-    submit('/inquiries/employment', payload),
+    submit(legacyApiUrl('/inquiries/employment'), payload),
 };

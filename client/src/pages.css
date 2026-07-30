@@ -1006,8 +1006,16 @@
   margin-top: 0.15rem;
 }
 
-.page-form-status.is-error { color: #9d1d20; }
+.page-form-status.is-error,
+.page-form-status.is-validation,
+.page-form-status.is-unavailable { color: #9d1d20; }
 .page-form-status.is-success { color: #1f7040; }
+
+.page-form-status a {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
 
 .page-room-grid {
   display: grid;

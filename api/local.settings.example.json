@@ -7,14 +7,13 @@
     "AZURE_CLIENT_ID": "",
     "AZURE_CLIENT_SECRET": "",
     "GRAPH_SENDER_EMAIL": "",
-    "INQUIRY_RECIPIENT_EMAIL": "beatriz@diamondpeo.com",
+    "INQUIRY_RECIPIENT_EMAIL": "ashley@1890teahouse.com",
     "RECAPTCHA_SECRET_KEY": "",
-    "ALLOWED_ORIGINS": "http://localhost:5173,https://diamonddevelopmentteam.github.io",
-    "ALLOWED_RECAPTCHA_HOSTNAMES": "localhost,diamonddevelopmentteam.github.io"
+    "ALLOWED_RECAPTCHA_HOSTNAMES": "",
+    "ADDITIONAL_ALLOWED_ORIGINS": ""
   },
   "Host": {
     "LocalHttpPort": 7071,
-    "CORS": "http://localhost:5173",
     "CORSCredentials": false
   }
 }

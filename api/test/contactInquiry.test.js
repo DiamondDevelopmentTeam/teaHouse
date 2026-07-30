@@ -11,16 +11,20 @@ const config = Object.freeze({
   clientId: 'client-placeholder',
   clientSecret: 'secret-placeholder',
   graphSenderEmail: 'sender@example.test',
-  inquiryRecipientEmail: 'beatriz@diamondpeo.com',
+  inquiryRecipientEmail: 'ashley@1890teahouse.com',
   recaptchaSecretKey: 'recaptcha-placeholder',
-  allowedOrigins: ['http://localhost:5173', 'https://diamonddevelopmentteam.github.io'],
+  allowedOrigins: [
+    'http://localhost:5173',
+    'http://localhost:5174',
+    'https://diamonddevelopmentteam.github.io',
+  ],
   allowedRecaptchaHostnames: ['localhost', 'diamonddevelopmentteam.github.io'],
 });
 
 const validBody = Object.freeze({
   name: 'Visitor Name',
   email: 'visitor@example.com',
-  phone: '',
+  phone: '352-555-0123',
   inquiryType: 'General question',
   preferredDate: '2026-08-15',
   guestCount: '8',
@@ -66,6 +70,22 @@ test('required fields are rejected', () => {
   assert.throws(
     () => validateContactInquiry({ ...validBody, name: '   ' }),
     (error) => error instanceof ValidationError && error.code === 'name_required',
+  );
+});
+
+test('phone, preferred date, and guest count are required', () => {
+  for (const field of ['phone', 'preferredDate', 'guestCount']) {
+    assert.throws(
+      () => validateContactInquiry({ ...validBody, [field]: '' }),
+      (error) => error instanceof ValidationError && error.code === `${field}_required`,
+    );
+  }
+});
+
+test('invalid phone numbers are rejected', () => {
+  assert.throws(
+    () => validateContactInquiry({ ...validBody, phone: 'call me' }),
+    (error) => error instanceof ValidationError && error.code === 'phone_invalid',
   );
 });
 
@@ -197,7 +217,7 @@ test('Graph receives a sanitized multipart email with fixed sender and recipient
   );
   assert.equal(graphRequest.options.headers['Content-Type'], 'text/plain');
   assert.match(mimeMessage, /^From: Tea House Inquiry <sender@example\.test>\r?$/m);
-  assert.match(mimeMessage, /^To: beatriz@diamondpeo\.com\r?$/m);
+  assert.match(mimeMessage, /^To: ashley@1890teahouse\.com\r?$/m);
   assert.match(mimeMessage, /^Reply-To: .+ <visitor@example\.com>\r?$/m);
   assert.match(mimeMessage, /Content-Type: multipart\/alternative/);
   assert.match(mimeMessage, /Content-Type: text\/plain; charset="UTF-8"/);
@@ -205,6 +225,8 @@ test('Graph receives a sanitized multipart email with fixed sender and recipient
   assert.equal(inquiry.name, 'Visitor Name');
   assert.equal(emailContent.plainText.includes('\u0000'), false);
   assert.match(emailContent.plainText, /Website source: 1890 Tea House website contact form/);
+  assert.match(emailContent.html, /Reply to/);
+  assert.match(emailContent.html, /Visitor Name &lt;visitor@example\.com&gt;/);
   assert.match(emailContent.html, /Hello &lt;script&gt;alert\(&quot;no&quot;\)&lt;\/script&gt;/);
   assert.doesNotMatch(emailContent.html, /<script>/);
 });
@@ -216,12 +238,44 @@ test('configuration enforces the server-side inquiry recipient', () => {
     AZURE_CLIENT_SECRET: 'secret-placeholder',
     GRAPH_SENDER_EMAIL: 'sender@example.test',
     INQUIRY_RECIPIENT_EMAIL: 'different@example.test',
-    RECAPTCHA_SECRET_KEY: 'recaptcha-placeholder',
-    ALLOWED_ORIGINS: 'http://localhost:5173',
-    ALLOWED_RECAPTCHA_HOSTNAMES: 'localhost',
   };
 
   assert.throws(() => loadConfig(environment), /contact service is not configured/i);
+});
+
+test('default CORS origins and an optional custom origin are loaded server-side', () => {
+  const loaded = loadConfig({
+    AZURE_TENANT_ID: 'tenant-placeholder',
+    AZURE_CLIENT_ID: 'client-placeholder',
+    AZURE_CLIENT_SECRET: 'secret-placeholder',
+    GRAPH_SENDER_EMAIL: 'sender@example.test',
+    INQUIRY_RECIPIENT_EMAIL: 'ashley@1890teahouse.com',
+    ADDITIONAL_ALLOWED_ORIGINS: 'https://www.1890teahouse.com',
+  });
+
+  assert.deepEqual(loaded.allowedOrigins, [
+    'https://diamonddevelopmentteam.github.io',
+    'http://localhost:5173',
+    'http://localhost:5174',
+    'https://www.1890teahouse.com',
+  ]);
+  assert.equal(loaded.recaptchaSecretKey, '');
+});
+
+test('reCAPTCHA is optional but its server settings must be configured together', () => {
+  const baseEnvironment = {
+    AZURE_TENANT_ID: 'tenant-placeholder',
+    AZURE_CLIENT_ID: 'client-placeholder',
+    AZURE_CLIENT_SECRET: 'secret-placeholder',
+    GRAPH_SENDER_EMAIL: 'sender@example.test',
+    INQUIRY_RECIPIENT_EMAIL: 'ashley@1890teahouse.com',
+  };
+
+  assert.throws(
+    () => loadConfig({ ...baseEnvironment, RECAPTCHA_SECRET_KEY: 'secret-placeholder' }),
+    /contact service is not configured/i,
+  );
+  assert.doesNotThrow(() => loadConfig(baseEnvironment));
 });
 
 test('a disallowed CORS origin receives no allow-origin header', async () => {
@@ -252,8 +306,32 @@ test('missing backend configuration returns a generic service error', async () =
 
   assert.equal(response.status, 503);
   assert.deepEqual(response.jsonBody, {
+    ok: false,
+    error: {
+      code: 'service_unavailable',
+      message: 'The contact service is temporarily unavailable.',
+    },
     message: 'The contact service is temporarily unavailable.',
+    requestId: 'request-id',
   });
+});
+
+test('the handler skips reCAPTCHA when it is not configured', async () => {
+  let verificationCalls = 0;
+  const response = await handler({
+    configProvider: () => ({
+      ...config,
+      recaptchaSecretKey: '',
+      allowedRecaptchaHostnames: [],
+    }),
+    verifyRecaptchaFn: async () => {
+      verificationCalls += 1;
+    },
+  })(request({ body: { ...validBody, recaptchaToken: '' } }), context());
+
+  assert.equal(response.status, 202);
+  assert.equal(response.jsonBody.ok, true);
+  assert.equal(verificationCalls, 0);
 });
 
 test('invalid JSON and unsupported content types are rejected before dependencies run', async () => {

@@ -5,10 +5,11 @@ const GRAPH_BASE_URL = 'https://graph.microsoft.com/v1.0';
 const WEBSITE_SOURCE = '1890 Tea House website contact form';
 
 export class GraphMailError extends Error {
-  constructor(code) {
+  constructor(code, status) {
     super('The inquiry email could not be sent.');
     this.name = 'GraphMailError';
     this.code = code;
+    this.status = status;
   }
 }
 
@@ -38,10 +39,10 @@ export function buildInquiryEmailContent(inquiry, { submittedAt, requestId }) {
     '',
     `Name: ${inquiry.name}`,
     `Email: ${inquiry.email}`,
-    `Phone: ${inquiry.phone || 'Not provided'}`,
+    `Phone: ${inquiry.phone}`,
     `Inquiry type: ${inquiry.inquiryType}`,
-    `Preferred date: ${inquiry.preferredDate || 'Not provided'}`,
-    `Guest count: ${inquiry.guestCount || 'Not provided'}`,
+    `Preferred date: ${inquiry.preferredDate}`,
+    `Guest count: ${inquiry.guestCount}`,
     '',
     'Message:',
     inquiry.message,
@@ -54,10 +55,11 @@ export function buildInquiryEmailContent(inquiry, { submittedAt, requestId }) {
   const rows = [
     ['Customer name', inquiry.name],
     ['Customer email', inquiry.email],
-    ['Phone number', inquiry.phone || 'Not provided'],
+    ['Phone number', inquiry.phone],
     ['Inquiry type', inquiry.inquiryType],
-    ['Preferred date', inquiry.preferredDate || 'Not provided'],
-    ['Guest count', inquiry.guestCount || 'Not provided'],
+    ['Preferred date', inquiry.preferredDate],
+    ['Guest count', inquiry.guestCount],
+    ['Reply to', `${inquiry.name} <${inquiry.email}>`],
     ['Submission date and time', submittedAt],
     ['Website source', WEBSITE_SOURCE],
     ['Request ID', requestId],
@@ -174,5 +176,5 @@ export async function sendInquiryEmail({
     throw new GraphMailError('request_failed');
   }
 
-  if (!response.ok) throw new GraphMailError('request_failed');
+  if (!response.ok) throw new GraphMailError('request_failed', response.status);
 }
