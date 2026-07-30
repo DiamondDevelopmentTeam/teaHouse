@@ -18,7 +18,7 @@ GitHub Pages form
   -> POST Azure Function /api/send-inquiry
   -> Microsoft Entra app-only token
   -> Microsoft Graph /users/{sender}/sendMail
-  -> ashley@1890teahouse.com
+  -> beatriz@diamondpeo.com
 ```
 
 The only inquiry setting in the Pages build is the public Function endpoint:
@@ -31,21 +31,44 @@ VITE_INQUIRY_API_URL=https://<function-app-name>.azurewebsites.net/api/send-inqu
 
 `POST /api/send-inquiry` accepts JSON containing:
 
+- `formType`: `general`, `reservation`, `event`, or `contact`
 - `name`
 - `email`
 - `phone`
 - `preferredDate` in `YYYY-MM-DD` format
+- `preferredTime` when supplied by the reservation form
 - `guestCount` from 1 through 500
-- `inquiryType` from the options displayed by the form
+- `inquiryCategory` from the options displayed by the form
 - `message`
+- `pageUrl`
+- `preOrders` and `policyAgreement` when supplied by the reservation form
 - `website`, an empty spam honeypot
 - `recaptchaToken`, only when optional reCAPTCHA is enabled
 
 The Function normalizes line endings and whitespace, strips control characters,
 checks types and length limits, validates email, phone, date, guest count, and
-inquiry type, and HTML-escapes visitor content before placing it in the email.
+inquiry category, page URL, optional reservation details, and HTML-escapes visitor
+content before placing it in the email. A per-instance rate limiter permits five
+POST attempts per client in ten minutes; production deployments should also use
+an Azure perimeter rate-limit policy when distributed enforcement is required.
 Malformed requests receive a generic structured error. Internal Graph responses
 and credentials are never returned.
+
+The repository contains two real forms:
+
+- Visit/Contact inquiry form at `/contact`
+- Large-party reservation/event form at `/reservations#large-party`
+
+All Reserve controls outside these forms are navigation links to the Reservations
+page or the external Toast booking service. There are no newsletter, modal,
+mobile-menu, or other hidden submission forms.
+
+Email subjects are selected only by the validated server-side `formType`:
+
+- `1890 Tea House – General Inquiry`
+- `1890 Tea House – Reservation Request`
+- `1890 Tea House – Event Inquiry`
+- `1890 Tea House – Contact Request`
 
 Every response includes an `X-Request-ID` header and JSON `requestId`. Successful
 responses use this shape:
@@ -53,7 +76,7 @@ responses use this shape:
 ```json
 {
   "ok": true,
-  "message": "Thank you! Your inquiry has been sent to the Tea House team.",
+  "message": "Thank you! Your request has been sent to the Tea House team.",
   "requestId": "..."
 }
 ```
@@ -107,7 +130,7 @@ Configure these server-only application settings:
 | `AZURE_CLIENT_ID` | Yes | App registration client ID |
 | `AZURE_CLIENT_SECRET` | Yes | App credential; server only |
 | `GRAPH_SENDER_EMAIL` | Yes | Authorized Microsoft 365 sender mailbox |
-| `INQUIRY_RECIPIENT_EMAIL` | Yes | Must be `ashley@1890teahouse.com` |
+| `INQUIRY_RECIPIENT_EMAIL` | Yes | Must be `beatriz@diamondpeo.com` |
 | `ADDITIONAL_ALLOWED_ORIGINS` | No | Comma-separated future custom origins |
 | `RECAPTCHA_SECRET_KEY` | No | Optional reCAPTCHA v2 server secret |
 | `ALLOWED_RECAPTCHA_HOSTNAMES` | With reCAPTCHA | Comma-separated accepted hostnames |
@@ -145,12 +168,14 @@ when using `UseDevelopmentStorage=true`.
    cd api
    npm install
    npm run lint
+   npm run typecheck
    npm run build
    npm run test
 
    cd ../client
    npm install
    npm run lint
+   npm run typecheck
    npm run build
    npm run test
    ```
@@ -178,8 +203,8 @@ when using `UseDevelopmentStorage=true`.
    npm run dev -- --port 5173
    ```
 
-Use the Visit form for an end-to-end test. A `202` response and request ID mean
-Graph accepted the message; they do not by themselves prove mailbox delivery.
+Use both real forms for end-to-end tests. A `202` response and request ID mean
+Graph accepted a message; they do not by themselves prove mailbox delivery.
 
 ## Deploy the Azure Function
 
@@ -202,6 +227,7 @@ Graph accepted the message; they do not by themselves prove mailbox delivery.
    ```sh
    npm install
    npm run lint
+   npm run typecheck
    npm run build
    npm run test
    func azure functionapp publish <function-app-name>
@@ -234,6 +260,7 @@ $env:VITE_BASE_PATH = '/teaHouse/'
 $env:VITE_INQUIRY_API_URL = 'https://<function-app-name>.azurewebsites.net/api/send-inquiry'
 npm run build
 npm run verify:pages
+npm run verify:forms
 npm run preview -- --port 5174
 ```
 
@@ -245,11 +272,12 @@ For production verification:
 1. Deploy the Function and add the GitHub repository variable.
 2. Re-run the GitHub Pages workflow or push to `main`.
 3. Open `https://diamonddevelopmentteam.github.io/teaHouse/contact`.
-4. Submit a uniquely identifiable test message.
+4. Submit uniquely identifiable Visit and large-party test messages.
 5. Record the request ID shown in the response/network panel.
-6. Confirm the message arrived at `ashley@1890teahouse.com`, the From address is
+6. Confirm both messages arrived at `beatriz@diamondpeo.com`, the From address is
    `GRAPH_SENDER_EMAIL`, Reply-To is the visitor's address, and the name, phone,
-   date, guest count, inquiry type, message, timestamp, and request ID are present.
+   date, guest count, inquiry category, message, page URL, timestamp, and request
+   ID are present.
 7. If mail is missing, search Application Insights/Function logs by request ID
    and then check the sender mailbox's Sent Items, Exchange message trace, and
    junk/quarantine handling.

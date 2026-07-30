@@ -1,5 +1,5 @@
 import { contentService } from './contentService.js';
-import { inquiryService } from './inquiryService.js';
+import { FORM_TYPES, submitForm } from './formSubmission.ts';
 
 export async function getSiteContent() {
   return {
@@ -15,7 +15,12 @@ export async function getSiteContent() {
 }
 
 export function submitInquiry(type, payload) {
-  if (type === 'large-party') return inquiryService.submitLargeParty(payload);
-  if (type === 'employment') return inquiryService.submitEmployment(payload);
-  return inquiryService.submitContact(payload);
+  const formType = type === 'large-party'
+    ? FORM_TYPES.RESERVATION
+    : type === 'event'
+      ? FORM_TYPES.EVENT
+      : type === 'contact'
+        ? FORM_TYPES.CONTACT
+        : FORM_TYPES.GENERAL;
+  return submitForm({ ...payload, formType });
 }

@@ -44,6 +44,10 @@ jobs:
         run: npm ci
       - name: Lint source
         run: npm run lint
+      - name: Typecheck form service
+        run: npm run typecheck
+      - name: Test forms
+        run: npm run test
       - name: Audit images
         run: npm run audit:images
       - name: Validate public inquiry endpoint
@@ -53,6 +57,8 @@ jobs:
         run: npm run build
       - name: Verify Pages paths and SPA fallback
         run: npm run verify:pages
+      - name: Verify form endpoint and secret isolation
+        run: npm run verify:forms
       - name: Upload GitHub Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:

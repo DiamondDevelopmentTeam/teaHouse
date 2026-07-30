@@ -7,8 +7,15 @@ import {
 } from '../lib/config.js';
 import { corsHeaders, isOriginAllowed } from '../lib/cors.js';
 import { GraphMailError, sendInquiryEmail } from '../lib/graphMail.js';
+import {
+  inquiryRateLimiter,
+  requestClientKey,
+} from '../lib/rateLimit.js';
 import { RecaptchaError, verifyRecaptcha } from '../lib/recaptcha.js';
-import { ValidationError, validateContactInquiry } from '../lib/validation.js';
+import {
+  ValidationError,
+  validateInquirySubmission,
+} from '../lib/validation.js';
 
 const MAX_BODY_BYTES = 16 * 1024;
 
@@ -26,7 +33,7 @@ function jsonResponse(status, body, headers, requestId) {
 
 function safeLog(context, level, requestId, code, detail = '') {
   const logger = typeof context?.[level] === 'function' ? context[level].bind(context) : null;
-  logger?.(`[${requestId}] Contact inquiry ${code}${detail ? ` (${detail})` : ''}.`);
+  logger?.(`[${requestId}] Form submission ${code}${detail ? ` (${detail})` : ''}.`);
 }
 
 function errorBody(code, message, requestId) {
@@ -65,6 +72,7 @@ export function createContactInquiryHandler({
   configProvider = loadConfig,
   verifyRecaptchaFn = verifyRecaptcha,
   sendInquiryEmailFn = sendInquiryEmail,
+  rateLimiter = inquiryRateLimiter,
   now = () => new Date().toISOString(),
   requestIdFactory = randomUUID,
 } = {}) {
@@ -88,7 +96,7 @@ export function createContactInquiryHandler({
         503,
         errorBody(
           'service_unavailable',
-          'The contact service is temporarily unavailable.',
+          'The submission service is temporarily unavailable.',
           requestId,
         ),
         responseCorsHeaders,
@@ -117,9 +125,27 @@ export function createContactInquiryHandler({
       };
     }
 
+    const rateLimit = rateLimiter.check(requestClientKey(request));
+    if (!rateLimit.allowed) {
+      safeLog(context, 'warn', requestId, 'rate_limited');
+      return jsonResponse(
+        429,
+        errorBody(
+          'rate_limited',
+          'Too many requests were sent. Please wait and try again.',
+          requestId,
+        ),
+        {
+          ...responseCorsHeaders,
+          'Retry-After': String(rateLimit.retryAfterSeconds),
+        },
+        requestId,
+      );
+    }
+
     try {
       const body = await readJsonBody(request);
-      const inquiry = validateContactInquiry(body);
+      const inquiry = validateInquirySubmission(body);
 
       if (config.recaptchaSecretKey) {
         if (!inquiry.recaptchaToken) throw new RecaptchaError('missing');
@@ -137,12 +163,12 @@ export function createContactInquiryHandler({
         requestId,
       });
 
-      safeLog(context, 'log', requestId, 'sent');
+      safeLog(context, 'log', requestId, 'sent', `form_type=${inquiry.formType}`);
       return jsonResponse(
         202,
         {
           ok: true,
-          message: 'Thank you! Your inquiry has been sent to the Tea House team.',
+          message: 'Thank you! Your request has been sent to the Tea House team.',
           requestId,
         },
         responseCorsHeaders,

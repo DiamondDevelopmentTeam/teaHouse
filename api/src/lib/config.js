@@ -6,7 +6,7 @@ const REQUIRED_SETTINGS = [
   'INQUIRY_RECIPIENT_EMAIL',
 ];
 
-export const INQUIRY_RECIPIENT_EMAIL = 'ashley@1890teahouse.com';
+export const INQUIRY_RECIPIENT_EMAIL = 'beatriz@diamondpeo.com';
 export const DEFAULT_ALLOWED_ORIGINS = Object.freeze([
   'https://diamonddevelopmentteam.github.io',
   'http://localhost:5173',
@@ -15,7 +15,7 @@ export const DEFAULT_ALLOWED_ORIGINS = Object.freeze([
 
 export class ConfigurationError extends Error {
   constructor(missingSettings) {
-    super('The contact service is not configured.');
+    super('The form submission service is not configured.');
     this.name = 'ConfigurationError';
     this.missingSettings = missingSettings;
   }

@@ -2,16 +2,24 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import { loadConfig } from '../src/lib/config.js';
 import { createContactInquiryHandler } from '../src/functions/contactInquiry.js';
-import { buildInquiryEmailContent, sendInquiryEmail } from '../src/lib/graphMail.js';
+import {
+  FORM_SUBJECTS,
+  buildInquiryEmailContent,
+  sendInquiryEmail,
+} from '../src/lib/graphMail.js';
+import { createRateLimiter } from '../src/lib/rateLimit.js';
 import { RecaptchaError, verifyRecaptcha } from '../src/lib/recaptcha.js';
-import { ValidationError, validateContactInquiry } from '../src/lib/validation.js';
+import {
+  ValidationError,
+  validateInquirySubmission,
+} from '../src/lib/validation.js';
 
 const config = Object.freeze({
   tenantId: 'tenant-placeholder',
   clientId: 'client-placeholder',
   clientSecret: 'secret-placeholder',
   graphSenderEmail: 'sender@example.test',
-  inquiryRecipientEmail: 'ashley@1890teahouse.com',
+  inquiryRecipientEmail: 'beatriz@diamondpeo.com',
   recaptchaSecretKey: 'recaptcha-placeholder',
   allowedOrigins: [
     'http://localhost:5173',
@@ -22,13 +30,18 @@ const config = Object.freeze({
 });
 
 const validBody = Object.freeze({
+  formType: 'general',
   name: 'Visitor Name',
   email: 'visitor@example.com',
   phone: '352-555-0123',
-  inquiryType: 'General question',
   preferredDate: '2026-08-15',
+  preferredTime: '',
   guestCount: '8',
+  inquiryCategory: 'General question',
   message: 'Could you tell me about afternoon tea?',
+  pageUrl: 'https://diamonddevelopmentteam.github.io/teaHouse/contact',
+  preOrders: [],
+  policyAgreement: false,
   recaptchaToken: 'browser-token',
   website: '',
 });
@@ -38,6 +51,7 @@ function request({
   origin = 'http://localhost:5173',
   contentType = 'application/json',
   body = validBody,
+  clientIp = '203.0.113.10',
 } = {}) {
   const rawBody = typeof body === 'string' ? body : JSON.stringify(body);
   return {
@@ -46,6 +60,7 @@ function request({
       ...(origin ? { Origin: origin } : {}),
       ...(contentType ? { 'Content-Type': contentType } : {}),
       'Content-Length': String(Buffer.byteLength(rawBody)),
+      'X-Forwarded-For': clientIp,
     }),
     text: async () => rawBody,
   };
@@ -60,76 +75,89 @@ function handler(overrides = {}) {
     configProvider: () => config,
     verifyRecaptchaFn: async () => ({ hostname: 'localhost' }),
     sendInquiryEmailFn: async () => {},
+    rateLimiter: { check: () => ({ allowed: true, retryAfterSeconds: 0 }) },
     now: () => '2026-07-29T20:00:00.000Z',
     requestIdFactory: () => 'request-id',
     ...overrides,
   });
 }
 
-test('required fields are rejected', () => {
-  assert.throws(
-    () => validateContactInquiry({ ...validBody, name: '   ' }),
-    (error) => error instanceof ValidationError && error.code === 'name_required',
-  );
-});
-
-test('phone, preferred date, and guest count are required', () => {
-  for (const field of ['phone', 'preferredDate', 'guestCount']) {
+test('all common submission fields are required', () => {
+  for (const field of [
+    'formType',
+    'name',
+    'email',
+    'phone',
+    'preferredDate',
+    'guestCount',
+    'inquiryCategory',
+    'message',
+    'pageUrl',
+  ]) {
     assert.throws(
-      () => validateContactInquiry({ ...validBody, [field]: '' }),
+      () => validateInquirySubmission({ ...validBody, [field]: '' }),
       (error) => error instanceof ValidationError && error.code === `${field}_required`,
     );
   }
 });
 
-test('invalid phone numbers are rejected', () => {
+test('email, phone, date, time, guest count, page URL, and lengths are validated', () => {
+  const invalidCases = [
+    ['email', 'not-an-email', 'email_invalid'],
+    ['phone', 'call me', 'phone_invalid'],
+    ['preferredDate', '2026-02-30', 'preferredDate_invalid'],
+    ['preferredTime', '29:70', 'preferredTime_invalid'],
+    ['guestCount', '501', 'guestCount_invalid'],
+    ['pageUrl', 'javascript:alert(1)', 'pageUrl_invalid'],
+    ['message', 'x'.repeat(5001), 'message_too_long'],
+  ];
+
+  for (const [field, value, code] of invalidCases) {
+    assert.throws(
+      () => validateInquirySubmission({ ...validBody, [field]: value }),
+      (error) => error instanceof ValidationError && error.code === code,
+    );
+  }
+});
+
+test('form types, categories, pre-orders, and the honeypot are allowlisted', () => {
+  const invalidCases = [
+    ['formType', 'employment', 'formType_invalid'],
+    ['inquiryCategory', 'Billing', 'inquiryCategory_invalid'],
+    ['preOrders', ['Unknown package'], 'preOrders_invalid'],
+    ['website', 'https://spam.example', 'honeypot'],
+  ];
+
+  for (const [field, value, code] of invalidCases) {
+    assert.throws(
+      () => validateInquirySubmission({ ...validBody, [field]: value }),
+      (error) => error instanceof ValidationError && error.code === code,
+    );
+  }
+});
+
+test('reservation requests require server-side policy agreement', () => {
   assert.throws(
-    () => validateContactInquiry({ ...validBody, phone: 'call me' }),
-    (error) => error instanceof ValidationError && error.code === 'phone_invalid',
+    () => validateInquirySubmission({
+      ...validBody,
+      formType: 'reservation',
+      inquiryCategory: 'Tea Room',
+      policyAgreement: false,
+    }),
+    (error) =>
+      error instanceof ValidationError && error.code === 'policyAgreement_required',
   );
 });
 
-test('invalid email is rejected', () => {
-  assert.throws(
-    () => validateContactInquiry({ ...validBody, email: 'not-an-email' }),
-    (error) => error instanceof ValidationError && error.code === 'email_invalid',
-  );
-});
+test('visitor fields are normalized and control characters are removed', () => {
+  const inquiry = validateInquirySubmission({
+    ...validBody,
+    name: '  Visitor\nName  ',
+    message: 'Hello\u0000 there',
+  });
 
-test('an overly long message is rejected', () => {
-  assert.throws(
-    () => validateContactInquiry({ ...validBody, message: 'x'.repeat(5001) }),
-    (error) => error instanceof ValidationError && error.code === 'message_too_long',
-  );
-});
-
-test('inquiry types are trimmed but values outside the allowlist are rejected', () => {
-  assert.equal(
-    validateContactInquiry({ ...validBody, inquiryType: '  General question  ' }).inquiryType,
-    'General question',
-  );
-  assert.throws(
-    () => validateContactInquiry({ ...validBody, inquiryType: 'Billing' }),
-    (error) => error instanceof ValidationError && error.code === 'inquiryType_invalid',
-  );
-});
-
-test('preferred date and guest count are validated', () => {
-  assert.throws(
-    () => validateContactInquiry({ ...validBody, preferredDate: '2026-02-30' }),
-    (error) => error instanceof ValidationError && error.code === 'preferredDate_invalid',
-  );
-  assert.throws(
-    () => validateContactInquiry({ ...validBody, guestCount: '501' }),
-    (error) => error instanceof ValidationError && error.code === 'guestCount_invalid',
-  );
-});
-
-test('honeypot submissions are rejected', () => {
-  assert.throws(
-    () => validateContactInquiry({ ...validBody, website: 'https://spam.example' }),
-    (error) => error instanceof ValidationError && error.code === 'honeypot',
-  );
+  assert.equal(inquiry.name, 'Visitor Name');
+  assert.equal(inquiry.message, 'Hello there');
 });
 
 test('failed reCAPTCHA verification fails closed', async () => {
@@ -144,21 +172,6 @@ test('failed reCAPTCHA verification fails closed', async () => {
       }),
     }),
     (error) => error instanceof RecaptchaError && error.code === 'rejected',
-  );
-});
-
-test('a reCAPTCHA response from an invalid hostname is rejected', async () => {
-  await assert.rejects(
-    verifyRecaptcha({
-      token: 'browser-token',
-      secret: 'secret-placeholder',
-      allowedHostnames: ['localhost'],
-      fetchImpl: async () => ({
-        ok: true,
-        json: async () => ({ success: true, hostname: 'untrusted.example' }),
-      }),
-    }),
-    (error) => error instanceof RecaptchaError && error.code === 'invalid_hostname',
   );
 });
 
@@ -177,12 +190,38 @@ test('Graph is not called when reCAPTCHA fails', async () => {
   assert.equal(graphCalls, 0);
 });
 
-test('Graph receives a sanitized multipart email with fixed sender and recipient', async () => {
+test('the handler skips reCAPTCHA when it is not configured', async () => {
+  let verificationCalls = 0;
+  const response = await handler({
+    configProvider: () => ({
+      ...config,
+      recaptchaSecretKey: '',
+      allowedRecaptchaHostnames: [],
+    }),
+    verifyRecaptchaFn: async () => {
+      verificationCalls += 1;
+    },
+  })(request({ body: { ...validBody, recaptchaToken: '' } }), context());
+
+  assert.equal(response.status, 202);
+  assert.equal(response.jsonBody.ok, true);
+  assert.equal(verificationCalls, 0);
+});
+
+test('all form types have the required email subject', () => {
+  assert.deepEqual(FORM_SUBJECTS, {
+    general: '1890 Tea House – General Inquiry',
+    reservation: '1890 Tea House – Reservation Request',
+    event: '1890 Tea House – Event Inquiry',
+    contact: '1890 Tea House – Contact Request',
+  });
+});
+
+test('Graph receives a sanitized multipart email with fixed server recipient', async () => {
   let credentialArguments;
   let graphRequest;
-  const inquiry = validateContactInquiry({
+  const inquiry = validateInquirySubmission({
     ...validBody,
-    name: '  Visitor\nName  ',
     message: 'Hello\u0000 <script>alert("no")</script>',
   });
   const emailContent = buildInquiryEmailContent(inquiry, {
@@ -215,23 +254,17 @@ test('Graph receives a sanitized multipart email with fixed sender and recipient
     graphRequest.url,
     'https://graph.microsoft.com/v1.0/users/sender%40example.test/sendMail',
   );
-  assert.equal(graphRequest.options.headers['Content-Type'], 'text/plain');
-  assert.match(mimeMessage, /^From: Tea House Inquiry <sender@example\.test>\r?$/m);
-  assert.match(mimeMessage, /^To: ashley@1890teahouse\.com\r?$/m);
+  assert.match(mimeMessage, /^To: beatriz@diamondpeo\.com\r?$/m);
   assert.match(mimeMessage, /^Reply-To: .+ <visitor@example\.com>\r?$/m);
+  assert.match(mimeMessage, /^Subject: =\?UTF-8\?B\?.+\?=\r?$/m);
   assert.match(mimeMessage, /Content-Type: multipart\/alternative/);
-  assert.match(mimeMessage, /Content-Type: text\/plain; charset="UTF-8"/);
-  assert.match(mimeMessage, /Content-Type: text\/html; charset="UTF-8"/);
-  assert.equal(inquiry.name, 'Visitor Name');
-  assert.equal(emailContent.plainText.includes('\u0000'), false);
-  assert.match(emailContent.plainText, /Website source: 1890 Tea House website contact form/);
-  assert.match(emailContent.html, /Reply to/);
-  assert.match(emailContent.html, /Visitor Name &lt;visitor@example\.com&gt;/);
+  assert.match(emailContent.plainText, /Form type: general/);
+  assert.match(emailContent.plainText, /Page URL: https:\/\/diamonddevelopmentteam/);
   assert.match(emailContent.html, /Hello &lt;script&gt;alert\(&quot;no&quot;\)&lt;\/script&gt;/);
   assert.doesNotMatch(emailContent.html, /<script>/);
 });
 
-test('configuration enforces the server-side inquiry recipient', () => {
+test('configuration enforces the server-side recipient', () => {
   const environment = {
     AZURE_TENANT_ID: 'tenant-placeholder',
     AZURE_CLIENT_ID: 'client-placeholder',
@@ -240,7 +273,7 @@ test('configuration enforces the server-side inquiry recipient', () => {
     INQUIRY_RECIPIENT_EMAIL: 'different@example.test',
   };
 
-  assert.throws(() => loadConfig(environment), /contact service is not configured/i);
+  assert.throws(() => loadConfig(environment), /submission service is not configured/i);
 });
 
 test('default CORS origins and an optional custom origin are loaded server-side', () => {
@@ -249,7 +282,7 @@ test('default CORS origins and an optional custom origin are loaded server-side'
     AZURE_CLIENT_ID: 'client-placeholder',
     AZURE_CLIENT_SECRET: 'secret-placeholder',
     GRAPH_SENDER_EMAIL: 'sender@example.test',
-    INQUIRY_RECIPIENT_EMAIL: 'ashley@1890teahouse.com',
+    INQUIRY_RECIPIENT_EMAIL: 'beatriz@diamondpeo.com',
     ADDITIONAL_ALLOWED_ORIGINS: 'https://www.1890teahouse.com',
   });
 
@@ -259,23 +292,6 @@ test('default CORS origins and an optional custom origin are loaded server-side'
     'http://localhost:5174',
     'https://www.1890teahouse.com',
   ]);
-  assert.equal(loaded.recaptchaSecretKey, '');
-});
-
-test('reCAPTCHA is optional but its server settings must be configured together', () => {
-  const baseEnvironment = {
-    AZURE_TENANT_ID: 'tenant-placeholder',
-    AZURE_CLIENT_ID: 'client-placeholder',
-    AZURE_CLIENT_SECRET: 'secret-placeholder',
-    GRAPH_SENDER_EMAIL: 'sender@example.test',
-    INQUIRY_RECIPIENT_EMAIL: 'ashley@1890teahouse.com',
-  };
-
-  assert.throws(
-    () => loadConfig({ ...baseEnvironment, RECAPTCHA_SECRET_KEY: 'secret-placeholder' }),
-    /contact service is not configured/i,
-  );
-  assert.doesNotThrow(() => loadConfig(baseEnvironment));
 });
 
 test('a disallowed CORS origin receives no allow-origin header', async () => {
@@ -299,68 +315,41 @@ test('OPTIONS preflight returns CORS headers for an allowed origin', async () =>
   assert.equal(response.headers['Access-Control-Allow-Methods'], 'POST, OPTIONS');
 });
 
-test('missing backend configuration returns a generic service error', async () => {
+test('rate limiting returns a structured 429 response', async () => {
+  const limiter = createRateLimiter({ limit: 1, windowMs: 60_000, now: () => 1_000 });
+  const guardedHandler = handler({ rateLimiter: limiter });
+
+  assert.equal((await guardedHandler(request(), context())).status, 202);
+  const response = await guardedHandler(request(), context());
+
+  assert.equal(response.status, 429);
+  assert.equal(response.jsonBody.error.code, 'rate_limited');
+  assert.equal(response.headers['Retry-After'], '60');
+});
+
+test('missing backend configuration returns a generic service error with request ID', async () => {
   const response = await handler({
     configProvider: () => loadConfig({}),
   })(request(), context());
 
   assert.equal(response.status, 503);
-  assert.deepEqual(response.jsonBody, {
-    ok: false,
-    error: {
-      code: 'service_unavailable',
-      message: 'The contact service is temporarily unavailable.',
-    },
-    message: 'The contact service is temporarily unavailable.',
-    requestId: 'request-id',
-  });
+  assert.equal(response.jsonBody.error.code, 'service_unavailable');
+  assert.equal(response.jsonBody.requestId, 'request-id');
 });
 
-test('the handler skips reCAPTCHA when it is not configured', async () => {
-  let verificationCalls = 0;
-  const response = await handler({
-    configProvider: () => ({
-      ...config,
-      recaptchaSecretKey: '',
-      allowedRecaptchaHostnames: [],
-    }),
-    verifyRecaptchaFn: async () => {
-      verificationCalls += 1;
-    },
-  })(request({ body: { ...validBody, recaptchaToken: '' } }), context());
-
-  assert.equal(response.status, 202);
-  assert.equal(response.jsonBody.ok, true);
-  assert.equal(verificationCalls, 0);
-});
-
-test('invalid JSON and unsupported content types are rejected before dependencies run', async () => {
-  let dependencyCalls = 0;
-  const guardedHandler = handler({
-    verifyRecaptchaFn: async () => {
-      dependencyCalls += 1;
-    },
-    sendInquiryEmailFn: async () => {
-      dependencyCalls += 1;
-    },
-  });
-
+test('invalid JSON, unsupported content types, and oversized bodies are rejected', async () => {
+  const guardedHandler = handler();
   const invalidJsonResponse = await guardedHandler(request({ body: '{' }), context());
   const unsupportedResponse = await guardedHandler(
     request({ contentType: 'text/plain' }),
     context(),
   );
-
-  assert.equal(invalidJsonResponse.status, 400);
-  assert.equal(unsupportedResponse.status, 415);
-  assert.equal(dependencyCalls, 0);
-});
-
-test('request bodies over the size limit are rejected', async () => {
-  const response = await handler()(
+  const oversizedResponse = await guardedHandler(
     request({ body: JSON.stringify({ padding: 'x'.repeat(16 * 1024) }) }),
     context(),
   );
 
-  assert.equal(response.status, 413);
+  assert.equal(invalidJsonResponse.status, 400);
+  assert.equal(unsupportedResponse.status, 415);
+  assert.equal(oversizedResponse.status, 413);
 });

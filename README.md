@@ -29,10 +29,11 @@ Images use explicit width and height values to prevent layout shift, native lazy
 
 ## Secure inquiry email
 
-The Visit form posts to the separate Azure Function in `api`, which validates the
-request and sends mail through Microsoft Graph application authentication. The
-GitHub Pages bundle contains only the public `VITE_INQUIRY_API_URL`; Graph
-credentials remain server-side.
+The Visit and large-party reservation/event forms share one typed frontend
+submission service and post to the separate Azure Function in `api`. The Function
+validates each request and sends it to `beatriz@diamondpeo.com` through Microsoft
+Graph application authentication. The GitHub Pages bundle contains only the
+public `VITE_INQUIRY_API_URL`; Graph credentials remain server-side.
 
 See `docs/MICROSOFT_GRAPH.md` for the endpoint contract, Microsoft Entra and
 `Mail.Send` setup, Azure settings, local testing, deployment, CORS, GitHub

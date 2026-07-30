@@ -2,7 +2,12 @@ import { ClientSecretCredential } from '@azure/identity';
 
 const GRAPH_SCOPE = 'https://graph.microsoft.com/.default';
 const GRAPH_BASE_URL = 'https://graph.microsoft.com/v1.0';
-const WEBSITE_SOURCE = '1890 Tea House website contact form';
+export const FORM_SUBJECTS = Object.freeze({
+  general: '1890 Tea House – General Inquiry',
+  reservation: '1890 Tea House – Reservation Request',
+  event: '1890 Tea House – Event Inquiry',
+  contact: '1890 Tea House – Contact Request',
+});
 
 export class GraphMailError extends Error {
   constructor(code, status) {
@@ -34,34 +39,42 @@ function encodeMimePart(value) {
 }
 
 export function buildInquiryEmailContent(inquiry, { submittedAt, requestId }) {
+  const subject = FORM_SUBJECTS[inquiry.formType];
+  const preOrders = inquiry.preOrders.length > 0 ? inquiry.preOrders.join(', ') : 'None selected';
   const plainText = [
-    'A new contact inquiry was submitted to the 1890 Tea House website.',
+    'A new form submission was received from the 1890 Tea House website.',
     '',
+    `Form type: ${inquiry.formType}`,
     `Name: ${inquiry.name}`,
-    `Email: ${inquiry.email}`,
+    `Visitor email: ${inquiry.email}`,
     `Phone: ${inquiry.phone}`,
-    `Inquiry type: ${inquiry.inquiryType}`,
     `Preferred date: ${inquiry.preferredDate}`,
+    `Preferred time: ${inquiry.preferredTime || 'Not provided'}`,
     `Guest count: ${inquiry.guestCount}`,
+    `Inquiry category: ${inquiry.inquiryCategory}`,
+    `Pre-order interests: ${preOrders}`,
     '',
     'Message:',
     inquiry.message,
     '',
     `Submitted: ${submittedAt}`,
-    `Website source: ${WEBSITE_SOURCE}`,
+    `Page URL: ${inquiry.pageUrl}`,
     `Request ID: ${requestId}`,
   ].join('\n');
 
   const rows = [
-    ['Customer name', inquiry.name],
-    ['Customer email', inquiry.email],
+    ['Form type', inquiry.formType],
+    ['Name', inquiry.name],
+    ['Visitor email', inquiry.email],
     ['Phone number', inquiry.phone],
-    ['Inquiry type', inquiry.inquiryType],
     ['Preferred date', inquiry.preferredDate],
+    ['Preferred time', inquiry.preferredTime || 'Not provided'],
     ['Guest count', inquiry.guestCount],
+    ['Inquiry category', inquiry.inquiryCategory],
+    ['Pre-order interests', preOrders],
     ['Reply to', `${inquiry.name} <${inquiry.email}>`],
     ['Submission date and time', submittedAt],
-    ['Website source', WEBSITE_SOURCE],
+    ['Page URL', inquiry.pageUrl],
     ['Request ID', requestId],
   ].map(([label, value]) => `
     <tr>
@@ -79,7 +92,7 @@ export function buildInquiryEmailContent(inquiry, { submittedAt, requestId }) {
             <tr>
               <td style="padding:28px 32px;background:#25352f;color:#ffffff">
                 <div style="font-size:12px;letter-spacing:2px;text-transform:uppercase">1890 Tea House</div>
-                <h1 style="margin:8px 0 0;font-family:Georgia,serif;font-size:28px;font-weight:normal">New website inquiry</h1>
+                <h1 style="margin:8px 0 0;font-family:Georgia,serif;font-size:28px;font-weight:normal">${escapeHtml(subject)}</h1>
               </td>
             </tr>
             <tr>
@@ -97,14 +110,17 @@ export function buildInquiryEmailContent(inquiry, { submittedAt, requestId }) {
   </body>
 </html>`;
 
-  return { plainText, html };
+  return { subject, plainText, html };
 }
 
 export function buildGraphMimeMessage(
   inquiry,
   { senderEmail, recipientEmail, submittedAt, requestId },
 ) {
-  const { plainText, html } = buildInquiryEmailContent(inquiry, { submittedAt, requestId });
+  const { subject, plainText, html } = buildInquiryEmailContent(
+    inquiry,
+    { submittedAt, requestId },
+  );
   const boundarySuffix = requestId.replace(/[^a-zA-Z0-9]/g, '') || 'inquiry';
   const boundary = `tea_house_${boundarySuffix}`;
   const submittedDate = new Date(submittedAt).toUTCString();
@@ -113,7 +129,7 @@ export function buildGraphMimeMessage(
     `From: Tea House Inquiry <${senderEmail}>`,
     `To: ${recipientEmail}`,
     `Reply-To: ${encodeHeader(inquiry.name)} <${inquiry.email}>`,
-    `Subject: ${encodeHeader(`New Tea House Inquiry from ${inquiry.name}`)}`,
+    `Subject: ${encodeHeader(subject)}`,
     `Date: ${submittedDate}`,
     'MIME-Version: 1.0',
     `Content-Type: multipart/alternative; boundary="${boundary}"`,

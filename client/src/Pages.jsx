@@ -1,15 +1,18 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import ReCAPTCHA from 'react-google-recaptcha';
 import PageShell from './components/PageShell.jsx';
 import OptimizedImage from './components/OptimizedImage.jsx';
+import FormVerification, {
+  isFormVerificationEnabled,
+} from './components/FormVerification.jsx';
 import { business, businessAddress } from './data/business.js';
 import { eventStatus } from './data/events.js';
 import { contentService } from './services/contentService.js';
 import {
-  InquirySubmissionError,
-  inquiryService,
-} from './services/inquiryService.js';
+  FORM_TYPES,
+  FormSubmissionError,
+  submitForm,
+} from './services/formSubmission.ts';
 
 import building from './assets/images/building.webp';
 import charcuterieBoard from './assets/images/charcuterie-board.webp';
@@ -320,32 +323,126 @@ export function EventsPage() {
   );
 }
 
-function LargePartyForm() {
-  const [status, setStatus] = useState({ type: '', message: '' });
+function SubmissionStatus({ status }) {
+  const isError = status.type === 'validation-error' || status.type === 'submission-error';
+
+  return (
+    <p
+      className={`page-form-status is-${status.type}`}
+      role={isError ? 'alert' : 'status'}
+      aria-live="polite"
+    >
+      {status.type === 'submission-error' ? (
+        <>
+          We could not send your request. Your information is still in the form.
+          Please try again, call <a href={business.phoneHref}>{business.phone}</a>, or
+          email <a href={`mailto:${business.email}`}>{business.email}</a>.
+          {status.requestId ? ` Reference: ${status.requestId}.` : ''}
+        </>
+      ) : (
+        <>
+          {status.message}
+          {status.type === 'success' && status.requestId
+            ? ` Reference: ${status.requestId}.`
+            : ''}
+        </>
+      )}
+    </p>
+  );
+}
+
+function submissionErrorStatus(error) {
+  return {
+    type: error instanceof FormSubmissionError && error.kind === 'validation'
+      ? 'validation-error'
+      : 'submission-error',
+    message: error instanceof Error ? error.message : 'Your request could not be sent.',
+    requestId: error instanceof FormSubmissionError ? error.requestId : '',
+  };
+}
+
+export function LargePartyForm() {
+  const verificationRef = useRef(null);
+  const submittingRef = useRef(false);
+  const [status, setStatus] = useState({ type: 'idle', message: '', requestId: '' });
+  const [verificationToken, setVerificationToken] = useState('');
+  const isSubmitting = status.type === 'submitting';
+
+  const resetVerification = () => {
+    verificationRef.current?.reset();
+    setVerificationToken('');
+  };
+
   const handleSubmit = async (event) => {
     event.preventDefault();
     const form = event.currentTarget;
-    if (!form.reportValidity()) return;
-    setStatus({ type: 'pending', message: 'Preparing your request…' });
+    if (submittingRef.current || isSubmitting) return;
+
+    setStatus({ type: 'validating', message: 'Checking your request…', requestId: '' });
+    if (!form.reportValidity()) {
+      setStatus({
+        type: 'validation-error',
+        message: 'Please complete all required fields.',
+        requestId: '',
+      });
+      return;
+    }
+
+    if (isFormVerificationEnabled() && !verificationToken) {
+      setStatus({
+        type: 'validation-error',
+        message: 'Please complete the verification before sending.',
+        requestId: '',
+      });
+      return;
+    }
+
     const formData = new FormData(form);
-    const payload = Object.fromEntries(formData);
-    payload.preOrders = formData.getAll('preOrders');
+    const inquiryCategory = String(formData.get('occasion') || '').trim();
+    const eventCategories = new Set(['Wedding event', 'Private event']);
+    const payload = {
+      formType: eventCategories.has(inquiryCategory)
+        ? FORM_TYPES.EVENT
+        : FORM_TYPES.RESERVATION,
+      name: String(formData.get('fullName') || '').trim(),
+      email: String(formData.get('email') || '').trim(),
+      phone: String(formData.get('phone') || '').trim(),
+      preferredDate: String(formData.get('date') || '').trim(),
+      preferredTime: String(formData.get('time') || '').trim(),
+      guestCount: String(formData.get('guests') || '').trim(),
+      inquiryCategory,
+      message: String(formData.get('message') || '').trim(),
+      preOrders: formData.getAll('preOrders').map(String),
+      policyAgreement: formData.get('policyAgreement') === 'Agreed',
+      website: String(formData.get('website') || '').trim(),
+      recaptchaToken: verificationToken,
+      pageUrl: window.location.href,
+    };
+
+    submittingRef.current = true;
+    setStatus({ type: 'submitting', message: 'Sending your request…', requestId: '' });
     try {
-      await inquiryService.submitLargeParty(payload);
+      const result = await submitForm(payload);
       setStatus({
         type: 'success',
-        message: 'Thank you. Your request has been sent.',
+        message: 'Thank you. Your request has been sent to the Tea House team.',
+        requestId: result.requestId,
       });
       form.reset();
+      resetVerification();
     } catch (error) {
-      setStatus({ type: 'error', message: error.message });
+      resetVerification();
+      setStatus(submissionErrorStatus(error));
+    } finally {
+      submittingRef.current = false;
     }
   };
+
   return (
     <form className="page-form page-form--large" onSubmit={handleSubmit}>
-      <label>Full name<input name="fullName" autoComplete="name" required /></label>
-      <label>Phone<input type="tel" name="phone" autoComplete="tel" required /></label>
-      <label>Email<input type="email" name="email" autoComplete="email" required /></label>
+      <label>Full name<input name="fullName" autoComplete="name" maxLength="120" required /></label>
+      <label>Phone<input type="tel" name="phone" autoComplete="tel" minLength="7" maxLength="40" required /></label>
+      <label>Email<input type="email" name="email" autoComplete="email" maxLength="254" required /></label>
       <label>Requested date<input type="date" name="date" required /></label>
       <label>Requested time<input type="time" name="time" required /></label>
       <label>Number of guests<input type="number" name="guests" min="12" max="22" required /></label>
@@ -353,10 +450,38 @@ function LargePartyForm() {
       <fieldset><legend>Optional pre-order interests</legend>
         {['Charcuterie boards', 'Tea sandwiches', 'Desserts', 'Tea service for the table'].map((item) => <label className="page-check" key={item}><input type="checkbox" name="preOrders" value={item} />{item}</label>)}
       </fieldset>
-      <label className="page-form-wide">Message<textarea name="message" rows="6" placeholder="Tell us about the occasion, seating preference, dietary needs, or other requests." /></label>
+      <label className="page-form-wide">Message<textarea name="message" rows="6" maxLength="5000" required placeholder="Tell us about the occasion, seating preference, dietary needs, or other requests." /></label>
       <label className="page-check page-form-wide"><input type="checkbox" name="policyAgreement" value="Agreed" required />I have read and agree to the large-party policies shown on this page.</label>
-      <button className="page-button" type="submit" disabled={status.type === 'pending'}>Send large-party request</button>
-      <p className={`page-form-status is-${status.type}`} aria-live="polite">{status.message}</p>
+      <div className="page-form-honeypot" aria-hidden="true">
+        <label>Website<input name="website" type="text" tabIndex="-1" autoComplete="off" /></label>
+      </div>
+      <FormVerification
+        verificationRef={verificationRef}
+        onChange={(token) => {
+          setVerificationToken(token);
+          if (token) setStatus({ type: 'idle', message: '', requestId: '' });
+        }}
+        onExpired={() => {
+          resetVerification();
+          setStatus({
+            type: 'validation-error',
+            message: 'Verification expired. Please complete it again.',
+            requestId: '',
+          });
+        }}
+        onError={() => {
+          resetVerification();
+          setStatus({
+            type: 'validation-error',
+            message: 'Verification could not load. Please try again.',
+            requestId: '',
+          });
+        }}
+      />
+      <button className="page-button" type="submit" disabled={isSubmitting}>
+        {isSubmitting ? 'Sending…' : 'Send large-party request'}
+      </button>
+      <SubmissionStatus status={status} />
     </form>
   );
 }
@@ -532,37 +657,31 @@ export function GalleryPage() {
   );
 }
 
-function ContactForm() {
-  const recaptchaRef = useRef(null);
+export function ContactForm() {
+  const verificationRef = useRef(null);
   const submittingRef = useRef(false);
-  const apiEnabled = inquiryService.isApiConfigured();
-  const recaptchaSiteKey = (import.meta.env.VITE_RECAPTCHA_SITE_KEY || '').trim();
-  const [status, setStatus] = useState(
-    apiEnabled
-      ? { type: 'ready', message: '', requestId: '' }
-      : { type: 'unavailable', message: '', requestId: '' },
-  );
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [recaptchaToken, setRecaptchaToken] = useState('');
+  const [status, setStatus] = useState({ type: 'idle', message: '', requestId: '' });
+  const [verificationToken, setVerificationToken] = useState('');
+  const isSubmitting = status.type === 'submitting';
 
-  const resetRecaptcha = () => {
-    recaptchaRef.current?.reset();
-    setRecaptchaToken('');
+  const resetVerification = () => {
+    verificationRef.current?.reset();
+    setVerificationToken('');
   };
 
-  const handleRecaptchaExpired = () => {
-    resetRecaptcha();
+  const handleVerificationExpired = () => {
+    resetVerification();
     setStatus({
-      type: 'validation',
+      type: 'validation-error',
       message: 'Verification expired. Please complete it again.',
       requestId: '',
     });
   };
 
-  const handleRecaptchaError = () => {
-    resetRecaptcha();
+  const handleVerificationError = () => {
+    resetVerification();
     setStatus({
-      type: 'validation',
+      type: 'validation-error',
       message: 'Verification could not load. Please try again.',
       requestId: '',
     });
@@ -573,16 +692,19 @@ function ContactForm() {
     const form = event.currentTarget;
 
     if (submittingRef.current || isSubmitting) return;
-    if (!form.reportValidity()) return;
-
-    if (!apiEnabled) {
-      setStatus({ type: 'unavailable', message: '', requestId: '' });
+    setStatus({ type: 'validating', message: 'Checking your inquiry…', requestId: '' });
+    if (!form.reportValidity()) {
+      setStatus({
+        type: 'validation-error',
+        message: 'Please complete all required fields.',
+        requestId: '',
+      });
       return;
     }
 
-    if (recaptchaSiteKey && !recaptchaToken) {
+    if (isFormVerificationEnabled() && !verificationToken) {
       setStatus({
-        type: 'validation',
+        type: 'validation-error',
         message: 'Please complete the verification before sending.',
         requestId: '',
       });
@@ -590,73 +712,43 @@ function ContactForm() {
     }
 
     const formData = new FormData(form);
+    const inquiryCategory = String(formData.get('inquiryType') || '').trim();
+    const eventCategories = new Set(['Large party', 'Private event', 'Catering']);
     const payload = {
+      formType: eventCategories.has(inquiryCategory)
+        ? FORM_TYPES.EVENT
+        : inquiryCategory === 'General question'
+          ? FORM_TYPES.GENERAL
+          : FORM_TYPES.CONTACT,
       name: String(formData.get('name') || '').trim(),
       email: String(formData.get('email') || '').trim(),
       phone: String(formData.get('phone') || '').trim(),
-      inquiryType: String(formData.get('inquiryType') || '').trim(),
       preferredDate: String(formData.get('preferredDate') || '').trim(),
       guestCount: String(formData.get('guestCount') || '').trim(),
+      inquiryCategory,
       message: String(formData.get('message') || '').trim(),
       website: String(formData.get('website') || '').trim(),
-      recaptchaToken,
+      recaptchaToken: verificationToken,
+      pageUrl: window.location.href,
     };
 
-    if (
-      !payload.name
-      || !payload.email
-      || !payload.phone
-      || !payload.preferredDate
-      || !payload.guestCount
-      || !payload.inquiryType
-      || !payload.message
-    ) {
-      setStatus({
-        type: 'validation',
-        message: 'Please complete all required fields.',
-        requestId: '',
-      });
-      return;
-    }
-
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(payload.email)) {
-      setStatus({
-        type: 'validation',
-        message: 'Please enter a valid email address.',
-        requestId: '',
-      });
-      return;
-    }
-
     submittingRef.current = true;
-    setIsSubmitting(true);
     setStatus({ type: 'submitting', message: 'Sending your inquiry…', requestId: '' });
 
     try {
-      const result = await inquiryService.submitContact(payload);
+      const result = await submitForm(payload);
       setStatus({
         type: 'success',
-        message: typeof result.message === 'string'
-          ? result.message
-          : 'Thank you! Your inquiry has been sent to the Tea House team.',
-        requestId: typeof result.requestId === 'string' ? result.requestId : '',
+        message: result.message,
+        requestId: result.requestId,
       });
       form.reset();
-      resetRecaptcha();
+      resetVerification();
     } catch (error) {
-      resetRecaptcha();
-      const isValidationError = error instanceof InquirySubmissionError
-        && error.kind === 'validation';
-      setStatus({
-        type: isValidationError ? 'validation' : 'unavailable',
-        message: error instanceof Error
-          ? error.message
-          : 'Your inquiry could not be submitted. Please try again.',
-        requestId: error instanceof InquirySubmissionError ? error.requestId : '',
-      });
+      resetVerification();
+      setStatus(submissionErrorStatus(error));
     } finally {
       submittingRef.current = false;
-      setIsSubmitting(false);
     }
   };
 
@@ -671,20 +763,15 @@ function ContactForm() {
     <div className="page-form-honeypot" aria-hidden="true">
       <label>Website<input name="website" type="text" tabIndex="-1" autoComplete="off" /></label>
     </div>
-    {recaptchaSiteKey ? (
-      <div className="page-form-recaptcha">
-        <ReCAPTCHA
-          ref={recaptchaRef}
-          sitekey={recaptchaSiteKey}
-          onChange={(token) => {
-            setRecaptchaToken(token || '');
-            if (token) setStatus({ type: 'ready', message: '', requestId: '' });
-          }}
-          onExpired={handleRecaptchaExpired}
-          onErrored={handleRecaptchaError}
-        />
-      </div>
-    ) : null}
+    <FormVerification
+      verificationRef={verificationRef}
+      onChange={(token) => {
+        setVerificationToken(token);
+        if (token) setStatus({ type: 'idle', message: '', requestId: '' });
+      }}
+      onExpired={handleVerificationExpired}
+      onError={handleVerificationError}
+    />
     <button
       className="page-button"
       type="submit"
@@ -692,27 +779,7 @@ function ContactForm() {
     >
       {isSubmitting ? 'Sending…' : 'Send Inquiry'}
     </button>
-    <p
-      className={`page-form-status is-${status.type}`}
-      role={status.type === 'validation' || status.type === 'unavailable' ? 'alert' : 'status'}
-      aria-live="polite"
-    >
-      {status.type === 'unavailable' ? (
-        <>
-          The online form is temporarily unavailable. Please call{' '}
-          <a href={business.phoneHref}>{business.phone}</a> or email{' '}
-          <a href={`mailto:${business.email}`}>{business.email}</a>.
-          {status.requestId ? ` Reference: ${status.requestId}.` : ''}
-        </>
-      ) : (
-        <>
-          {status.message}
-          {status.type === 'success' && status.requestId
-            ? ` Reference: ${status.requestId}.`
-            : ''}
-        </>
-      )}
-    </p>
+    <SubmissionStatus status={status} />
   </form>;
 }
 
