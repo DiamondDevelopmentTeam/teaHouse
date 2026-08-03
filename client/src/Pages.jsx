@@ -570,7 +570,7 @@ export function FAQPage() {
       <section className="page-section page-faq-list">
         {faqs.map(({ question, answer }, index) => {
           const expanded = open === index;
-          return <article key={question} className={expanded ? 'is-open' : ''}><h2><button type="button" aria-expanded={expanded} aria-controls={`faq-answer-${index}`} onClick={() => setOpen(expanded ? -1 : index)}><span>{String(index + 1).padStart(2, '0')}</span>{question}<i aria-hidden="true" /></button></h2><div id={`faq-answer-${index}`} hidden={!expanded}><p>{answer}</p></div></article>;
+          return <article key={question} className={expanded ? 'is-open' : ''}><h2><button type="button" aria-expanded={expanded} aria-controls={`faq-answer-${index}`} onClick={() => setOpen(expanded ? -1 : index)}><span className="page-faq-number">{String(index + 1).padStart(2, '0')}</span><span className="page-faq-question">{question}</span><i aria-hidden="true" /></button></h2><div id={`faq-answer-${index}`} hidden={!expanded}><p>{answer}</p></div></article>;
         })}
       </section>
       <CTA />

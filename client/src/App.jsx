@@ -568,8 +568,8 @@ function App() {
             {faqs.map((item, index) => (
               <details key={item.question}>
                 <summary>
-                  <span>{String(index + 1).padStart(2, '0')}</span>
-                  {item.question}
+                  <span className="faq-number">{String(index + 1).padStart(2, '0')}</span>
+                  <span className="faq-question">{item.question}</span>
                   <i aria-hidden="true" />
                 </summary>
                 <p>{item.answer}</p>

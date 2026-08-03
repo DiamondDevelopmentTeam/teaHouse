@@ -1127,22 +1127,28 @@
 
 .page-faq-list button {
   display: grid;
-  grid-template-columns: 4rem 1fr 1.5rem;
+  grid-template-columns: 4rem minmax(0, 1fr) 1.5rem;
   align-items: center;
+  gap: 1rem;
   width: 100%;
-  padding: 1.5rem 0;
+  padding: 1.45rem 0;
   border: 0;
   color: var(--ink);
   background: transparent;
-  font: 500 clamp(1.05rem, 1.7vw, 1.45rem)/1.3 var(--sans);
+  font: 600 clamp(1.05rem, 1.7vw, 1.45rem)/1.4 var(--sans);
   text-align: left;
   cursor: pointer;
 }
 
-.page-faq-list button span {
+.page-faq-list button .page-faq-number {
   color: var(--pink);
   font-size: 0.7rem;
   font-weight: 700;
+}
+
+.page-faq-question {
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 
 .page-faq-list button i {
@@ -1167,6 +1173,19 @@
   margin: 0;
   color: var(--muted);
   line-height: 1.7;
+}
+
+@media (max-width: 620px) {
+  .page-faq-list button {
+    grid-template-columns: 2rem minmax(0, 1fr) 1.25rem;
+    gap: 0.7rem;
+    padding-block: 1.3rem;
+    font-size: 1rem;
+  }
+
+  .page-faq-list article > div {
+    padding: 0 0 1.4rem 2.7rem;
+  }
 }
 
 .journal-article {

@@ -17,6 +17,8 @@
   --serif: 'Bodoni Moda', 'Iowan Old Style', 'Times New Roman', serif;
   --sans: 'Manrope', 'Segoe UI', Arial, sans-serif;
   --section-x: clamp(1.4rem, 5.6vw, 7rem);
+  --section-y: clamp(4.75rem, 7.5vw, 7.5rem);
+  --section-y-compact: clamp(4rem, 6vw, 6rem);
   --hero-shift: 0px;
 }
 
@@ -698,11 +700,11 @@ address {
 }
 
 .story {
-  padding-top: clamp(6rem, 11vw, 10rem);
-  padding-bottom: clamp(5.5rem, 10vw, 9rem);
+  padding-top: var(--section-y);
+  padding-bottom: var(--section-y);
   display: grid;
   grid-template-columns: minmax(20rem, 1fr) minmax(20rem, 0.7fr);
-  gap: 4rem 8vw;
+  gap: clamp(2.25rem, 3.25vw, 3.25rem) 8vw;
   background: var(--paper-light);
 }
 
@@ -741,7 +743,7 @@ address {
 }
 
 .story-copy .text-link {
-  margin-top: 2rem;
+  margin-top: 1.65rem;
 }
 
 .story-image {
@@ -784,12 +786,12 @@ address {
 }
 
 .menu-heading {
-  padding-top: clamp(5.5rem, 9vw, 8.5rem);
-  padding-bottom: clamp(3rem, 5vw, 5rem);
+  padding-top: var(--section-y);
+  padding-bottom: clamp(3rem, 4vw, 4rem);
   display: grid;
-  grid-template-columns: 1fr minmax(17rem, 0.42fr);
+  grid-template-columns: minmax(0, 1fr) minmax(19rem, 0.44fr);
   align-items: end;
-  gap: 3rem 8vw;
+  gap: 1.5rem clamp(3rem, 6vw, 7rem);
   border-bottom: 1px solid var(--line-light);
 }
 
@@ -803,23 +805,35 @@ address {
   color: var(--white);
 }
 
+.menu-heading h2 {
+  max-width: 11ch;
+  margin-top: 0;
+}
+
 .menu-heading > p:last-child {
+  max-width: 31rem;
+  padding-bottom: 0.35rem;
   color: rgba(255, 254, 249, 0.67);
   font-size: 1.04rem;
+  line-height: 1.75;
 }
 
 .menu-layout {
-  padding-top: clamp(4rem, 7vw, 7rem);
-  padding-bottom: clamp(4rem, 7vw, 7rem);
+  padding-top: var(--section-y-compact);
+  padding-bottom: var(--section-y-compact);
   display: grid;
   grid-template-columns: minmax(24rem, 1.1fr) minmax(20rem, 0.7fr);
-  gap: clamp(3rem, 8vw, 9rem);
+  gap: clamp(3rem, 6.5vw, 7rem);
   align-items: start;
 }
 
 .menu-lists {
-  display: grid;
-  gap: 4rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.menu-list + .menu-list {
+  margin-top: clamp(2.75rem, 4vw, 4rem);
 }
 
 .menu-list-title {
@@ -870,21 +884,20 @@ address {
 }
 
 .menu-note {
-  margin-top: -1.8rem;
+  margin-top: 1.4rem;
   color: rgba(255, 254, 249, 0.48);
   font-size: 0.7rem;
 }
 
 .menu-lists .button {
   width: fit-content;
-  margin-top: -1.5rem;
+  margin-top: 1.6rem;
 }
 
 .menu-image {
   position: sticky;
   top: 7rem;
-  height: min(70rem, 72vw);
-  max-height: 52rem;
+  height: clamp(34rem, 54vw, 48rem);
   overflow: hidden;
 }
 
@@ -916,7 +929,7 @@ address {
 }
 
 .service-ledger article {
-  min-height: 18rem;
+  min-height: 16rem;
   padding: 2rem clamp(1.2rem, 2vw, 2.2rem) 2.4rem;
   display: flex;
   flex-direction: column;
@@ -950,8 +963,8 @@ address {
 }
 
 .rooms {
-  padding-top: clamp(6rem, 10vw, 10rem);
-  padding-bottom: clamp(6rem, 10vw, 10rem);
+  padding-top: var(--section-y);
+  padding-bottom: var(--section-y);
   display: grid;
   grid-template-columns: minmax(26rem, 0.9fr) minmax(25rem, 0.8fr);
   align-items: center;
@@ -1051,8 +1064,8 @@ address {
 }
 
 .events-copy {
-  padding-top: clamp(5rem, 9vw, 9rem);
-  padding-bottom: clamp(5rem, 9vw, 9rem);
+  padding-top: var(--section-y);
+  padding-bottom: var(--section-y);
   align-self: center;
 }
 
@@ -1095,8 +1108,8 @@ address {
 }
 
 .notes {
-  padding-top: clamp(5.5rem, 9vw, 8.5rem);
-  padding-bottom: clamp(5.5rem, 9vw, 8.5rem);
+  padding-top: var(--section-y);
+  padding-bottom: var(--section-y);
   background: var(--sage);
 }
 
@@ -1215,11 +1228,11 @@ address {
 }
 
 .faq {
-  padding-top: clamp(6rem, 10vw, 9rem);
-  padding-bottom: clamp(6rem, 10vw, 9rem);
+  padding-top: var(--section-y);
+  padding-bottom: var(--section-y);
   display: grid;
   grid-template-columns: minmax(18rem, 0.65fr) minmax(28rem, 1.2fr);
-  gap: clamp(4rem, 10vw, 10rem);
+  gap: clamp(4rem, 8vw, 8rem);
   background: var(--paper-light);
 }
 
@@ -1252,9 +1265,9 @@ address {
 }
 
 .faq-list summary {
-  padding: 1.65rem 0;
+  padding: 1.55rem 0;
   display: grid;
-  grid-template-columns: 3rem 1fr 1.5rem;
+  grid-template-columns: 3rem minmax(0, 1fr) 1.5rem;
   align-items: center;
   gap: 1rem;
   cursor: pointer;
@@ -1262,18 +1275,26 @@ address {
   color: var(--ink);
   font-family: var(--serif);
   font-size: clamp(1.4rem, 2.2vw, 2.2rem);
-  line-height: 1.2;
+  font-weight: 500;
+  letter-spacing: -0.018em;
+  line-height: 1.28;
 }
 
 .faq-list summary::-webkit-details-marker {
   display: none;
 }
 
-.faq-list summary span {
+.faq-list summary .faq-number {
   color: var(--pink);
   font-family: var(--sans);
   font-size: 0.6rem;
   font-weight: 700;
+  letter-spacing: normal;
+}
+
+.faq-question {
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 
 .faq-list summary i {
@@ -1304,9 +1325,10 @@ address {
 
 .faq-list details > p {
   max-width: 40rem;
-  padding: 0 3rem 1.8rem 4rem;
+  padding: 0 3rem 1.7rem 4rem;
   color: var(--muted);
-  font-size: 0.88rem;
+  font-size: 0.94rem;
+  line-height: 1.75;
 }
 
 .visit {
@@ -1347,8 +1369,8 @@ address {
 }
 
 .visit-details {
-  padding-top: clamp(5rem, 8vw, 8.5rem);
-  padding-bottom: clamp(5rem, 8vw, 8.5rem);
+  padding-top: var(--section-y);
+  padding-bottom: var(--section-y);
   align-self: center;
 }
 
@@ -1739,7 +1761,7 @@ address {
   }
 
   .story {
-    gap: 2rem;
+    gap: 1.9rem;
   }
 
   .story-heading h2 {
@@ -1754,10 +1776,19 @@ address {
     grid-column: auto;
   }
 
+  .menu-heading {
+    row-gap: 1.25rem;
+  }
+
+  .menu-heading > p:last-child {
+    max-width: 38rem;
+    padding-bottom: 0;
+  }
+
   .menu-image {
     position: relative;
     top: auto;
-    height: min(45rem, 105vw);
+    height: min(38rem, 78vw);
   }
 
   .rooms {
@@ -1794,6 +1825,10 @@ address {
 
   .faq-intro {
     position: static;
+  }
+
+  .faq {
+    gap: 3rem;
   }
 
   .visit-media {
@@ -1916,12 +1951,24 @@ address {
     height: 30rem;
   }
 
+  .story,
+  .menu-heading,
+  .menu-layout,
+  .rooms,
+  .events-copy,
+  .notes,
+  .faq,
+  .visit-details {
+    padding-top: 4.5rem;
+    padding-bottom: 4.5rem;
+  }
+
   .story-image figcaption {
     width: 92%;
   }
 
   .menu-layout {
-    gap: 3.5rem;
+    gap: 3rem;
   }
 
   .menu-list-title {
@@ -1938,7 +1985,7 @@ address {
   }
 
   .menu-image {
-    height: 130vw;
+    height: min(34rem, 105vw);
   }
 
   .service-ledger {
@@ -2014,12 +2061,15 @@ address {
   }
 
   .faq-list summary {
-    grid-template-columns: 1.8rem 1fr 1.2rem;
-    font-size: 1.35rem;
+    padding-block: 1.35rem;
+    grid-template-columns: 1.8rem minmax(0, 1fr) 1.2rem;
+    gap: 0.75rem;
+    font-size: 1.28rem;
+    line-height: 1.35;
   }
 
   .faq-list details > p {
-    padding-left: 2.8rem;
+    padding-left: 2.55rem;
     padding-right: 0;
   }
 
