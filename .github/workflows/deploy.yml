@@ -55,7 +55,7 @@ jobs:
           node -e "const value=process.env.VITE_INQUIRY_API_URL; if(!value) throw new Error('Repository variable VITE_INQUIRY_API_URL is required'); const url=new URL(value); if(url.protocol !== 'https:' || url.pathname !== '/api/send-inquiry') throw new Error('VITE_INQUIRY_API_URL must be an HTTPS /api/send-inquiry endpoint');"
       - name: Validate public reCAPTCHA key
         run: |
-          node -e "if(!String(process.env.VITE_RECAPTCHA_SITE_KEY || '').trim()) throw new Error('Repository variable VITE_RECAPTCHA_SITE_KEY is required');"
+          node -e "if(!String(process.env.VITE_RECAPTCHA_SITE_KEY || '').trim()) throw new Error('Repository variable VITE_RECAPTCHA_SITE_KEY is required. Configure it at: GitHub repository -> Settings -> Secrets and variables -> Actions -> Variables -> VITE_RECAPTCHA_SITE_KEY');"
       - name: Build Vite site
         run: npm run build
       - name: Verify Pages paths and SPA fallback
