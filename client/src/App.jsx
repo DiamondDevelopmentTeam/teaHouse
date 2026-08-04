@@ -7,6 +7,7 @@ import { Meta } from './Pages.jsx';
 import building from './assets/images/building.webp';
 import cupOfFruits from './assets/images/cupOfFruits.jpg';
 import diamondSuites from './assets/images/DiamondSuitesDownTownOcala.webp';
+import interior from './assets/images/migrated/about/interior.webp';
 import tableOfTeaHouse from './assets/images/tableOfTeaHouse.jpg';
 import teaHouseBanner from './assets/images/teaHouseBanner.webp';
 import teaHouseLogo from './assets/images/TeaHouseLogo.webp';
@@ -19,10 +20,10 @@ const largePartyLink = '/reservations#large-party';
 const directionsLink = business.directionsUrl;
 
 const primaryNav = [
-  { label: 'About', to: '/about' },
-  { label: 'Menus', to: '/menus' },
-  { label: 'Tea Rooms', to: '/tea-rooms' },
-  { label: 'Visit', to: '/contact' },
+  { label: 'Our Story', href: '#about' },
+  { label: 'Tea & Dining', href: '#menus' },
+  { label: 'Gatherings', href: '#events' },
+  { label: 'Visit', href: '#contact' },
 ];
 
 const fullNav = [{ label: 'Home', to: '/' }, ...navigation];
@@ -40,10 +41,10 @@ const sweetFavorites = [
 ];
 
 const services = [
-  ['01', 'Curated tea & coffee', 'Classic pours, matcha, chai, espresso, and more.'],
-  ['02', 'Tea sandwiches & bites', 'Fresh, elegant plates for a light lunch or a leisurely afternoon.'],
-  ['03', 'Charcuterie', 'Signature cups and boards sized for solo visits or shared tables.'],
-  ['04', 'Pastries & desserts', 'A sweet finish, prepared with a little ceremony.'],
+  ['01', 'Tea & coffee', 'Classic pours, matcha, chai, espresso, and more for a quick cup or a longer stay.'],
+  ['02', 'Sandwiches & bites', 'Light plates that work for lunch, afternoon tea, or something in between.'],
+  ['03', 'Charcuterie', 'Signature cups and boards sized for solo visits, date nights, and shared tables.'],
+  ['04', 'Pastries & desserts', 'A sweet finish to pair with the last pour from the pot.'],
 ];
 
 const faqs = [
@@ -58,19 +59,24 @@ const faqs = [
       'Please share dietary needs in advance and the team will do its best to accommodate them.',
   },
   {
-    question: 'Can I host a private event?',
+    question: 'Can I plan a private gathering?',
     answer:
-      'Yes. Tea rooms and event options are available for celebrations, meetings, and other gatherings.',
+      'Private tea rooms and event options are available for celebrations, meetings, and other gatherings. Submit a large-party request so the team can help with the right space and details.',
   },
   {
-    question: 'Do you serve alcohol?',
+    question: 'Does 1890 Tea House offer catering?',
     answer:
-      'Yes. Select wines and craft beverages are available alongside tea and coffee service.',
+      'Catering is part of the current Tea House offering. Selections and arrangements vary, so send an inquiry to discuss your date, guest count, and menu needs.',
   },
   {
-    question: 'Is parking available?',
+    question: 'How do I start an event inquiry?',
     answer:
-      'Yes. Ample parking is available in the Diamond Downtown Ocala parking area.',
+      'Use the large-party request form for groups of 12 or more. Your plans are not confirmed until the Tea House follows up with availability and next steps.',
+  },
+  {
+    question: 'Where can I find current menus and hours?',
+    answer:
+      'Use the Menus page for current listed selections and the Visit section for regular hours. Hours and offerings can change for holidays or special events, so contact the Tea House when timing is important.',
   },
 ];
 
@@ -100,6 +106,7 @@ function Arrow() {
 function App() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [openFaq, setOpenFaq] = useState(0);
   const menuCloseRef = useRef(null);
 
   useEffect(() => {
@@ -187,9 +194,9 @@ function App() {
 
           <nav className="primary-nav" aria-label="Primary navigation">
             {primaryNav.map((item) => (
-              <NavLink key={item.to} to={item.to}>
+              <a key={item.href} href={item.href}>
                 {item.label}
-              </NavLink>
+              </a>
             ))}
           </nav>
 
@@ -257,7 +264,7 @@ function App() {
               <em>to linger.</em>
             </h1>
             <p className="hero-intro">
-              Curated teas, artful bites, and private rooms in one of Ocala’s most distinctive historic settings.
+              Curated teas, artful bites, private rooms, and catering in a character-filled downtown Ocala setting made for unrushed conversation.
             </p>
             <div className="hero-actions">
               <a className="button button--gold" href={reservationLink} target="_blank" rel="noreferrer">
@@ -315,14 +322,25 @@ function App() {
               1890 Tea House is a place to slow the pace, share something delicious, and let conversation take its time.
             </p>
             <p>
-              Set inside the historic Diamond Suites building, the tea house brings together thoughtfully selected drinks, delicate bites, private rooms, and a welcoming patio in the heart of Ocala.
+              Set inside the historic Diamond Suites building, the tea house brings together thoughtfully selected drinks, delicate bites, individually styled rooms, and a welcoming patio in downtown Ocala.
             </p>
-            <a className="text-link" href="#tea-rooms">
-              Explore the experience <Arrow />
-            </a>
+            <p>
+              Come for a pot and a quiet lunch, make an afternoon of tea and dessert, or gather a table around charcuterie and conversation. The experience is polished without feeling hurried or formal.
+            </p>
+            <p>
+              That balance is the heart of 1890: a memorable setting with the ease of a neighborhood welcome, designed for everyday visits as much as celebrations.
+            </p>
+            <div className="story-actions">
+              <Link className="text-link" to="/about">
+                Read our story <Arrow />
+              </Link>
+              <a className="text-link" href="#tea-rooms">
+                Explore the rooms <Arrow />
+              </a>
+            </div>
           </div>
 
-          <figure className="story-image image-reveal" data-reveal>
+          <figure className="story-image image-reveal">
             <img
               src={building}
               alt="The black, white, and pink 1890 Tea House with its outdoor patio"
@@ -332,10 +350,55 @@ function App() {
               decoding="async"
             />
             <figcaption>
-              <span>Since 1890</span>
-              A landmark setting on Silver Springs Boulevard
+              <span>Downtown Ocala</span>
+              The Tea House at Diamond Suites on Silver Springs Boulevard
             </figcaption>
           </figure>
+        </section>
+
+        <section className="experience section-pad" aria-labelledby="experience-title">
+          <div className="experience-intro" data-reveal>
+            <p className="eyebrow">The 1890 experience</p>
+            <h2 id="experience-title">Choose your own kind of pause.</h2>
+            <p>
+              The Tea House can be a quick meeting place, a leisurely lunch, an afternoon ritual, or the setting for a milestone. Each visit starts with the same invitation: settle in and stay awhile.
+            </p>
+          </div>
+
+          <figure className="experience-image image-reveal" data-reveal>
+            <img
+              src={interior}
+              alt="An elegant 1890 Tea House interior with a set table and chandelier"
+              width="1442"
+              height="903"
+              loading="lazy"
+              decoding="async"
+            />
+            <figcaption>Rooms with their own character, ready for tea, lunch, and conversation.</figcaption>
+          </figure>
+
+          <div className="experience-grid">
+            <article data-reveal>
+              <span>01</span>
+              <h3>A pot worth pausing for</h3>
+              <p>Explore classic tea, matcha, chai, coffee, and other pours at the pace that suits your table.</p>
+            </article>
+            <article data-reveal>
+              <span>02</span>
+              <h3>Lunch with a little ceremony</h3>
+              <p>Build a visit around tea sandwiches, light bites, charcuterie, pastries, or a well-earned dessert.</p>
+            </article>
+            <article data-reveal>
+              <span>03</span>
+              <h3>Space to gather</h3>
+              <p>Individually styled tea rooms and event options give birthdays, showers, meetings, and reunions a distinctive backdrop.</p>
+            </article>
+            <article data-reveal>
+              <span>04</span>
+              <h3>The occasion can travel</h3>
+              <p>Catering brings Tea House flavors to gatherings beyond these rooms, with details planned around your event.</p>
+            </article>
+          </div>
         </section>
 
         <section id="menus" className="menu-section" aria-labelledby="menu-title">
@@ -343,7 +406,7 @@ function App() {
             <p className="eyebrow eyebrow--gold">From the kitchen</p>
             <h2 id="menu-title">A menu made to wander through.</h2>
             <p>
-              Pair your pot with something savory, something sweet, or a board for the whole table.
+              Pair a pot or favorite pour with something savory, something sweet, or a charcuterie board for the whole table. The current menus make room for light lunches, lingering afternoons, and celebratory treats.
             </p>
           </div>
 
@@ -471,18 +534,18 @@ function App() {
             <p className="eyebrow eyebrow--gold">Events & catering</p>
             <h2 id="events-title">Bring the occasion. We’ll set the scene.</h2>
             <p>
-              From bridal showers and birthdays to book clubs, business lunches, and gatherings at home, 1890 brings a gracious touch to the table.
+              From bridal showers and birthdays to book clubs, business lunches, and gatherings elsewhere, 1890 offers an inviting setting and catering options for occasions that deserve thoughtful details.
             </p>
             <div className="event-types">
               <article>
                 <span>Gather here</span>
                 <h3>Private celebrations</h3>
-                <p>Tea rooms and patio spaces for meaningful moments, large or small.</p>
+                <p>Ask about tea rooms and event options for meaningful moments, meetings, and larger tables.</p>
               </article>
               <article>
                 <span>Bring 1890 to you</span>
                 <h3>Catering</h3>
-                <p>Tea sandwiches, charcuterie, pastries, and beverages for your gathering.</p>
+                <p>Share your date, guest count, and menu needs so the team can discuss current catering options.</p>
               </article>
             </div>
             <div className="events-actions">
@@ -559,21 +622,32 @@ function App() {
           <div className="faq-intro" data-reveal>
             <p className="eyebrow">Good to know</p>
             <h2 id="faq-title">Before you visit.</h2>
-            <p>Need something else? Call or email the tea house and the team will be happy to help.</p>
-            <a className="text-link" href={`mailto:${business.email}`}>
-              Ask a question <Arrow />
-            </a>
+            <p>Find quick answers about reservations, dietary needs, gatherings, and planning ahead.</p>
+            <Link className="text-link" to="/contact">
+              Send an inquiry <Arrow />
+            </Link>
           </div>
           <div className="faq-list" data-reveal>
             {faqs.map((item, index) => (
-              <details key={item.question}>
-                <summary>
+              <article className={`faq-item ${openFaq === index ? 'is-open' : ''}`} key={item.question}>
+                <button
+                  type="button"
+                  aria-expanded={openFaq === index}
+                  aria-controls={`faq-answer-${index}`}
+                  onClick={() => setOpenFaq((current) => (current === index ? -1 : index))}
+                >
                   <span className="faq-number">{String(index + 1).padStart(2, '0')}</span>
                   <span className="faq-question">{item.question}</span>
                   <i aria-hidden="true" />
-                </summary>
-                <p>{item.answer}</p>
-              </details>
+                </button>
+                <div
+                  id={`faq-answer-${index}`}
+                  className="faq-answer"
+                  aria-hidden={openFaq !== index}
+                >
+                  <div><p>{item.answer}</p></div>
+                </div>
+              </article>
             ))}
           </div>
         </section>
@@ -624,11 +698,25 @@ function App() {
             </div>
           </div>
         </section>
+
+        <section className="closing-cta section-pad" aria-labelledby="closing-title">
+          <p className="eyebrow" data-reveal>Plan your visit</p>
+          <div className="closing-cta-copy" data-reveal>
+            <h2 id="closing-title">A table, a room, or an occasion of your own.</h2>
+            <p>Browse what is being served, reserve a smaller table, or tell the Tea House team what you are planning.</p>
+          </div>
+          <div className="closing-cta-actions" data-reveal>
+            <Link className="button button--ink" to="/menus">View the menus <Arrow /></Link>
+            <Link className="button button--outline-ink" to="/reservations">Reserve a table <Arrow /></Link>
+            <Link className="text-link" to={largePartyLink}>Plan a gathering <Arrow /></Link>
+          </div>
+        </section>
       </main>
 
       <footer className="site-footer section-pad">
         <div className="footer-brand">
           <BrandMark />
+          <p>Tea, dining, private rooms, and catering in downtown Ocala.</p>
           <img
             className="diamond-logo"
             src={diamondSuites}
@@ -658,6 +746,9 @@ function App() {
           {fullNav.slice(6).map((item) => (
             <Link key={item.label} to={item.to}>{item.label}</Link>
           ))}
+          <Link to={largePartyLink}>Event inquiry</Link>
+          <Link to="/privacy">Privacy</Link>
+          <Link to="/terms">Terms</Link>
         </div>
 
         <div className="footer-visit">
@@ -678,7 +769,7 @@ function App() {
         </div>
 
         <div className="footer-bottom">
-          <p>© 2026 1890 Tea House. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} 1890 Tea House. All rights reserved.</p>
           <a href="#home">Back to top <span aria-hidden="true">↑</span></a>
         </div>
       </footer>

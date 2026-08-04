@@ -19,7 +19,7 @@ env:
   VITE_BASE_PATH: /teaHouse/
   VITE_INQUIRY_API_URL: ${{ vars.VITE_INQUIRY_API_URL }}
   VITE_CONTENT_API_BASE_URL: ${{ vars.VITE_CONTENT_API_BASE_URL }}
-  VITE_RECAPTCHA_SITE_KEY: ${{ vars.VITE_RECAPTCHA_SITE_KEY || secrets.VITE_RECAPTCHA_SITE_KEY }}
+  VITE_RECAPTCHA_SITE_KEY: ${{ vars.VITE_RECAPTCHA_SITE_KEY }}
 
 jobs:
   build:
@@ -63,7 +63,6 @@ jobs:
       - name: Diagnose public configuration
         env:
           KEY_FROM_VARIABLE: ${{ vars.VITE_RECAPTCHA_SITE_KEY }}
-          KEY_FROM_SECRET: ${{ secrets.VITE_RECAPTCHA_SITE_KEY }}
         run: |
           echo "Repository: $GITHUB_REPOSITORY"
 
@@ -71,12 +70,6 @@ jobs:
             echo "reCAPTCHA repository variable found"
           else
             echo "reCAPTCHA repository variable missing"
-          fi
-
-          if [ -n "$KEY_FROM_SECRET" ]; then
-            echo "reCAPTCHA repository secret found"
-          else
-            echo "reCAPTCHA repository secret missing"
           fi
 
           echo "Final reCAPTCHA key length: ${#VITE_RECAPTCHA_SITE_KEY}"
@@ -87,7 +80,7 @@ jobs:
 
       - name: Validate public reCAPTCHA key
         run: |
-          node -e "const value=String(process.env.VITE_RECAPTCHA_SITE_KEY || '').trim(); if(!value) throw new Error('VITE_RECAPTCHA_SITE_KEY is required. Add it under repository Settings -> Secrets and variables -> Actions');"
+          node -e "const value=String(process.env.VITE_RECAPTCHA_SITE_KEY || '').trim(); if(!value) throw new Error('VITE_RECAPTCHA_SITE_KEY is required. Configure it in GitHub repository -> Settings -> Secrets and variables -> Actions -> Variables -> VITE_RECAPTCHA_SITE_KEY');"
 
       - name: Build the site
         run: npm run build
