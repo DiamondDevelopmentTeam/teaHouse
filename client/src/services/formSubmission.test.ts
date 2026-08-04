@@ -7,6 +7,7 @@ import {
 
 const payload = {
   formType: FORM_TYPES.GENERAL,
+  websiteName: '1890 Tea House',
   name: 'Visitor',
   email: 'visitor@example.com',
   phone: '352-555-0123',

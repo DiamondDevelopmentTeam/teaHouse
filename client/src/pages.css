@@ -561,6 +561,26 @@
 .page-form-recaptcha {
   grid-column: 1 / -1;
   min-height: 78px;
+  max-width: 100%;
+  overflow: visible;
+}
+
+.page-form-recaptcha__widget {
+  width: 304px;
+  max-width: 100%;
+}
+
+.page-form-recaptcha__message,
+.page-form-recaptcha > p {
+  max-width: 32rem;
+  margin: 0.45rem 0 0;
+  color: var(--muted);
+  font: 0.85rem/1.5 var(--sans);
+}
+
+.page-form-recaptcha.is-error > p,
+.page-form-recaptcha__message[role="alert"] {
+  color: #8a2f2f;
 }
 
 .page-form-status {
@@ -701,7 +721,11 @@
 }
 
 @media (max-width: 380px) {
-  .page-form-recaptcha > div {
+  .page-form-recaptcha__widget {
+    width: 262px;
+  }
+
+  .page-form-recaptcha__widget > div {
     transform: scale(0.86);
     transform-origin: left top;
   }

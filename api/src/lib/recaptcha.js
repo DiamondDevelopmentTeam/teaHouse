@@ -14,7 +14,12 @@ export async function verifyRecaptcha({
   allowedHostnames,
   fetchImpl = fetch,
 }) {
-  if (!token) throw new RecaptchaError('missing_token');
+  if (typeof token !== 'string' || token.trim() === '') {
+    throw new RecaptchaError('missing_token');
+  }
+  if (typeof secret !== 'string' || secret.trim() === '') {
+    throw new RecaptchaError('unavailable');
+  }
 
   const body = new URLSearchParams({ secret, response: token });
   let response;
@@ -39,7 +44,20 @@ export async function verifyRecaptcha({
     throw new RecaptchaError('invalid_response');
   }
 
-  if (result.success !== true) throw new RecaptchaError('rejected');
+  if (result.success !== true) {
+    const errorCodes = Array.isArray(result['error-codes']) ? result['error-codes'] : [];
+    if (errorCodes.includes('timeout-or-duplicate')) {
+      throw new RecaptchaError('expired_or_duplicate');
+    }
+    if (errorCodes.some((code) => [
+      'missing-input-response',
+      'invalid-input-response',
+      'bad-request',
+    ].includes(code))) {
+      throw new RecaptchaError('malformed_token');
+    }
+    throw new RecaptchaError('rejected');
+  }
 
   const hostname = typeof result.hostname === 'string' ? result.hostname.toLowerCase() : '';
   if (!hostname || !allowedHostnames.includes(hostname)) {
@@ -48,4 +66,3 @@ export async function verifyRecaptcha({
 
   return { hostname };
 }
-

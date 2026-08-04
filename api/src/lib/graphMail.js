@@ -1,13 +1,20 @@
 import { ClientSecretCredential } from '@azure/identity';
+import { GRAPH_SENDER_EMAIL } from './config.js';
+import { buildEmailFooter } from './emailFooter.js';
 
 const GRAPH_SCOPE = 'https://graph.microsoft.com/.default';
 const GRAPH_BASE_URL = 'https://graph.microsoft.com/v1.0';
-export const FORM_SUBJECTS = Object.freeze({
-  general: '1890 Tea House – General Inquiry',
-  reservation: '1890 Tea House – Reservation Request',
-  event: '1890 Tea House – Event Inquiry',
-  contact: '1890 Tea House – Contact Request',
+export const DEFAULT_WEBSITE_NAME = '1890 Tea House';
+export const FORM_TYPE_TITLES = Object.freeze({
+  general: 'General Inquiry',
+  reservation: 'Reservation Request',
+  event: 'Event Inquiry',
+  contact: 'Contact Request',
 });
+export const FORM_SUBJECTS = Object.freeze(Object.fromEntries(
+  Object.entries(FORM_TYPE_TITLES)
+    .map(([formType, title]) => [formType, `${DEFAULT_WEBSITE_NAME} – ${title}`]),
+));
 
 export class GraphMailError extends Error {
   constructor(code, status) {
@@ -38,45 +45,70 @@ function encodeMimePart(value) {
     .join('\r\n');
 }
 
-export function buildInquiryEmailContent(inquiry, { submittedAt, requestId }) {
-  const subject = FORM_SUBJECTS[inquiry.formType];
-  const preOrders = inquiry.preOrders.length > 0 ? inquiry.preOrders.join(', ') : 'None selected';
-  const plainText = [
-    'A new form submission was received from the 1890 Tea House website.',
+function formatSubmissionTime(value) {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return String(value);
+  return `${date.toISOString().replace('T', ' ').replace(/\.\d{3}Z$/, '')} UTC`;
+}
+
+function defangUrl(value) {
+  return String(value)
+    .replace('://', ':\u200B//')
+    .replaceAll('.', '.\u200B');
+}
+
+function addPlainField(lines, label, value) {
+  if (value === undefined || value === null || value === '') return;
+  lines.push(`${label}: ${value}`);
+}
+
+export function buildInquiryEmailContent(
+  inquiry,
+  { submittedAt, requestId, senderEmail = GRAPH_SENDER_EMAIL },
+) {
+  const websiteName = inquiry.websiteName || DEFAULT_WEBSITE_NAME;
+  const formTitle = FORM_TYPE_TITLES[inquiry.formType];
+  const subject = `${websiteName} – ${formTitle}`;
+  const submittedAtDisplay = formatSubmissionTime(submittedAt);
+  const preOrders = inquiry.preOrders.length > 0 ? inquiry.preOrders.join(', ') : '';
+  const emailFooter = buildEmailFooter(senderEmail);
+  const plainLines = [
+    `A new form submission was received from the ${websiteName} website.`,
     '',
-    `Form type: ${inquiry.formType}`,
-    `Name: ${inquiry.name}`,
-    `Visitor email: ${inquiry.email}`,
-    `Phone: ${inquiry.phone}`,
-    `Preferred date: ${inquiry.preferredDate}`,
-    `Preferred time: ${inquiry.preferredTime || 'Not provided'}`,
-    `Guest count: ${inquiry.guestCount}`,
-    `Inquiry category: ${inquiry.inquiryCategory}`,
-    `Pre-order interests: ${preOrders}`,
-    '',
-    'Message:',
-    inquiry.message,
-    '',
-    `Submitted: ${submittedAt}`,
-    `Page URL: ${inquiry.pageUrl}`,
-    `Request ID: ${requestId}`,
-  ].join('\n');
+  ];
+  addPlainField(plainLines, 'Form type', inquiry.formType);
+  addPlainField(plainLines, 'Name', inquiry.name);
+  addPlainField(plainLines, 'Visitor email', inquiry.email);
+  addPlainField(plainLines, 'Phone', inquiry.phone);
+  addPlainField(plainLines, 'Subject', inquiry.subject);
+  addPlainField(plainLines, 'Preferred date', inquiry.preferredDate);
+  addPlainField(plainLines, 'Preferred time', inquiry.preferredTime);
+  addPlainField(plainLines, 'Guest count', inquiry.guestCount);
+  addPlainField(plainLines, 'Inquiry category', inquiry.inquiryCategory);
+  addPlainField(plainLines, 'Pre-order interests', preOrders);
+  plainLines.push('', 'Message:', inquiry.message, '');
+  addPlainField(plainLines, 'Submitted', submittedAtDisplay);
+  addPlainField(plainLines, 'Origin page', defangUrl(inquiry.pageUrl));
+  addPlainField(plainLines, 'Request ID', requestId);
+  const plainText = `${plainLines.join('\n')}\n\n${emailFooter.plainText}`;
 
   const rows = [
     ['Form type', inquiry.formType],
     ['Name', inquiry.name],
     ['Visitor email', inquiry.email],
     ['Phone number', inquiry.phone],
+    ['Subject', inquiry.subject],
     ['Preferred date', inquiry.preferredDate],
-    ['Preferred time', inquiry.preferredTime || 'Not provided'],
+    ['Preferred time', inquiry.preferredTime],
     ['Guest count', inquiry.guestCount],
     ['Inquiry category', inquiry.inquiryCategory],
     ['Pre-order interests', preOrders],
     ['Reply to', `${inquiry.name} <${inquiry.email}>`],
-    ['Submission date and time', submittedAt],
-    ['Page URL', inquiry.pageUrl],
+    ['Submission date and time', submittedAtDisplay],
+    ['Origin page', defangUrl(inquiry.pageUrl)],
     ['Request ID', requestId],
-  ].map(([label, value]) => `
+  ].filter(([, value]) => value !== undefined && value !== null && value !== '')
+    .map(([label, value]) => `
     <tr>
       <th style="padding:10px 12px;text-align:left;vertical-align:top;border-bottom:1px solid #e6dfd4;color:#57493d;font-size:13px;width:180px">${escapeHtml(label)}</th>
       <td style="padding:10px 12px;border-bottom:1px solid #e6dfd4;color:#241f1a;font-size:14px">${escapeHtml(value)}</td>
@@ -91,7 +123,7 @@ export function buildInquiryEmailContent(inquiry, { submittedAt, requestId }) {
           <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:680px;background:#ffffff;border:1px solid #e6dfd4">
             <tr>
               <td style="padding:28px 32px;background:#25352f;color:#ffffff">
-                <div style="font-size:12px;letter-spacing:2px;text-transform:uppercase">1890 Tea House</div>
+                <div style="font-size:12px;letter-spacing:2px;text-transform:uppercase">${escapeHtml(websiteName)}</div>
                 <h1 style="margin:8px 0 0;font-family:Georgia,serif;font-size:28px;font-weight:normal">${escapeHtml(subject)}</h1>
               </td>
             </tr>
@@ -102,6 +134,9 @@ export function buildInquiryEmailContent(inquiry, { submittedAt, requestId }) {
                 <h2 style="margin:28px 0 10px;font-family:Georgia,serif;font-size:20px;font-weight:normal">Message</h2>
                 <div style="padding:16px;background:#f8f5ef;border-left:3px solid #9a7956;white-space:pre-wrap;font-size:14px;line-height:1.6">${escapeHtml(inquiry.message)}</div>
               </td>
+            </tr>
+            <tr>
+              <td>${emailFooter.html}</td>
             </tr>
           </table>
         </td>
@@ -119,14 +154,15 @@ export function buildGraphMimeMessage(
 ) {
   const { subject, plainText, html } = buildInquiryEmailContent(
     inquiry,
-    { submittedAt, requestId },
+    { submittedAt, requestId, senderEmail },
   );
   const boundarySuffix = requestId.replace(/[^a-zA-Z0-9]/g, '') || 'inquiry';
-  const boundary = `tea_house_${boundarySuffix}`;
+  const boundary = `web_forms_${boundarySuffix}`;
   const submittedDate = new Date(submittedAt).toUTCString();
+  const websiteName = inquiry.websiteName || DEFAULT_WEBSITE_NAME;
 
   return [
-    `From: Tea House Inquiry <${senderEmail}>`,
+    `From: ${encodeHeader(`${websiteName} Website Inquiry`)} <${senderEmail}>`,
     `To: ${recipientEmail}`,
     `Reply-To: ${encodeHeader(inquiry.name)} <${inquiry.email}>`,
     `Subject: ${encodeHeader(subject)}`,

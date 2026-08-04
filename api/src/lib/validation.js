@@ -86,6 +86,14 @@ function normalizePolicyAgreement(value) {
   return value;
 }
 
+function rejectMarkupOrLinks(value, field) {
+  const hasHtml = /<\s*\/?\s*[a-z][^>]*>/i.test(value);
+  const hasLink = /(?:https?:\/\/|www\.|javascript:|data:text\/html)/i.test(value)
+    || /\[[^\]]+\]\([^)]+\)/.test(value);
+  if (hasHtml || hasLink) throw new ValidationError(`${field}_disallowed_content`);
+  return value;
+}
+
 export function validateInquirySubmission(body) {
   if (!body || typeof body !== 'object' || Array.isArray(body)) {
     throw new ValidationError('body_invalid');
@@ -99,6 +107,7 @@ export function validateInquirySubmission(body) {
     maximum: 20,
   });
   const name = normalizeText(body.name, 'name', { required: true, maximum: 120 });
+  const websiteName = normalizeText(body.websiteName, 'websiteName', { maximum: 120 });
   const email = normalizeText(body.email, 'email', { required: true, maximum: 254 });
   const phone = normalizeText(body.phone, 'phone', {
     required: true,
@@ -124,6 +133,7 @@ export function validateInquirySubmission(body) {
     maximum: 5000,
     multiline: true,
   });
+  const subject = normalizeText(body.subject, 'subject', { maximum: 160 });
   const pageUrl = normalizeText(body.pageUrl, 'pageUrl', {
     required: true,
     maximum: 2048,
@@ -137,6 +147,10 @@ export function validateInquirySubmission(body) {
   if (!FORM_TYPES.includes(formType)) {
     throw new ValidationError('formType_invalid');
   }
+  rejectMarkupOrLinks(name, 'name');
+  rejectMarkupOrLinks(websiteName, 'websiteName');
+  rejectMarkupOrLinks(subject, 'subject');
+  rejectMarkupOrLinks(message, 'message');
   if (!/^[A-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[A-Z0-9-]+(?:\.[A-Z0-9-]+)+$/i.test(email)) {
     throw new ValidationError('email_invalid');
   }
@@ -171,6 +185,7 @@ export function validateInquirySubmission(body) {
 
   return {
     formType,
+    websiteName,
     name,
     email,
     phone,
@@ -178,6 +193,7 @@ export function validateInquirySubmission(body) {
     preferredTime,
     guestCount,
     inquiryCategory,
+    subject,
     message,
     pageUrl: parsedPageUrl.href,
     preOrders,

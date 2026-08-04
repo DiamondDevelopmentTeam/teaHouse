@@ -15,16 +15,20 @@ The safe request path is:
 
 ```text
 GitHub Pages form
+  -> visible reCAPTCHA v2 token
   -> POST Azure Function /api/send-inquiry
+  -> Google reCAPTCHA siteverify
   -> Microsoft Entra app-only token
   -> Microsoft Graph /users/{sender}/sendMail
   -> beatriz@diamondpeo.com
 ```
 
-The only inquiry setting in the Pages build is the public Function endpoint:
+The only inquiry settings in the Pages build are the public Function endpoint and
+public reCAPTCHA v2 site key:
 
 ```env
 VITE_INQUIRY_API_URL=https://<function-app-name>.azurewebsites.net/api/send-inquiry
+VITE_RECAPTCHA_SITE_KEY=your_recaptcha_site_key
 ```
 
 ## Endpoint behavior
@@ -43,12 +47,13 @@ VITE_INQUIRY_API_URL=https://<function-app-name>.azurewebsites.net/api/send-inqu
 - `pageUrl`
 - `preOrders` and `policyAgreement` when supplied by the reservation form
 - `website`, an empty spam honeypot
-- `recaptchaToken`, only when optional reCAPTCHA is enabled
+- `recaptchaToken`, required and verified server-side before email delivery
 
 The Function normalizes line endings and whitespace, strips control characters,
 checks types and length limits, validates email, phone, date, guest count, and
 inquiry category, page URL, optional reservation details, and HTML-escapes visitor
-content before placing it in the email. A per-instance rate limiter permits five
+content before placing it in the email. HTML markup and user-entered links are
+rejected. A per-instance rate limiter permits five
 POST attempts per client in ten minutes; production deployments should also use
 an Azure perimeter rate-limit policy when distributed enforcement is required.
 Malformed requests receive a generic structured error. Internal Graph responses
@@ -97,7 +102,10 @@ Errors use this shape:
 
 Azure logs record the request ID, a safe failure category, missing setting names,
 and a Graph HTTP status when available. They do not record secrets, access tokens,
-Graph response bodies, or inquiry contents.
+reCAPTCHA tokens, Graph response bodies, or inquiry contents. Every generated
+message includes both HTML and plain-text alternatives, identifies the originating
+website, uses a UTC submission timestamp, omits empty optional fields, escapes
+visitor content, and ends with the shared privacy/confidentiality footer.
 
 ## Microsoft Entra and Graph configuration
 
@@ -129,16 +137,18 @@ Configure these server-only application settings:
 | `AZURE_TENANT_ID` | Yes | Microsoft Entra tenant ID |
 | `AZURE_CLIENT_ID` | Yes | App registration client ID |
 | `AZURE_CLIENT_SECRET` | Yes | App credential; server only |
-| `GRAPH_SENDER_EMAIL` | Yes | Authorized Microsoft 365 sender mailbox |
+| `GRAPH_SENDER_EMAIL` | Yes | Must be `donotreply@diamondpeo.com` |
 | `INQUIRY_RECIPIENT_EMAIL` | Yes | Must be `beatriz@diamondpeo.com` |
 | `ADDITIONAL_ALLOWED_ORIGINS` | No | Comma-separated future custom origins |
-| `RECAPTCHA_SECRET_KEY` | No | Optional reCAPTCHA v2 server secret |
-| `ALLOWED_RECAPTCHA_HOSTNAMES` | With reCAPTCHA | Comma-separated accepted hostnames |
+| `RECAPTCHA_SECRET_KEY` | Yes | reCAPTCHA v2 server secret; Azure only |
+| `ALLOWED_RECAPTCHA_HOSTNAMES` | No | Comma-separated extra accepted hostnames |
 
 The Function always permits only these built-in browser origins:
 
 ```text
 https://diamonddevelopmentteam.github.io
+https://1890teahouse.com
+https://www.1890teahouse.com
 http://localhost:5173
 http://localhost:5174
 ```
@@ -153,9 +163,12 @@ Also add the same origins under the Function App's **API > CORS** settings. Do n
 use `*`. Azure documents the portal and CLI CORS options in
 [Configure function app settings](https://learn.microsoft.com/azure/azure-functions/functions-how-to-use-azure-function-app-settings#cors).
 
-reCAPTCHA is optional. If enabled, configure both `RECAPTCHA_SECRET_KEY` and
-`ALLOWED_RECAPTCHA_HOSTNAMES` on the Function and set
-`VITE_RECAPTCHA_SITE_KEY` in GitHub. If it is not enabled, leave all three empty.
+The built-in approved reCAPTCHA hostnames are `localhost`,
+`diamonddevelopmentteam.github.io`, `1890teahouse.com`, and
+`www.1890teahouse.com`. Add any future production hostnames through
+`ALLOWED_RECAPTCHA_HOSTNAMES`. In the Google reCAPTCHA admin console, register the
+same hostnames without protocols, paths, ports, or trailing slashes. The GitHub
+Pages `/teaHouse/` base path is not part of the reCAPTCHA domain registration.
 
 ## Run locally
 
@@ -181,7 +194,7 @@ when using `UseDevelopmentStorage=true`.
    ```
 
 2. Copy `api/local.settings.example.json` to `api/local.settings.json`, fill in
-   the five required server settings, and keep the file uncommitted.
+   the required server settings, and keep the file uncommitted.
 3. Start the Function:
 
    ```sh
@@ -193,7 +206,7 @@ when using `UseDevelopmentStorage=true`.
 
    ```env
    VITE_INQUIRY_API_URL=http://localhost:7071/api/send-inquiry
-   VITE_RECAPTCHA_SITE_KEY=
+   VITE_RECAPTCHA_SITE_KEY=your_recaptcha_site_key
    ```
 
 5. Start the frontend on an allowed origin:
@@ -208,8 +221,8 @@ Graph accepted a message; they do not by themselves prove mailbox delivery.
 
 ## Deploy the Azure Function
 
-1. Create a Node.js 22 Azure Function App using Functions runtime v4, or select
-   the existing Function App.
+1. Select the existing `diamondpeo-webforms-api` Function App (Node.js 22,
+   Functions runtime v4).
 2. Add the required application settings above in Azure Portal. Restart the app
    after changing settings.
 3. Add each approved origin to the Function App CORS allowlist. The CLI form is:
@@ -241,16 +254,17 @@ Graph accepted a message; they do not by themselves prove mailbox delivery.
 ## Configure and test GitHub Pages
 
 In the `diamonddevelopmentteam/teaHouse` repository, add this **Actions
-repository variable**:
+repository variables**:
 
 ```text
 VITE_INQUIRY_API_URL=https://<function-app-name>.azurewebsites.net/api/send-inquiry
+VITE_RECAPTCHA_SITE_KEY=your_recaptcha_site_key
 ```
 
-The Pages workflow injects it during `npm run build` and now fails rather than
-publishing a bundle when it is missing or is not an HTTPS `/api/send-inquiry`
-URL. Do not add any Microsoft credential as a repository variable or secret for
-the Pages job.
+The Pages workflow injects both public values during `npm run build` and fails
+rather than publishing when either is missing. Do not add
+`RECAPTCHA_SECRET_KEY`, Microsoft credentials, or the Graph sender configuration
+to the Pages job.
 
 To reproduce a production Pages build locally in PowerShell:
 
@@ -258,6 +272,7 @@ To reproduce a production Pages build locally in PowerShell:
 cd client
 $env:VITE_BASE_PATH = '/teaHouse/'
 $env:VITE_INQUIRY_API_URL = 'https://<function-app-name>.azurewebsites.net/api/send-inquiry'
+$env:VITE_RECAPTCHA_SITE_KEY = 'your_recaptcha_site_key'
 npm run build
 npm run verify:pages
 npm run verify:forms
@@ -281,3 +296,12 @@ For production verification:
 7. If mail is missing, search Application Insights/Function logs by request ID
    and then check the sender mailbox's Sent Items, Exchange message trace, and
    junk/quarantine handling.
+
+## Frontend coverage
+
+This repository contains the two public Tea House forms listed above, and both
+use the same visible checkbox and typed submission service. No additional
+frontend that references this Function endpoint is present in this workspace.
+Any separately maintained website that posts to `diamondpeo-webforms-api` must
+add the same `VITE_RECAPTCHA_SITE_KEY` widget and send `recaptchaToken`; the now
+mandatory backend check will reject that website's submissions until it does.

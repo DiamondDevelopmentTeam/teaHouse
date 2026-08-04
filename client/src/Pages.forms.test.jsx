@@ -11,6 +11,30 @@ import {
 } from './services/formSubmission.ts';
 import { ContactForm, LargePartyForm } from './Pages.jsx';
 
+vi.mock('./components/FormVerification.jsx', async () => {
+  const ReactModule = await import('react');
+  return {
+    default: function MockFormVerification({ onChange, onExpired, onError }) {
+      return ReactModule.createElement(
+        'div',
+        null,
+        ReactModule.createElement('button', {
+          type: 'button',
+          onClick: () => onChange('verified-browser-token'),
+        }, 'Complete human verification'),
+        ReactModule.createElement('button', {
+          type: 'button',
+          onClick: onExpired,
+        }, 'Expire human verification'),
+        ReactModule.createElement('button', {
+          type: 'button',
+          onClick: onError,
+        }, 'Fail human verification'),
+      );
+    },
+  };
+});
+
 vi.mock('./services/formSubmission.ts', async (importOriginal) => {
   const actual = await importOriginal();
   return {
@@ -26,6 +50,7 @@ async function completeContactForm(user) {
   await user.type(screen.getByLabelText('Preferred date'), '2026-08-15');
   await user.type(screen.getByLabelText('Guest count'), '4');
   await user.type(screen.getByLabelText('Message'), 'Please tell me about afternoon tea.');
+  await user.click(screen.getByRole('button', { name: 'Complete human verification' }));
 }
 
 async function completeLargePartyForm(user, occasion = 'Tea Room') {
@@ -38,11 +63,12 @@ async function completeLargePartyForm(user, occasion = 'Tea Room') {
   await user.selectOptions(screen.getByLabelText('Occasion or reservation type'), occasion);
   await user.type(screen.getByLabelText('Message'), 'We would like a quiet room.');
   await user.click(screen.getByLabelText(/I have read and agree/));
+  await user.click(screen.getByRole('button', { name: 'Complete human verification' }));
 }
 
 beforeEach(() => {
   vi.clearAllMocks();
-  vi.stubEnv('VITE_RECAPTCHA_SITE_KEY', '');
+  vi.stubEnv('VITE_RECAPTCHA_SITE_KEY', 'public-test-site-key');
 });
 
 afterEach(() => {
@@ -66,8 +92,10 @@ describe('website forms', () => {
     await waitFor(() => expect(submitForm).toHaveBeenCalledOnce());
     expect(submitForm.mock.calls[0][0]).toMatchObject({
       formType: FORM_TYPES.GENERAL,
+      websiteName: '1890 Tea House',
       inquiryCategory: 'General question',
       name: 'Visitor Name',
+      recaptchaToken: 'verified-browser-token',
       pageUrl: 'http://localhost:3000/',
     });
   });
@@ -137,6 +165,21 @@ describe('website forms', () => {
     expect(await screen.findByText(/Reference: success-request-id/)).toBeTruthy();
     expect(screen.getByLabelText('Name').value).toBe('');
     expect(screen.getByLabelText('Message').value).toBe('');
+    expect(screen.getByRole('button', { name: 'Send Inquiry' }).disabled).toBe(true);
+  });
+
+  it('keeps submission disabled until reCAPTCHA succeeds and handles expiration', async () => {
+    const user = userEvent.setup();
+    render(<ContactForm />);
+    const submitButton = screen.getByRole('button', { name: 'Send Inquiry' });
+
+    expect(submitButton.disabled).toBe(true);
+    await user.click(screen.getByRole('button', { name: 'Complete human verification' }));
+    expect(submitButton.disabled).toBe(false);
+    await user.click(screen.getByRole('button', { name: 'Expire human verification' }));
+
+    expect(submitButton.disabled).toBe(true);
+    expect(screen.getByText('Verification expired. Please complete it again.')).toBeTruthy();
   });
 
   it('blocks duplicate submissions while the first request is pending', async () => {

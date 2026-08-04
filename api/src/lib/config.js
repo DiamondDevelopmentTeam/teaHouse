@@ -4,13 +4,23 @@ const REQUIRED_SETTINGS = [
   'AZURE_CLIENT_SECRET',
   'GRAPH_SENDER_EMAIL',
   'INQUIRY_RECIPIENT_EMAIL',
+  'RECAPTCHA_SECRET_KEY',
 ];
 
 export const INQUIRY_RECIPIENT_EMAIL = 'beatriz@diamondpeo.com';
+export const GRAPH_SENDER_EMAIL = 'donotreply@diamondpeo.com';
 export const DEFAULT_ALLOWED_ORIGINS = Object.freeze([
   'https://diamonddevelopmentteam.github.io',
+  'https://1890teahouse.com',
+  'https://www.1890teahouse.com',
   'http://localhost:5173',
   'http://localhost:5174',
+]);
+export const DEFAULT_ALLOWED_RECAPTCHA_HOSTNAMES = Object.freeze([
+  'localhost',
+  'diamonddevelopmentteam.github.io',
+  '1890teahouse.com',
+  'www.1890teahouse.com',
 ]);
 
 export class ConfigurationError extends Error {
@@ -38,6 +48,15 @@ function parseOrigin(value) {
   }
 }
 
+function parseHostname(value) {
+  const hostname = String(value || '').toLowerCase();
+  if (hostname === 'localhost') return hostname;
+  if (!/^(?=.{1,253}$)(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,63}$/.test(hostname)) {
+    return null;
+  }
+  return hostname;
+}
+
 export function loadAllowedOrigins(environment = process.env) {
   const additionalOrigins = parseList(environment.ADDITIONAL_ALLOWED_ORIGINS);
   const invalidOrigins = additionalOrigins.filter((origin) => !parseOrigin(origin));
@@ -62,19 +81,23 @@ export function loadConfig(environment = process.env) {
     throw new ConfigurationError(['INQUIRY_RECIPIENT_EMAIL']);
   }
 
-  const graphSenderEmail = environment.GRAPH_SENDER_EMAIL.trim();
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(graphSenderEmail)) {
+  const graphSenderEmail = environment.GRAPH_SENDER_EMAIL.trim().toLowerCase();
+  if (graphSenderEmail !== GRAPH_SENDER_EMAIL) {
     throw new ConfigurationError(['GRAPH_SENDER_EMAIL']);
   }
 
-  const recaptchaSecretKey = String(environment.RECAPTCHA_SECRET_KEY || '').trim();
-  const allowedRecaptchaHostnames = parseList(environment.ALLOWED_RECAPTCHA_HOSTNAMES)
+  const recaptchaSecretKey = environment.RECAPTCHA_SECRET_KEY.trim();
+  const additionalRecaptchaHostnames = parseList(environment.ALLOWED_RECAPTCHA_HOSTNAMES)
     .map((hostname) => hostname.toLowerCase());
-  if (Boolean(recaptchaSecretKey) !== (allowedRecaptchaHostnames.length > 0)) {
-    throw new ConfigurationError([
-      recaptchaSecretKey ? 'ALLOWED_RECAPTCHA_HOSTNAMES' : 'RECAPTCHA_SECRET_KEY',
-    ]);
+  if (additionalRecaptchaHostnames.some((hostname) => !parseHostname(hostname))) {
+    throw new ConfigurationError(['ALLOWED_RECAPTCHA_HOSTNAMES']);
   }
+  const allowedRecaptchaHostnames = [
+    ...new Set([
+      ...DEFAULT_ALLOWED_RECAPTCHA_HOSTNAMES,
+      ...additionalRecaptchaHostnames,
+    ]),
+  ];
 
   return {
     tenantId: environment.AZURE_TENANT_ID.trim(),

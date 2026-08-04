@@ -18,7 +18,7 @@ const config = Object.freeze({
   tenantId: 'tenant-placeholder',
   clientId: 'client-placeholder',
   clientSecret: 'secret-placeholder',
-  graphSenderEmail: 'sender@example.test',
+  graphSenderEmail: 'donotreply@diamondpeo.com',
   inquiryRecipientEmail: 'beatriz@diamondpeo.com',
   recaptchaSecretKey: 'recaptcha-placeholder',
   allowedOrigins: [
@@ -31,6 +31,7 @@ const config = Object.freeze({
 
 const validBody = Object.freeze({
   formType: 'general',
+  websiteName: '1890 Tea House',
   name: 'Visitor Name',
   email: 'visitor@example.com',
   phone: '352-555-0123',
@@ -38,6 +39,7 @@ const validBody = Object.freeze({
   preferredTime: '',
   guestCount: '8',
   inquiryCategory: 'General question',
+  subject: '',
   message: 'Could you tell me about afternoon tea?',
   pageUrl: 'https://diamonddevelopmentteam.github.io/teaHouse/contact',
   preOrders: [],
@@ -160,6 +162,20 @@ test('visitor fields are normalized and control characters are removed', () => {
   assert.equal(inquiry.message, 'Hello there');
 });
 
+test('visitor HTML, scripts, and links are rejected before email generation', () => {
+  for (const [field, value, code] of [
+    ['name', '<b>Visitor</b>', 'name_disallowed_content'],
+    ['message', '<script>alert(1)</script>', 'message_disallowed_content'],
+    ['message', 'Please visit https://spam.example', 'message_disallowed_content'],
+    ['message', '[click here](https://spam.example)', 'message_disallowed_content'],
+  ]) {
+    assert.throws(
+      () => validateInquirySubmission({ ...validBody, [field]: value }),
+      (error) => error instanceof ValidationError && error.code === code,
+    );
+  }
+});
+
 test('failed reCAPTCHA verification fails closed', async () => {
   await assert.rejects(
     verifyRecaptcha({
@@ -172,6 +188,79 @@ test('failed reCAPTCHA verification fails closed', async () => {
       }),
     }),
     (error) => error instanceof RecaptchaError && error.code === 'rejected',
+  );
+});
+
+test('expired or duplicate reCAPTCHA tokens are distinguished safely', async () => {
+  await assert.rejects(
+    verifyRecaptcha({
+      token: 'browser-token',
+      secret: 'secret-placeholder',
+      allowedHostnames: ['localhost'],
+      fetchImpl: async () => ({
+        ok: true,
+        json: async () => ({
+          success: false,
+          'error-codes': ['timeout-or-duplicate'],
+        }),
+      }),
+    }),
+    (error) => error instanceof RecaptchaError && error.code === 'expired_or_duplicate',
+  );
+});
+
+test('malformed reCAPTCHA tokens are rejected', async () => {
+  await assert.rejects(
+    verifyRecaptcha({
+      token: 'malformed-token',
+      secret: 'secret-placeholder',
+      allowedHostnames: ['localhost'],
+      fetchImpl: async () => ({
+        ok: true,
+        json: async () => ({
+          success: false,
+          'error-codes': ['invalid-input-response'],
+        }),
+      }),
+    }),
+    (error) => error instanceof RecaptchaError && error.code === 'malformed_token',
+  );
+});
+
+test('successful reCAPTCHA verification requires an approved hostname', async () => {
+  await assert.rejects(
+    verifyRecaptcha({
+      token: 'browser-token',
+      secret: 'secret-placeholder',
+      allowedHostnames: ['localhost'],
+      fetchImpl: async () => ({
+        ok: true,
+        json: async () => ({ success: true, hostname: 'untrusted.example' }),
+      }),
+    }),
+    (error) => error instanceof RecaptchaError && error.code === 'invalid_hostname',
+  );
+
+  await assert.doesNotReject(() => verifyRecaptcha({
+    token: 'browser-token',
+    secret: 'secret-placeholder',
+    allowedHostnames: ['localhost'],
+    fetchImpl: async () => ({
+      ok: true,
+      json: async () => ({ success: true, hostname: 'LOCALHOST' }),
+    }),
+  }));
+});
+
+test('reCAPTCHA network failures fail closed', async () => {
+  await assert.rejects(
+    verifyRecaptcha({
+      token: 'browser-token',
+      secret: 'secret-placeholder',
+      allowedHostnames: ['localhost'],
+      fetchImpl: async () => { throw new Error('network unavailable'); },
+    }),
+    (error) => error instanceof RecaptchaError && error.code === 'unavailable',
   );
 });
 
@@ -190,22 +279,49 @@ test('Graph is not called when reCAPTCHA fails', async () => {
   assert.equal(graphCalls, 0);
 });
 
-test('the handler skips reCAPTCHA when it is not configured', async () => {
+test('a successful verified submission calls Graph exactly once', async () => {
   let verificationCalls = 0;
+  let graphCalls = 0;
   const response = await handler({
-    configProvider: () => ({
-      ...config,
-      recaptchaSecretKey: '',
-      allowedRecaptchaHostnames: [],
-    }),
-    verifyRecaptchaFn: async () => {
+    verifyRecaptchaFn: async (input) => {
       verificationCalls += 1;
+      assert.equal(input.token, validBody.recaptchaToken);
+      assert.equal(input.secret, config.recaptchaSecretKey);
+      return { hostname: 'localhost' };
     },
-  })(request({ body: { ...validBody, recaptchaToken: '' } }), context());
+    sendInquiryEmailFn: async () => { graphCalls += 1; },
+  })(request(), context());
 
   assert.equal(response.status, 202);
-  assert.equal(response.jsonBody.ok, true);
-  assert.equal(verificationCalls, 0);
+  assert.equal(verificationCalls, 1);
+  assert.equal(graphCalls, 1);
+});
+
+test('logs never include the complete reCAPTCHA token or form submission', async () => {
+  const logs = [];
+  const privateToken = 'complete-private-recaptcha-token';
+  const response = await handler({
+    verifyRecaptchaFn: async () => { throw new RecaptchaError('rejected'); },
+  })(request({ body: { ...validBody, recaptchaToken: privateToken } }), {
+    log: (entry) => logs.push(entry),
+    warn: (entry) => logs.push(entry),
+    error: (entry) => logs.push(entry),
+  });
+
+  assert.equal(response.status, 400);
+  assert.doesNotMatch(logs.join('\n'), new RegExp(privateToken));
+  assert.doesNotMatch(logs.join('\n'), /Visitor Name|visitor@example\.com/);
+});
+
+test('the handler rejects a missing reCAPTCHA token before Graph is called', async () => {
+  let graphCalls = 0;
+  const response = await handler({
+    sendInquiryEmailFn: async () => { graphCalls += 1; },
+  })(request({ body: { ...validBody, recaptchaToken: '' } }), context());
+
+  assert.equal(response.status, 400);
+  assert.equal(response.jsonBody.error.code, 'verification_failed');
+  assert.equal(graphCalls, 0);
 });
 
 test('all form types have the required email subject', () => {
@@ -222,11 +338,15 @@ test('Graph receives a sanitized multipart email with fixed server recipient', a
   let graphRequest;
   const inquiry = validateInquirySubmission({
     ...validBody,
-    message: 'Hello\u0000 <script>alert("no")</script>',
+    message: 'Hello\u0000 & welcome',
   });
-  const emailContent = buildInquiryEmailContent(inquiry, {
+  const emailContent = buildInquiryEmailContent({
+    ...inquiry,
+    message: 'Hello <script>alert("no")</script>',
+  }, {
     submittedAt: '2026-07-29T20:00:00.000Z',
     requestId: 'request-id',
+    senderEmail: config.graphSenderEmail,
   });
 
   await sendInquiryEmail({
@@ -252,16 +372,26 @@ test('Graph receives a sanitized multipart email with fixed server recipient', a
   ]);
   assert.equal(
     graphRequest.url,
-    'https://graph.microsoft.com/v1.0/users/sender%40example.test/sendMail',
+    'https://graph.microsoft.com/v1.0/users/donotreply%40diamondpeo.com/sendMail',
   );
+  assert.match(mimeMessage, /^From: =\?UTF-8\?B\?.+\?= <donotreply@diamondpeo\.com>\r?$/m);
   assert.match(mimeMessage, /^To: beatriz@diamondpeo\.com\r?$/m);
   assert.match(mimeMessage, /^Reply-To: .+ <visitor@example\.com>\r?$/m);
   assert.match(mimeMessage, /^Subject: =\?UTF-8\?B\?.+\?=\r?$/m);
   assert.match(mimeMessage, /Content-Type: multipart\/alternative/);
   assert.match(emailContent.plainText, /Form type: general/);
-  assert.match(emailContent.plainText, /Page URL: https:\/\/diamonddevelopmentteam/);
+  assert.match(emailContent.plainText, /Submitted: 2026-07-29 20:00:00 UTC/);
+  assert.match(emailContent.plainText, /Privacy and Confidentiality Notice/);
+  assert.match(emailContent.plainText, /donotreply@diamondpeo\.com/);
   assert.match(emailContent.html, /Hello &lt;script&gt;alert\(&quot;no&quot;\)&lt;\/script&gt;/);
+  assert.match(emailContent.html, /Privacy and Confidentiality Notice/);
+  assert.ok(
+    emailContent.html.lastIndexOf('Privacy and Confidentiality Notice')
+      > emailContent.html.lastIndexOf('Message'),
+  );
   assert.doesNotMatch(emailContent.html, /<script>/);
+  assert.doesNotMatch(emailContent.html, /Preferred time/);
+  assert.doesNotMatch(emailContent.html, /Pre-order interests/);
 });
 
 test('configuration enforces the server-side recipient', () => {
@@ -269,11 +399,23 @@ test('configuration enforces the server-side recipient', () => {
     AZURE_TENANT_ID: 'tenant-placeholder',
     AZURE_CLIENT_ID: 'client-placeholder',
     AZURE_CLIENT_SECRET: 'secret-placeholder',
-    GRAPH_SENDER_EMAIL: 'sender@example.test',
+    GRAPH_SENDER_EMAIL: 'donotreply@diamondpeo.com',
     INQUIRY_RECIPIENT_EMAIL: 'different@example.test',
+    RECAPTCHA_SECRET_KEY: 'recaptcha-placeholder',
   };
 
   assert.throws(() => loadConfig(environment), /submission service is not configured/i);
+});
+
+test('configuration enforces donotreply@diamondpeo.com as the Graph sender', () => {
+  assert.throws(() => loadConfig({
+    AZURE_TENANT_ID: 'tenant-placeholder',
+    AZURE_CLIENT_ID: 'client-placeholder',
+    AZURE_CLIENT_SECRET: 'secret-placeholder',
+    GRAPH_SENDER_EMAIL: 'another@example.test',
+    INQUIRY_RECIPIENT_EMAIL: 'beatriz@diamondpeo.com',
+    RECAPTCHA_SECRET_KEY: 'recaptcha-placeholder',
+  }), /submission service is not configured/i);
 });
 
 test('default CORS origins and an optional custom origin are loaded server-side', () => {
@@ -281,16 +423,24 @@ test('default CORS origins and an optional custom origin are loaded server-side'
     AZURE_TENANT_ID: 'tenant-placeholder',
     AZURE_CLIENT_ID: 'client-placeholder',
     AZURE_CLIENT_SECRET: 'secret-placeholder',
-    GRAPH_SENDER_EMAIL: 'sender@example.test',
+    GRAPH_SENDER_EMAIL: 'donotreply@diamondpeo.com',
     INQUIRY_RECIPIENT_EMAIL: 'beatriz@diamondpeo.com',
+    RECAPTCHA_SECRET_KEY: 'recaptcha-placeholder',
     ADDITIONAL_ALLOWED_ORIGINS: 'https://www.1890teahouse.com',
   });
 
   assert.deepEqual(loaded.allowedOrigins, [
     'https://diamonddevelopmentteam.github.io',
+    'https://1890teahouse.com',
+    'https://www.1890teahouse.com',
     'http://localhost:5173',
     'http://localhost:5174',
-    'https://www.1890teahouse.com',
+  ]);
+  assert.deepEqual(loaded.allowedRecaptchaHostnames, [
+    'localhost',
+    'diamonddevelopmentteam.github.io',
+    '1890teahouse.com',
+    'www.1890teahouse.com',
   ]);
 });
 

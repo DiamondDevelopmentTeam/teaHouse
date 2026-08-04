@@ -32,8 +32,18 @@ Images use explicit width and height values to prevent layout shift, native lazy
 The Visit and large-party reservation/event forms share one typed frontend
 submission service and post to the separate Azure Function in `api`. The Function
 validates each request and sends it to `beatriz@diamondpeo.com` through Microsoft
-Graph application authentication. The GitHub Pages bundle contains only the
-public `VITE_INQUIRY_API_URL`; Graph credentials remain server-side.
+Graph application authentication from `donotreply@diamondpeo.com`. Both forms use
+visible reCAPTCHA v2 and the Function verifies every token before Graph is called.
+The GitHub Pages bundle contains only the public Function URL and reCAPTCHA site
+key; the reCAPTCHA secret and Graph credentials remain server-side.
+
+Copy `client/.env.example` to `client/.env.local` for local frontend work. In
+GitHub, configure `VITE_INQUIRY_API_URL` and `VITE_RECAPTCHA_SITE_KEY` as Actions
+repository variables. In the `diamondpeo-webforms-api` Azure Function App,
+configure `RECAPTCHA_SECRET_KEY`, `GRAPH_SENDER_EMAIL=donotreply@diamondpeo.com`,
+the Microsoft Graph tenant/client settings, recipient, CORS origins, and any
+additional approved reCAPTCHA hostnames as Function App application settings.
+Never use a `VITE_*` name for a server secret.
 
 See `docs/MICROSOFT_GRAPH.md` for the endpoint contract, Microsoft Entra and
 `Mail.Send` setup, Azure settings, local testing, deployment, CORS, GitHub
@@ -42,7 +52,7 @@ repository variable, and real-delivery verification.
 ## GitHub Pages
 
 Pushing to `main` runs `.github/workflows/deploy.yml`. The workflow requires the
-public `VITE_INQUIRY_API_URL` repository variable, installs with the lockfile,
+public `VITE_INQUIRY_API_URL` and `VITE_RECAPTCHA_SITE_KEY` repository variables, installs with the lockfile,
 lints, builds, verifies the deployment paths, uploads `client/dist`, and deploys
 it with GitHub Pages.
 

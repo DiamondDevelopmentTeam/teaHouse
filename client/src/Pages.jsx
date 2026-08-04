@@ -2,9 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import PageShell from './components/PageShell.jsx';
 import OptimizedImage from './components/OptimizedImage.jsx';
-import FormVerification, {
-  isFormVerificationEnabled,
-} from './components/FormVerification.jsx';
+import FormVerification from './components/FormVerification.jsx';
 import { business, businessAddress } from './data/business.js';
 import { eventStatus } from './data/events.js';
 import { contentService } from './services/contentService.js';
@@ -388,7 +386,7 @@ export function LargePartyForm() {
       return;
     }
 
-    if (isFormVerificationEnabled() && !verificationToken) {
+    if (!verificationToken) {
       setStatus({
         type: 'validation-error',
         message: 'Please complete the verification before sending.',
@@ -404,6 +402,7 @@ export function LargePartyForm() {
       formType: eventCategories.has(inquiryCategory)
         ? FORM_TYPES.EVENT
         : FORM_TYPES.RESERVATION,
+      websiteName: '1890 Tea House',
       name: String(formData.get('fullName') || '').trim(),
       email: String(formData.get('email') || '').trim(),
       phone: String(formData.get('phone') || '').trim(),
@@ -478,7 +477,7 @@ export function LargePartyForm() {
           });
         }}
       />
-      <button className="page-button" type="submit" disabled={isSubmitting}>
+      <button className="page-button" type="submit" disabled={isSubmitting || !verificationToken}>
         {isSubmitting ? 'Sending…' : 'Send large-party request'}
       </button>
       <SubmissionStatus status={status} />
@@ -702,7 +701,7 @@ export function ContactForm() {
       return;
     }
 
-    if (isFormVerificationEnabled() && !verificationToken) {
+    if (!verificationToken) {
       setStatus({
         type: 'validation-error',
         message: 'Please complete the verification before sending.',
@@ -720,6 +719,7 @@ export function ContactForm() {
         : inquiryCategory === 'General question'
           ? FORM_TYPES.GENERAL
           : FORM_TYPES.CONTACT,
+      websiteName: '1890 Tea House',
       name: String(formData.get('name') || '').trim(),
       email: String(formData.get('email') || '').trim(),
       phone: String(formData.get('phone') || '').trim(),
@@ -775,7 +775,7 @@ export function ContactForm() {
     <button
       className="page-button"
       type="submit"
-      disabled={isSubmitting}
+      disabled={isSubmitting || !verificationToken}
     >
       {isSubmitting ? 'Sending…' : 'Send Inquiry'}
     </button>

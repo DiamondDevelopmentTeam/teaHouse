@@ -147,14 +147,12 @@ export function createContactInquiryHandler({
       const body = await readJsonBody(request);
       const inquiry = validateInquirySubmission(body);
 
-      if (config.recaptchaSecretKey) {
-        if (!inquiry.recaptchaToken) throw new RecaptchaError('missing');
-        await verifyRecaptchaFn({
-          token: inquiry.recaptchaToken,
-          secret: config.recaptchaSecretKey,
-          allowedHostnames: config.allowedRecaptchaHostnames,
-        });
-      }
+      if (!inquiry.recaptchaToken) throw new RecaptchaError('missing_token');
+      await verifyRecaptchaFn({
+        token: inquiry.recaptchaToken,
+        secret: config.recaptchaSecretKey,
+        allowedHostnames: config.allowedRecaptchaHostnames,
+      });
 
       await sendInquiryEmailFn({
         inquiry,
@@ -168,7 +166,7 @@ export function createContactInquiryHandler({
         202,
         {
           ok: true,
-          message: 'Thank you! Your request has been sent to the Tea House team.',
+          message: 'Thank you! Your request has been sent.',
           requestId,
         },
         responseCorsHeaders,

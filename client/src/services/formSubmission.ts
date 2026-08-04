@@ -9,6 +9,7 @@ export type FormType = typeof FORM_TYPES[keyof typeof FORM_TYPES];
 
 export interface FormSubmission {
   formType: FormType;
+  websiteName: string;
   name: string;
   email: string;
   phone: string;
