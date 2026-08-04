@@ -56,7 +56,7 @@ jobs:
       - name: Validate public reCAPTCHA key
         run: |
           node -e "if(!String(process.env.VITE_RECAPTCHA_SITE_KEY || '').trim()) throw new Error('Repository variable VITE_RECAPTCHA_SITE_KEY is required. Configure it at: GitHub repository -> Settings -> Secrets and variables -> Actions -> Variables -> VITE_RECAPTCHA_SITE_KEY');"
-      - name: Build Vite site
+      - name: Build the site
         run: npm run build
       - name: Verify Pages paths and SPA fallback
         run: npm run verify:pages
