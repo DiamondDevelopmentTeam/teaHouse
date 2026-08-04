@@ -745,7 +745,7 @@ address {
 .story-copy > p {
   max-width: 47rem;
   color: var(--muted);
-  font-size: clamp(0.98rem, 1.05vw, 1.08rem);
+  font-size: clamp(1.02rem, 1.05vw, 1.08rem);
   line-height: 1.82;
 }
 
