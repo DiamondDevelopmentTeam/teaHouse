@@ -19,49 +19,85 @@ env:
   VITE_BASE_PATH: /teaHouse/
   VITE_INQUIRY_API_URL: ${{ vars.VITE_INQUIRY_API_URL }}
   VITE_CONTENT_API_BASE_URL: ${{ vars.VITE_CONTENT_API_BASE_URL }}
-  VITE_RECAPTCHA_SITE_KEY: ${{ vars.VITE_RECAPTCHA_SITE_KEY }}
+  VITE_RECAPTCHA_SITE_KEY: ${{ vars.VITE_RECAPTCHA_SITE_KEY || secrets.VITE_RECAPTCHA_SITE_KEY }}
 
 jobs:
   build:
     name: Build site
     runs-on: ubuntu-latest
     timeout-minutes: 10
+
     defaults:
       run:
         working-directory: client
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: 24
           cache: npm
           cache-dependency-path: client/package-lock.json
+
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
+
       - name: Install dependencies
         run: npm ci
+
       - name: Lint source
         run: npm run lint
+
       - name: Typecheck form service
         run: npm run typecheck
+
       - name: Test forms
         run: npm run test
+
       - name: Audit images
         run: npm run audit:images
+
+      - name: Diagnose public configuration
+        env:
+          KEY_FROM_VARIABLE: ${{ vars.VITE_RECAPTCHA_SITE_KEY }}
+          KEY_FROM_SECRET: ${{ secrets.VITE_RECAPTCHA_SITE_KEY }}
+        run: |
+          echo "Repository: $GITHUB_REPOSITORY"
+
+          if [ -n "$KEY_FROM_VARIABLE" ]; then
+            echo "reCAPTCHA repository variable found"
+          else
+            echo "reCAPTCHA repository variable missing"
+          fi
+
+          if [ -n "$KEY_FROM_SECRET" ]; then
+            echo "reCAPTCHA repository secret found"
+          else
+            echo "reCAPTCHA repository secret missing"
+          fi
+
+          echo "Final reCAPTCHA key length: ${#VITE_RECAPTCHA_SITE_KEY}"
+
       - name: Validate public inquiry endpoint
         run: |
-          node -e "const value=process.env.VITE_INQUIRY_API_URL; if(!value) throw new Error('Repository variable VITE_INQUIRY_API_URL is required'); const url=new URL(value); if(url.protocol !== 'https:' || url.pathname !== '/api/send-inquiry') throw new Error('VITE_INQUIRY_API_URL must be an HTTPS /api/send-inquiry endpoint');"
+          node -e "const value=String(process.env.VITE_INQUIRY_API_URL || '').trim(); if(!value) throw new Error('Repository variable VITE_INQUIRY_API_URL is required'); const url=new URL(value); if(url.protocol !== 'https:' || url.pathname !== '/api/send-inquiry') throw new Error('VITE_INQUIRY_API_URL must be an HTTPS /api/send-inquiry endpoint');"
+
       - name: Validate public reCAPTCHA key
         run: |
-          node -e "if(!String(process.env.VITE_RECAPTCHA_SITE_KEY || '').trim()) throw new Error('Repository variable VITE_RECAPTCHA_SITE_KEY is required. Configure it at: GitHub repository -> Settings -> Secrets and variables -> Actions -> Variables -> VITE_RECAPTCHA_SITE_KEY');"
+          node -e "const value=String(process.env.VITE_RECAPTCHA_SITE_KEY || '').trim(); if(!value) throw new Error('VITE_RECAPTCHA_SITE_KEY is required. Add it under repository Settings -> Secrets and variables -> Actions');"
+
       - name: Build the site
         run: npm run build
+
       - name: Verify Pages paths and SPA fallback
         run: npm run verify:pages
+
       - name: Verify form endpoint and secret isolation
         run: npm run verify:forms
+
       - name: Upload GitHub Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
@@ -72,9 +108,11 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     timeout-minutes: 10
+
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
+
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
