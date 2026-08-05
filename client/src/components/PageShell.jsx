@@ -1,12 +1,17 @@
-import { useEffect, useRef, useState } from 'react';
-import { Link, NavLink, useLocation } from 'react-router-dom';
+import React, { useEffect, useRef, useState } from 'react';
+import { Link } from 'react-router-dom';
 import teaHouseLogo from '../assets/images/TeaHouseLogo.webp';
 import diamondSuites from '../assets/images/DiamondSuitesDownTownOcala.webp';
-import { business, navigation } from '../data/business.js';
+import {
+  business,
+  footerNavigationGroups,
+  navigation,
+  primaryNavigation,
+} from '../data/business.js';
 import OptimizedImage from './OptimizedImage.jsx';
+import SiteLink from './SiteLink.jsx';
+import useSiteMenu from './useSiteMenu.js';
 import '../pages.css';
-
-const primaryPaths = new Set(['/about', '/menus', '/tea-rooms', '/contact']);
 
 function BrandMark({ compact = false, onClick }) {
   return (
@@ -23,9 +28,8 @@ function BrandMark({ compact = false, onClick }) {
 
 export default function PageShell({ children }) {
   const [isScrolled, setIsScrolled] = useState(false);
-  const [menuOpen, setMenuOpen] = useState(false);
   const menuCloseRef = useRef(null);
-  const location = useLocation();
+  const { menuOpen, closeMenu, toggleMenu } = useSiteMenu(menuCloseRef);
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 32);
@@ -34,30 +38,6 @@ export default function PageShell({ children }) {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  useEffect(() => {
-    setMenuOpen(false);
-  }, [location.pathname]);
-
-  useEffect(() => {
-    if (!menuOpen) return undefined;
-
-    const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-    menuCloseRef.current?.focus();
-
-    const handleKeyDown = (event) => {
-      if (event.key === 'Escape') setMenuOpen(false);
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    return () => {
-      document.body.style.overflow = previousOverflow;
-      window.removeEventListener('keydown', handleKeyDown);
-    };
-  }, [menuOpen]);
-
-  const closeMenu = () => setMenuOpen(false);
-
   return (
     <div className="site-shell page-site">
       <a className="skip-link" href="#page-main">Skip to content</a>
@@ -65,11 +45,9 @@ export default function PageShell({ children }) {
         <div className="header-inner">
           <BrandMark compact={isScrolled} onClick={closeMenu} />
           <nav className="primary-nav" aria-label="Primary navigation">
-            {navigation
-              .filter(({ to }) => primaryPaths.has(to))
-              .map(({ label, to }) => (
-                <NavLink key={to} to={to}>{label === 'Contact' ? 'Visit' : label}</NavLink>
-              ))}
+            {primaryNavigation.map((item) => (
+              <SiteLink key={item.to} item={item} active />
+            ))}
           </nav>
           <div className="header-actions">
             <Link className="header-reserve" to="/reservations">
@@ -78,7 +56,7 @@ export default function PageShell({ children }) {
             <button
               className="menu-toggle"
               type="button"
-              onClick={() => setMenuOpen((open) => !open)}
+              onClick={toggleMenu}
               aria-expanded={menuOpen}
               aria-controls="page-site-menu"
               aria-label="Open site menu"
@@ -107,11 +85,11 @@ export default function PageShell({ children }) {
         <div className="menu-panel-body">
           <p className="eyebrow">Explore 1890</p>
           <nav aria-label="Full navigation">
-            <NavLink to="/" onClick={closeMenu}><span>01</span>Home</NavLink>
-            {navigation.map(({ label, to }, index) => (
-              <NavLink key={to} to={to} onClick={closeMenu}>
-                <span>{String(index + 2).padStart(2, '0')}</span>{label}
-              </NavLink>
+            <SiteLink item={{ label: 'Home', to: '/', type: 'route' }} active onClick={closeMenu}><span>01</span>Home</SiteLink>
+            {navigation.map((item, index) => (
+              <SiteLink key={item.to} item={item} active onClick={closeMenu}>
+                <span>{String(index + 2).padStart(2, '0')}</span>{item.label}
+              </SiteLink>
             ))}
           </nav>
           <div className="menu-panel-details">
@@ -126,19 +104,15 @@ export default function PageShell({ children }) {
       <footer className="site-footer section-pad">
         <div className="footer-brand">
           <BrandMark />
+          <p>Tea, dining, private rooms, and catering in downtown Ocala.</p>
           <OptimizedImage className="diamond-logo" src={diamondSuites} alt="Diamond Suites Downtown Ocala" width={1200} height={200} />
         </div>
-        <div className="footer-nav">
-          <p>Explore</p>
-          <Link to="/">Home</Link>
-          {navigation.slice(0, 6).map(({ label, to }) => <Link key={to} to={to}>{label}</Link>)}
-        </div>
-        <div className="footer-nav">
-          <p>More</p>
-          {navigation.slice(6).map(({ label, to }) => <Link key={to} to={to}>{label}</Link>)}
-          <Link to="/privacy">Privacy</Link>
-          <Link to="/terms">Terms</Link>
-        </div>
+        {footerNavigationGroups.map((group) => (
+          <div className="footer-nav" key={group.label}>
+            <p>{group.label}</p>
+            {group.items.map((item) => <SiteLink key={item.to} item={item} />)}
+          </div>
+        ))}
         <div className="footer-visit">
           <p>Visit</p>
           <address>{business.address.street}<br />{business.address.locality}, {business.address.region} {business.address.postalCode}</address>
@@ -152,6 +126,10 @@ export default function PageShell({ children }) {
         </div>
         <div className="footer-bottom">
           <p>© 2026 1890 Tea House. All rights reserved.</p>
+          <nav className="footer-legal" aria-label="Legal">
+            <Link to="/privacy">Privacy</Link>
+            <Link to="/terms">Terms</Link>
+          </nav>
           <a href="#page-main">Back to top <span aria-hidden="true">↑</span></a>
         </div>
       </footer>

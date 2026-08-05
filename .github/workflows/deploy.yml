@@ -18,6 +18,7 @@ concurrency:
 env:
   VITE_BASE_PATH: /teaHouse/
   VITE_INQUIRY_API_URL: ${{ vars.VITE_INQUIRY_API_URL }}
+  VITE_SERVER_APPLICATION_API_URL: ${{ vars.VITE_SERVER_APPLICATION_API_URL }}
   VITE_CONTENT_API_BASE_URL: ${{ vars.VITE_CONTENT_API_BASE_URL }}
   VITE_RECAPTCHA_SITE_KEY: ${{ vars.VITE_RECAPTCHA_SITE_KEY }}
 
@@ -77,6 +78,10 @@ jobs:
       - name: Validate public inquiry endpoint
         run: |
           node -e "const value=String(process.env.VITE_INQUIRY_API_URL || '').trim(); if(!value) throw new Error('Repository variable VITE_INQUIRY_API_URL is required'); const url=new URL(value); if(url.protocol !== 'https:' || url.pathname !== '/api/send-inquiry') throw new Error('VITE_INQUIRY_API_URL must be an HTTPS /api/send-inquiry endpoint');"
+
+      - name: Validate public server application endpoint
+        run: |
+          node -e "const value=String(process.env.VITE_SERVER_APPLICATION_API_URL || '').trim(); if(!value) throw new Error('VITE_SERVER_APPLICATION_API_URL is required. Configure it in GitHub repository -> Settings -> Secrets and variables -> Actions -> Variables -> VITE_SERVER_APPLICATION_API_URL'); const url=new URL(value); if(url.protocol !== 'https:' || url.pathname !== '/api/send-server-application') throw new Error('VITE_SERVER_APPLICATION_API_URL must be an HTTPS /api/send-server-application endpoint');"
 
       - name: Validate public reCAPTCHA key
         run: |

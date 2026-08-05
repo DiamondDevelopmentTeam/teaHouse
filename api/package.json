@@ -13,7 +13,7 @@
     "lint": "npm run check",
     "build": "npm run check",
     "typecheck": "npm run check",
-    "check": "node --check src/functions/contactInquiry.js && node --check src/lib/config.js && node --check src/lib/cors.js && node --check src/lib/emailFooter.js && node --check src/lib/graphMail.js && node --check src/lib/rateLimit.js && node --check src/lib/recaptcha.js && node --check src/lib/validation.js"
+    "check": "node --check src/functions/contactInquiry.js && node --check src/functions/serverApplication.js && node --check src/lib/config.js && node --check src/lib/cors.js && node --check src/lib/emailFooter.js && node --check src/lib/graphMail.js && node --check src/lib/rateLimit.js && node --check src/lib/recaptcha.js && node --check src/lib/serverApplicationMail.js && node --check src/lib/serverApplicationValidation.js && node --check src/lib/validation.js"
   },
   "dependencies": {
     "@azure/functions": "^4.16.2",

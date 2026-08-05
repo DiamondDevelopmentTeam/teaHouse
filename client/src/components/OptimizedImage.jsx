@@ -1,3 +1,4 @@
+import React from 'react';
 import fallbackImage from '../assets/images/TeaHouseLogo.webp';
 
 export default function OptimizedImage({
@@ -8,6 +9,7 @@ export default function OptimizedImage({
   eager = false,
   sizes = '(max-width: 800px) 100vw, 50vw',
   className,
+  onMissing,
 }) {
   return (
     <img
@@ -23,6 +25,10 @@ export default function OptimizedImage({
       onError={(event) => {
         const image = event.currentTarget;
         image.onerror = null;
+        if (onMissing) {
+          onMissing();
+          return;
+        }
         image.src = fallbackImage;
         image.classList.add('is-missing');
       }}

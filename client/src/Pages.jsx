@@ -16,16 +16,16 @@ import building from './assets/images/building.webp';
 import charcuterieBoard from './assets/images/charcuterie-board.webp';
 import teaHouseBanner from './assets/images/teaHouseBanner.webp';
 import teaSandwiches from './assets/images/tea-sandwiches.webp';
-import teaService from './assets/images/tea-service.webp';
 import interior from './assets/images/migrated/about/interior.webp';
 import patio from './assets/images/migrated/about/patio.webp';
+import teaServiceFeature from './assets/images/migrated/gallery/33.webp';
 
 const imageLibrary = {
   building: { src: building, alt: 'The 1890 Tea House exterior and patio', width: 1536, height: 1024 },
-  board: { src: charcuterieBoard, alt: 'A colorful charcuterie board prepared for sharing', width: 361, height: 395 },
+  board: { src: charcuterieBoard, alt: 'A charcuterie board prepared for sharing', width: 1442, height: 907 },
   banner: { src: teaHouseBanner, alt: 'Wine and a charcuterie board arranged on a light table', width: 1442, height: 907 },
   sandwiches: { src: teaSandwiches, alt: 'Classic tea sandwiches beside a floral tea service', width: 376, height: 265 },
-  service: { src: teaService, alt: 'A floral teapot and cups arranged on a gold stand', width: 361, height: 395 },
+  service: { src: teaServiceFeature, alt: 'Floral teapots and a teacup arranged for service', width: 800, height: 1422 },
   interior: { src: interior, alt: 'The warm interior of 1890 Tea House', width: 1442, height: 903 },
 };
 
@@ -118,18 +118,55 @@ function breadcrumbSchema(items) {
   };
 }
 
-function PageHero({ eyebrow, title, intro, image = 'banner', actions }) {
+function PageHero({ eyebrow, title, intro, image = 'banner', actions, className = '' }) {
   const media = typeof image === 'string' ? imageLibrary[image] : image;
+  const [mediaAvailable, setMediaAvailable] = useState(Boolean(media?.src));
+
+  useEffect(() => {
+    setMediaAvailable(Boolean(media?.src));
+  }, [media?.src]);
+
   return (
-    <section className="page-hero">
+    <section className={`page-hero${mediaAvailable ? '' : ' page-hero--text'}${className ? ` ${className}` : ''}`}>
       <div className="page-hero__copy">
         <p className="page-eyebrow">{eyebrow}</p>
         <h1>{title}</h1>
         <p>{intro}</p>
         {actions ? <div className="page-actions">{actions}</div> : null}
       </div>
-      <div className="page-hero__media">
-        <OptimizedImage {...media} eager sizes="(max-width: 900px) 100vw, 56vw" />
+      {mediaAvailable ? (
+        <div className="page-hero__media">
+          <OptimizedImage {...media} eager sizes="(max-width: 900px) 100vw, 56vw" onMissing={() => setMediaAvailable(false)} />
+        </div>
+      ) : null}
+    </section>
+  );
+}
+
+function ReservationsHero() {
+  return (
+    <section className="reservations-hero">
+      <div className="reservations-hero__inner">
+        <div className="reservations-hero__copy">
+          <p className="page-eyebrow">Reservations</p>
+          <h1>Choose the gathering you have in mind.</h1>
+          <p>Settle into a cozy Tea Room or the welcoming patio for a birthday, catch-up, small gathering, or an unhurried pot of tea.</p>
+          <nav className="reservations-hero__actions" aria-label="Reservation options">
+            <ExternalLink className="page-button" href={business.reservationUrl}>Reserve a Table</ExternalLink>
+            <Link className="page-button reservations-hero__secondary" to="/tea-rooms">Reserve a Tea Room</Link>
+            <Link className="page-text-link" to="/reservations#large-party">Plan a Gathering for 12+</Link>
+          </nav>
+        </div>
+        <figure className="reservations-hero__media">
+          <OptimizedImage
+            src={imageLibrary.service.src}
+            alt={imageLibrary.service.alt}
+            width={imageLibrary.service.width}
+            height={imageLibrary.service.height}
+            eager
+            sizes="(max-width: 900px) calc(100vw - 3rem), 38rem"
+          />
+        </figure>
       </div>
     </section>
   );
@@ -488,14 +525,8 @@ export function LargePartyForm() {
 export function ReservationsPage() {
   return (
     <PageShell>
-      <Meta title="Reservations" description="Reserve at 1890 Tea House, review large-party policies, and request Tea Room or patio seating for groups of 12 or more." path="/reservations" image={teaService} schema={[breadcrumbSchema([['Home', '/'], ['Reservations', '/reservations']])]} />
-      <PageHero eyebrow="Reservations" title="Choose the gathering you have in mind." intro="Settle into a cozy Tea Room or the welcoming patio for a birthday, catch-up, small gathering, or an unhurried pot of tea." image="service" />
-      <section className="page-section">
-        <div className="page-card-grid">
-          <article className="page-card page-card--action"><span>1–11 guests</span><h3>Reserve with Toast</h3><p>Choose an available date and time through the secure reservation page.</p><ExternalLink className="page-button" href={business.reservationUrl}>Find a table</ExternalLink></article>
-          <article className="page-card page-card--action"><span>12+ guests</span><h3>Request a large party</h3><p>Share your date, guest count, and occasion. A request is not confirmed until the Tea House follows up.</p><a className="page-button page-button--dark" href="#large-party">Start request</a></article>
-        </div>
-      </section>
+      <Meta title="Reservations" description="Reserve at 1890 Tea House, review large-party policies, and request Tea Room or patio seating for groups of 12 or more." path="/reservations" image={teaServiceFeature} schema={[breadcrumbSchema([['Home', '/'], ['Reservations', '/reservations']])]} />
+      <ReservationsHero />
       <section className="page-section page-large-party" id="large-party">
         <div>
           <SectionTitle eyebrow="Groups of 12 or more" title="Plan the table together.">
@@ -547,7 +578,7 @@ export function NewsPage() {
       <Meta title="News" description="Read all current press coverage and announcements about 1890 Tea House." path="/news" image={news[0].image} schema={[breadcrumbSchema([['Home', '/'], ['News', '/news']])]} />
       <PageHero eyebrow="News and press" title="1890 in the community." intro="Stories from local publications about the house, the menu, and a new gathering place in downtown Ocala." image="building" />
       <section className="page-section page-press-grid">
-        {news.map((item) => <article key={item.href}><OptimizedImage src={item.image} alt={item.imageAlt} width={item.width} height={item.height} /><div><p>{item.publication} · <time dateTime={item.date}>{item.dateDisplay}</time></p><h2>{item.headline}</h2><p>{item.summary}</p><ExternalLink href={item.href}>Read at {item.publication}</ExternalLink></div></article>)}
+        {news.map((item) => <article key={item.href}><div className="page-press-media"><OptimizedImage src={item.image} alt={item.imageAlt} width={item.width} height={item.height} sizes="(max-width: 720px) 100vw, (max-width: 1000px) 50vw, 33vw" /></div><div className="page-press-content"><p>{item.publication} · <time dateTime={item.date}>{item.dateDisplay}</time></p><h2>{item.headline}</h2><p>{item.summary}</p><ExternalLink href={item.href}>Read at {item.publication}</ExternalLink></div></article>)}
       </section>
       <CTA />
     </PageShell>
@@ -809,7 +840,7 @@ export function CareersPage() {
   return (
     <PageShell>
       <Meta title="Careers" description="Learn about joining the warm, guest-focused team at 1890 Tea House and access the current application." path="/careers" image={interior} schema={[breadcrumbSchema([['Home', '/'], ['Careers', '/careers']])]} />
-      <PageHero eyebrow="Join our team" title="Help us make every visit feel special." intro="1890 Tea House is building a team around gracious service, thoughtful food and drink, and a warm welcome in the heart of downtown Ocala." image="interior" />
+      <PageHero className="careers-hero" eyebrow="Join our team" title="Help us make every visit feel special." intro="1890 Tea House is building a team around gracious service, thoughtful food and drink, and a warm welcome in the heart of downtown Ocala." image="interior" />
       <section className="page-section page-split">
         <SectionTitle eyebrow="Work at 1890" title="Hospitality with heart.">
           The Tea House welcomes applicants who enjoy creating memorable guest experiences in a beautiful, fast-paced setting inside Diamond Suites Downtown Ocala.
@@ -817,7 +848,7 @@ export function CareersPage() {
         <div className="page-prose">
           <p>The current application asks about availability, weekend and holiday scheduling, customer-service and food-handling experience, POS familiarity, comfort carrying trays and standing for a shift, certifications, education, references, and work authorization.</p>
           <p>Resume upload and the complete employment certification remain in the current secure application workflow.</p>
-          <ExternalLink className="page-button" href={business.applicationUrl}>Open the employment application</ExternalLink>
+          <Link className="page-button" to={business.applicationUrl}>Open the server application</Link>
         </div>
       </section>
       <section className="page-section page-note"><h2>Before you apply</h2><p>Have your employment history, availability, two references, certifications, and résumé ready. The application also includes consent for a background check and a signed accuracy certification.</p></section>

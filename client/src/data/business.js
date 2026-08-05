@@ -22,7 +22,7 @@ export const business = {
   reservationUrl:
     import.meta.env.VITE_RESERVATION_URL ||
     'https://tables.toasttab.com/restaurants/d470b089-02bc-4930-8828-ada15babda58/findTime',
-  applicationUrl: 'https://1890teahouse.com/server-application/',
+  applicationUrl: '/server-application',
   directionsUrl:
     'https://www.google.com/maps/search/?api=1&query=1890+Tea+House+917+E+Silver+Springs+Blvd+Ocala+FL+34470',
   socials: [
@@ -44,15 +44,54 @@ export const business = {
 export const businessAddress = `${business.address.street}, ${business.address.locality}, ${business.address.region} ${business.address.postalCode}`;
 
 export const navigation = [
-  { label: 'About', to: '/about' },
-  { label: 'Menus', to: '/menus' },
-  { label: 'Events', to: '/events' },
-  { label: 'Reservations', to: '/reservations' },
-  { label: 'Tea Rooms', to: '/tea-rooms' },
-  { label: 'News', to: '/news' },
-  { label: 'Gallery', to: '/gallery' },
-  { label: 'FAQs', to: '/faqs' },
-  { label: 'Journal', to: '/journal' },
-  { label: 'Contact', to: '/contact' },
-  { label: 'Careers', to: '/careers' },
+  { label: 'About', to: '/about', type: 'route' },
+  { label: 'Menus', to: '/menus', type: 'route' },
+  { label: 'Events', to: '/events', type: 'route' },
+  { label: 'Reservations', to: '/reservations', type: 'route' },
+  { label: 'Tea Rooms', to: '/tea-rooms', type: 'route' },
+  { label: 'News', to: '/news', type: 'route' },
+  { label: 'Gallery', to: '/gallery', type: 'route' },
+  { label: 'FAQs', to: '/faqs', type: 'route' },
+  { label: 'Journal', to: '/journal', type: 'route' },
+  { label: 'Contact', to: '/contact', type: 'route' },
+  { label: 'Careers', to: '/careers', type: 'route' },
+  { label: 'Join Our Team', to: '/server-application', type: 'route' },
+];
+
+export const primaryNavigation = [
+  { label: 'Our Story', to: '/about', type: 'route' },
+  { label: 'Tea & Dining', to: '/menus', type: 'route' },
+  { label: 'Gatherings', to: '/reservations', type: 'route' },
+  { label: 'Visit', to: '/contact', type: 'route' },
+];
+
+export const footerNavigationGroups = [
+  {
+    label: 'Explore',
+    items: [
+      { label: 'Home', to: '/', type: 'route' },
+      { label: 'About', to: '/about', type: 'route' },
+      { label: 'Menus', to: '/menus', type: 'route' },
+      { label: 'News', to: '/news', type: 'route' },
+      { label: 'Gallery', to: '/gallery', type: 'route' },
+      { label: 'Journal', to: '/journal', type: 'route' },
+    ],
+  },
+  {
+    label: 'Plan Your Visit',
+    items: [
+      { label: 'Reservations', to: '/reservations', type: 'route' },
+      { label: 'Tea Rooms', to: '/tea-rooms', type: 'route' },
+      { label: 'Events', to: '/events', type: 'route' },
+      { label: 'FAQs', to: '/faqs', type: 'route' },
+      { label: 'Contact', to: '/contact', type: 'route' },
+    ],
+  },
+  {
+    label: 'Work With Us',
+    items: [
+      { label: 'Careers', to: '/careers', type: 'route' },
+      { label: 'Server Application', to: '/server-application', type: 'route' },
+    ],
+  },
 ];

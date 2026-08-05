@@ -8,6 +8,7 @@
     "AZURE_CLIENT_SECRET": "",
     "GRAPH_SENDER_EMAIL": "donotreply@diamondpeo.com",
     "INQUIRY_RECIPIENT_EMAIL": "beatriz@diamondpeo.com",
+    "SERVER_APPLICATION_RECIPIENT_EMAIL": "",
     "RECAPTCHA_SECRET_KEY": "your_recaptcha_secret_key",
     "ALLOWED_RECAPTCHA_HOSTNAMES": "",
     "ADDITIONAL_ALLOWED_ORIGINS": ""

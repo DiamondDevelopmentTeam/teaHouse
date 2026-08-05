@@ -17,8 +17,8 @@
   --serif: 'Bodoni Moda', 'Iowan Old Style', 'Times New Roman', serif;
   --sans: 'Manrope', 'Segoe UI', Arial, sans-serif;
   --section-x: clamp(1.4rem, 5.6vw, 7rem);
-  --section-y: clamp(4.75rem, 7.5vw, 7.5rem);
-  --section-y-compact: clamp(4rem, 6vw, 6rem);
+  --section-y: clamp(4.25rem, 6.5vw, 6.5rem);
+  --section-y-compact: clamp(3.5rem, 5vw, 5rem);
   --hero-shift: 0px;
 }
 
@@ -67,10 +67,6 @@ a {
   text-decoration: none;
 }
 
-a:visited {
-  color: inherit;
-}
-
 img {
   display: block;
   max-width: 100%;
@@ -103,7 +99,8 @@ address {
 
 .site-shell {
   width: 100%;
-  overflow: clip;
+  overflow-x: clip;
+  overflow-y: visible;
   background: var(--paper-light);
 }
 
@@ -315,6 +312,7 @@ address {
   overflow-x: hidden;
   overflow-y: auto;
   visibility: hidden;
+  pointer-events: none;
   transform: translateY(-100%);
   transition: transform 520ms cubic-bezier(0.76, 0, 0.24, 1), visibility 520ms;
 }
@@ -325,6 +323,7 @@ address {
   right: -0.04em;
   bottom: -0.28em;
   z-index: -1;
+  pointer-events: none;
   color: rgba(255, 254, 249, 0.035);
   font-family: var(--serif);
   font-size: clamp(12rem, 32vw, 38rem);
@@ -333,6 +332,7 @@ address {
 
 .menu-panel.is-open {
   visibility: visible;
+  pointer-events: auto;
   transform: translateY(0);
 }
 
@@ -455,8 +455,7 @@ address {
 
 .hero-kicker {
   margin-bottom: 2rem;
-  opacity: 0;
-  animation: heroIn 780ms 180ms ease forwards;
+  animation: heroIn 780ms 180ms ease both;
 }
 
 .hero h1 {
@@ -467,8 +466,7 @@ address {
   font-weight: 400;
   letter-spacing: -0.055em;
   line-height: 0.86;
-  opacity: 0;
-  animation: heroIn 900ms 260ms cubic-bezier(0.2, 0.75, 0.2, 1) forwards;
+  animation: heroIn 900ms 260ms cubic-bezier(0.2, 0.75, 0.2, 1) both;
 }
 
 .hero h1 em,
@@ -485,8 +483,7 @@ address {
   color: rgba(255, 254, 249, 0.72);
   font-size: clamp(1rem, 1.25vw, 1.2rem);
   line-height: 1.75;
-  opacity: 0;
-  animation: heroIn 780ms 390ms ease forwards;
+  animation: heroIn 780ms 390ms ease both;
 }
 
 .hero-actions {
@@ -494,11 +491,12 @@ address {
   display: flex;
   align-items: center;
   gap: 1.8rem;
-  opacity: 0;
-  animation: heroIn 780ms 500ms ease forwards;
+  animation: heroIn 780ms 500ms ease both;
 }
 
 .button {
+  position: relative;
+  isolation: isolate;
   min-height: 3.65rem;
   padding: 0.9rem 1.3rem 0.9rem 1.5rem;
   display: inline-flex;
@@ -510,30 +508,49 @@ address {
   font-weight: 700;
   letter-spacing: 0.13em;
   line-height: 1;
+  text-shadow: none;
+  -webkit-text-fill-color: currentColor;
   text-transform: uppercase;
-  transition: color 200ms ease, background 200ms ease, border-color 200ms ease;
+  transition: color 200ms ease, background 200ms ease, border-color 200ms ease, transform 120ms ease;
 }
 
-.button--gold {
+.button--gold,
+a.button--gold:visited {
   color: var(--ink);
   background: var(--gold-bright);
 }
 
-.button--ink {
+.button--ink,
+a.button--ink:visited {
   color: var(--white);
   background: var(--ink);
 }
 
-.button--outline-light {
+.button--outline-light,
+a.button--outline-light:visited {
   color: var(--white);
   background: transparent;
   border-color: rgba(255, 254, 249, 0.42);
 }
 
-.button--outline-ink {
+.button--outline-ink,
+a.button--outline-ink:visited {
   color: var(--ink);
   background: transparent;
   border-color: rgba(20, 19, 15, 0.4);
+}
+
+.button:active {
+  transform: translateY(1px);
+}
+
+.button:disabled,
+.button[aria-disabled='true'] {
+  border-color: rgba(20, 19, 15, 0.16);
+  color: rgba(20, 19, 15, 0.54);
+  background: rgba(20, 19, 15, 0.1);
+  cursor: not-allowed;
+  opacity: 1;
 }
 
 .text-link {
@@ -862,7 +879,6 @@ address {
 }
 
 .experience-grid article {
-  min-height: 18rem;
   padding: clamp(1.8rem, 3vw, 3rem);
 }
 
@@ -1042,7 +1058,6 @@ address {
 }
 
 .service-ledger article {
-  min-height: 16rem;
   padding: 2rem clamp(1.2rem, 2vw, 2.2rem) 2.4rem;
   display: flex;
   flex-direction: column;
@@ -1079,20 +1094,21 @@ address {
   padding-top: var(--section-y);
   padding-bottom: var(--section-y);
   display: grid;
-  grid-template-columns: minmax(26rem, 0.9fr) minmax(25rem, 0.8fr);
-  align-items: center;
-  gap: clamp(4rem, 10vw, 11rem);
+  grid-template-columns: minmax(26rem, 1fr) minmax(25rem, 0.84fr);
+  align-items: start;
+  gap: clamp(3rem, 7vw, 8rem);
   background: var(--paper);
 }
 
 .rooms-gallery {
-  position: relative;
-  min-height: 46rem;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(9rem, 0.45fr);
+  align-items: end;
+  gap: clamp(0.75rem, 1.5vw, 1.25rem);
 }
 
 .rooms-image-main {
-  position: absolute;
-  inset: 0 16% 7rem 0;
+  aspect-ratio: 3 / 4;
   overflow: hidden;
 }
 
@@ -1105,13 +1121,12 @@ address {
 }
 
 .rooms-image-detail {
-  position: absolute;
-  right: 0;
-  bottom: 0;
-  width: 46%;
-  height: 19rem;
+  aspect-ratio: 361 / 395;
   overflow: hidden;
-  border: 0.65rem solid var(--paper);
+}
+
+.rooms-copy {
+  padding-top: clamp(0.5rem, 2vw, 2rem);
 }
 
 .rooms-copy h2 {
@@ -1165,7 +1180,7 @@ address {
 }
 
 .events-image {
-  min-height: 49rem;
+  aspect-ratio: 3 / 4;
   overflow: hidden;
 }
 
@@ -1241,7 +1256,6 @@ address {
 }
 
 .press-feature {
-  min-height: 29rem;
   padding: clamp(2rem, 4vw, 4.5rem);
   display: flex;
   flex-direction: column;
@@ -1278,11 +1292,11 @@ address {
 }
 
 .press-feature .text-link {
-  margin-top: auto;
+  margin-top: clamp(2rem, 4vw, 4rem);
 }
 
 .journal {
-  margin-top: clamp(4rem, 7vw, 7rem);
+  margin-top: clamp(3rem, 5vw, 5rem);
   display: grid;
   grid-template-columns: minmax(18rem, 0.75fr) repeat(2, minmax(18rem, 1fr));
   color: var(--white);
@@ -1292,7 +1306,6 @@ address {
 
 .journal-title,
 .journal > a {
-  min-height: 15rem;
   padding: 2rem;
 }
 
@@ -1469,7 +1482,7 @@ address {
 
 .visit-media {
   position: relative;
-  min-height: 49rem;
+  aspect-ratio: 3 / 4;
   overflow: hidden;
 }
 
@@ -1685,23 +1698,23 @@ address {
   text-transform: uppercase;
 }
 
-[data-reveal] {
+.reveal-ready [data-reveal] {
   opacity: 0;
-  transform: translateY(2rem);
-  transition: opacity 720ms ease var(--delay, 0ms), transform 720ms cubic-bezier(0.2, 0.75, 0.2, 1) var(--delay, 0ms);
+  transform: translateY(1rem);
+  transition: opacity 360ms ease var(--delay, 0ms), transform 420ms cubic-bezier(0.2, 0.75, 0.2, 1) var(--delay, 0ms);
 }
 
-[data-reveal].is-visible {
+.reveal-ready [data-reveal].is-visible {
   opacity: 1;
   transform: translateY(0);
 }
 
-.image-reveal[data-reveal] {
+.reveal-ready .image-reveal[data-reveal] {
   clip-path: inset(0 0 100% 0);
-  transition: opacity 200ms ease, transform 800ms cubic-bezier(0.2, 0.75, 0.2, 1), clip-path 900ms cubic-bezier(0.2, 0.75, 0.2, 1);
+  transition: opacity 200ms ease, transform 420ms cubic-bezier(0.2, 0.75, 0.2, 1), clip-path 520ms cubic-bezier(0.2, 0.75, 0.2, 1);
 }
 
-.image-reveal[data-reveal].is-visible {
+.reveal-ready .image-reveal[data-reveal].is-visible {
   clip-path: inset(0 0 0 0);
 }
 
@@ -2007,16 +2020,11 @@ address {
   }
 
   .rooms {
-    gap: 5rem;
-  }
-
-  .rooms-gallery {
-    min-height: 45rem;
+    gap: 3.5rem;
   }
 
   .events-image {
-    min-height: 65vw;
-    max-height: 43rem;
+    aspect-ratio: 4 / 3;
   }
 
   .event-types {
@@ -2047,7 +2055,7 @@ address {
   }
 
   .visit-media {
-    min-height: 70vw;
+    aspect-ratio: 4 / 3;
   }
 
   .closing-cta {
@@ -2230,7 +2238,6 @@ address {
   .service-ledger article:nth-child(2),
   .service-ledger article:nth-child(3),
   .service-ledger article:nth-child(4) {
-    min-height: 13rem;
     padding-inline: 0;
     border-left: 0;
     border-top: 1px solid var(--line-light);
@@ -2241,16 +2248,7 @@ address {
   }
 
   .rooms-gallery {
-    min-height: 36rem;
-  }
-
-  .rooms-image-main {
-    inset: 0 10% 5rem 0;
-  }
-
-  .rooms-image-detail {
-    width: 53%;
-    height: 15rem;
+    grid-template-columns: minmax(0, 1fr) minmax(7.5rem, 0.46fr);
   }
 
   .rooms-actions,
@@ -2266,11 +2264,10 @@ address {
   }
 
   .events-image {
-    min-height: 110vw;
+    aspect-ratio: 4 / 5;
   }
 
   .press-feature {
-    min-height: 31rem;
     padding: 2rem 1.5rem;
   }
 
@@ -2338,7 +2335,7 @@ address {
   }
 
   .visit-media {
-    min-height: 110vw;
+    aspect-ratio: 4 / 5;
   }
 
   .visit-address p {
@@ -2374,6 +2371,525 @@ address {
   }
 }
 
+/* ===========================================================================
+   1890 EDITORIAL IDENTITY SYSTEM
+   Shared scale, captions, ledgers, and interaction rules for the final pass.
+   =========================================================================== */
+
+:root {
+  --content-wide: 96rem;
+  --copy-wide: 44rem;
+  --copy-narrow: 32rem;
+  --editorial-gap: clamp(2rem, 4vw, 4.75rem);
+  --caption-size: 0.68rem;
+  --rule-gold: rgba(224, 184, 79, 0.62);
+  --rule-pink: rgba(185, 19, 97, 0.52);
+}
+
+.hero-copy::after,
+.hero-media::after,
+.story::before,
+.experience::before,
+.rooms::before,
+.closing-cta::before {
+  pointer-events: none;
+}
+
+.hero {
+  min-height: 0;
+  grid-template-columns: minmax(28rem, 0.9fr) minmax(36rem, 1.1fr);
+}
+
+.hero-copy {
+  min-height: 0;
+  padding-top: clamp(4rem, 7vw, 6.5rem);
+  padding-bottom: clamp(3.5rem, 5vw, 5rem);
+}
+
+.hero-copy::after {
+  left: clamp(1.2rem, 2vw, 2rem);
+  top: 17%;
+  height: 24%;
+  background: linear-gradient(var(--pink), var(--gold-bright));
+}
+
+.hero h1 {
+  max-width: 8.4ch;
+  text-wrap: balance;
+}
+
+.hero-intro {
+  max-width: var(--copy-narrow);
+}
+
+.hero-actions {
+  flex-wrap: wrap;
+}
+
+.hero-facts {
+  max-width: 36rem;
+  margin-top: clamp(2.5rem, 5vw, 4.25rem);
+}
+
+.hero-media {
+  min-height: 0;
+  aspect-ratio: auto;
+}
+
+.hero-main-image {
+  height: 100%;
+  min-height: 100%;
+  object-position: 54% center;
+}
+
+.hero-seal {
+  position: absolute;
+  right: clamp(1rem, 2vw, 2rem);
+  top: clamp(7.5rem, 11vw, 10rem);
+  z-index: -1;
+  width: clamp(5.4rem, 7vw, 7rem);
+  aspect-ratio: 1;
+  display: grid;
+  place-content: center;
+  place-items: center;
+  color: rgba(224, 184, 79, 0.34);
+  border: 1px solid currentColor;
+  border-radius: 50%;
+  pointer-events: none;
+  transform: rotate(-7deg);
+}
+
+.hero-seal::before,
+.hero-seal::after {
+  content: '';
+  position: absolute;
+  inset: 0.38rem;
+  border: 1px solid currentColor;
+  border-radius: 50%;
+}
+
+.hero-seal::after {
+  inset: 50% 0.8rem auto;
+  border: 0;
+  border-top: 1px solid currentColor;
+  border-radius: 0;
+}
+
+.hero-seal span {
+  font-family: var(--serif);
+  font-size: clamp(1.55rem, 2.4vw, 2.25rem);
+  line-height: 1;
+}
+
+.hero-seal i {
+  max-width: 7ch;
+  margin-top: 0.45rem;
+  font-size: 0.46rem;
+  font-style: normal;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  line-height: 1.25;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.story,
+.experience,
+.rooms,
+.notes,
+.faq,
+.closing-cta {
+  position: relative;
+  max-width: none;
+}
+
+.story::before,
+.experience::before,
+.rooms::before,
+.closing-cta::before {
+  content: '';
+  position: absolute;
+  top: var(--section-y);
+  right: var(--section-x);
+  width: clamp(3.5rem, 7vw, 7rem);
+  height: clamp(3.5rem, 7vw, 7rem);
+  border-top: 1px solid var(--rule-gold);
+  border-right: 1px solid var(--rule-pink);
+  opacity: 0.72;
+}
+
+.story-copy blockquote {
+  max-width: 35rem;
+  margin: 1.6rem 0 0;
+  padding: 1.25rem 0 0 1.4rem;
+  color: var(--ink);
+  border-top: 1px solid var(--rule-gold);
+  border-left: 1px solid var(--rule-pink);
+  font-family: var(--serif);
+  font-size: clamp(1.35rem, 2vw, 2rem);
+  font-style: italic;
+  line-height: 1.35;
+}
+
+.editorial-caption {
+  color: var(--muted);
+  font-size: var(--caption-size);
+  letter-spacing: 0.02em;
+  line-height: 1.55;
+}
+
+.editorial-caption > span {
+  display: block;
+  margin-bottom: 0.22rem;
+  color: var(--pink);
+  font-family: var(--sans);
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.story-image .editorial-caption {
+  color: var(--white);
+}
+
+.story-image .editorial-caption > span {
+  color: var(--gold-bright);
+  font-family: var(--serif);
+  font-size: 2.1rem;
+  font-weight: 400;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.experience-ledger-label {
+  grid-column: 1 / -1;
+  margin-bottom: -1.5rem;
+  padding-top: 0.8rem;
+  color: var(--pink);
+  border-top: 1px solid var(--rule-pink);
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.experience-grid {
+  grid-template-columns: 1.16fr 0.84fr 1.16fr 0.84fr;
+}
+
+.experience-grid article {
+  position: relative;
+  background: transparent;
+}
+
+.experience-grid article:nth-child(even) {
+  background: rgba(93, 98, 76, 0.07);
+}
+
+.experience-grid article::before {
+  content: '';
+  position: absolute;
+  left: clamp(1.5rem, 2.2vw, 2.2rem);
+  top: 0;
+  width: 2.5rem;
+  border-top: 2px solid var(--gold);
+  pointer-events: none;
+}
+
+.menu-image .editorial-caption,
+.rooms-gallery .editorial-caption {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  z-index: 1;
+  max-width: min(23rem, 88%);
+  padding: 0.8rem 1rem;
+  color: var(--white);
+  background: rgba(20, 19, 15, 0.88);
+  backdrop-filter: blur(2px);
+}
+
+.menu-image .editorial-caption > span,
+.rooms-gallery .editorial-caption > span {
+  color: var(--gold-bright);
+}
+
+.rooms-image-main,
+.rooms-image-detail {
+  position: relative;
+}
+
+.rooms-image-main {
+  border-top: 1px solid var(--gold);
+}
+
+.rooms-image-detail {
+  border-bottom: 1px solid var(--pink);
+}
+
+.rooms-list li {
+  grid-template-columns: 2.75rem minmax(0, 1fr);
+}
+
+.event-types {
+  position: relative;
+}
+
+.event-types::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 0;
+  bottom: 0;
+  border-left: 1px solid var(--rule-gold);
+  pointer-events: none;
+}
+
+.event-types article {
+  padding: 1.25rem clamp(1rem, 2.5vw, 2rem) 0 0;
+}
+
+.event-types article + article {
+  padding-right: 0;
+  padding-left: clamp(1rem, 2.5vw, 2rem);
+}
+
+.notes-heading {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(18rem, 0.45fr);
+  align-items: end;
+  gap: 1rem var(--editorial-gap);
+}
+
+.notes-heading .eyebrow {
+  grid-column: 1 / -1;
+}
+
+.notes-heading > p:last-child {
+  max-width: var(--copy-narrow);
+  padding-bottom: 0.35rem;
+  color: rgba(255, 254, 249, 0.76);
+  line-height: 1.7;
+}
+
+.notes-grid {
+  grid-template-columns: minmax(0, 1.18fr) minmax(0, 0.82fr);
+  gap: 1px;
+  background: rgba(255, 254, 249, 0.28);
+}
+
+.press-feature h3 {
+  max-width: 17ch;
+  font-size: clamp(2rem, 3vw, 3.65rem);
+}
+
+.press-feature--dark h3 {
+  font-size: clamp(1.9rem, 2.7vw, 3.25rem);
+}
+
+.faq-intro {
+  position: static;
+}
+
+.faq-item > button {
+  transition: color 180ms ease, background 180ms ease, padding 180ms ease;
+}
+
+.faq-item.is-open > button {
+  color: var(--pink-dark);
+}
+
+.faq-answer p {
+  max-width: 38rem;
+}
+
+.footer-bottom {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+}
+
+.footer-legal {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+.button .arrow,
+.text-link .arrow {
+  transition: transform 180ms ease;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .button:hover .arrow,
+  .text-link:hover .arrow {
+    transform: translateX(0.22rem);
+  }
+
+  .text-link:hover {
+    text-decoration-thickness: 2px;
+  }
+
+  .faq-item > button:hover {
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+    color: var(--pink-dark);
+    background: rgba(185, 19, 97, 0.045);
+  }
+}
+
+@media (max-width: 1180px) {
+  .hero {
+    grid-template-columns: minmax(25rem, 0.92fr) minmax(31rem, 1.08fr);
+  }
+
+  .hero-seal {
+    opacity: 0.7;
+  }
+
+  .experience-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .experience-grid article:nth-child(3) {
+    border-top: 1px solid var(--line);
+  }
+
+  .rooms-image-detail .editorial-caption {
+    display: none;
+  }
+}
+
+@media (max-width: 900px) {
+  .hero {
+    grid-template-columns: 1fr;
+  }
+
+  .hero-media {
+    min-height: 0;
+    aspect-ratio: 16 / 9;
+  }
+
+  .hero-seal {
+    top: 7rem;
+  }
+
+  .story::before,
+  .experience::before,
+  .rooms::before,
+  .closing-cta::before {
+    width: 3rem;
+    height: 3rem;
+  }
+
+  .notes-heading {
+    grid-template-columns: 1fr;
+  }
+
+  .notes-heading .eyebrow {
+    grid-column: auto;
+  }
+
+  .notes-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .event-types::before {
+    display: none;
+  }
+
+  .event-types article,
+  .event-types article + article {
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  .footer-bottom {
+    grid-template-columns: 1fr auto;
+  }
+
+  .footer-legal {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
+}
+
+@media (max-width: 620px) {
+  .hero-seal {
+    display: none;
+  }
+
+  .hero-copy {
+    padding-top: 3.5rem;
+    padding-bottom: 2.75rem;
+  }
+
+  .hero-media {
+    aspect-ratio: 4 / 3;
+  }
+
+  .hero-image-label {
+    width: min(21rem, 88%);
+  }
+
+  .story::before,
+  .experience::before,
+  .rooms::before,
+  .closing-cta::before {
+    display: none;
+  }
+
+  .story-copy blockquote {
+    padding-left: 1rem;
+    font-size: 1.35rem;
+  }
+
+  .experience-ledger-label {
+    margin-bottom: -0.75rem;
+  }
+
+  .experience-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .experience-grid article:nth-child(even) {
+    background: transparent;
+  }
+
+  .rooms-gallery .editorial-caption {
+    max-width: 92%;
+    padding: 0.65rem 0.75rem;
+  }
+
+  .event-types article + article {
+    margin-top: 1.25rem;
+  }
+
+  .notes-heading > p:last-child {
+    padding-bottom: 0;
+  }
+
+  .footer-bottom {
+    grid-template-columns: 1fr;
+  }
+
+  .footer-legal {
+    grid-column: auto;
+    grid-row: auto;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-seal,
+  .hero-copy::after,
+  .button .arrow,
+  .text-link .arrow {
+    animation: none;
+    transition: none;
+    transform: none;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
@@ -2398,5 +2914,829 @@ address {
   .hero-main-image {
     transform: none;
     will-change: auto;
+  }
+}
+
+/* ===========================================================================
+   Final compact layout pass
+   Keeps the editorial design while removing oversized gaps and tall media rows.
+   ========================================================================== */
+
+:root {
+  --section-y: clamp(3.25rem, 4.6vw, 4.75rem);
+  --section-y-compact: clamp(2.5rem, 3.4vw, 3.5rem);
+}
+
+/* Keep every CTA label readable above decorative layers. */
+.button,
+.button:visited {
+  color: inherit;
+  overflow: hidden;
+}
+
+.button::before,
+.button::after {
+  z-index: -1;
+  pointer-events: none;
+}
+
+.button--gold,
+a.button--gold:visited {
+  color: var(--ink);
+}
+
+.button--ink,
+a.button--ink:visited {
+  color: var(--white);
+}
+
+.button--outline-light,
+a.button--outline-light:visited {
+  color: var(--white);
+}
+
+.button--outline-ink,
+a.button--outline-ink:visited {
+  color: var(--ink);
+}
+
+/* Story: tighter opening copy and a shorter panoramic image. */
+.story {
+  gap: clamp(2rem, 3.5vw, 3rem) clamp(3rem, 5vw, 6rem);
+}
+
+.story-copy {
+  padding-top: 1.15rem;
+}
+
+.story-copy > p + p {
+  margin-top: 0.8rem;
+}
+
+.story-copy .story-lead {
+  margin-bottom: 0.95rem;
+}
+
+.story-actions {
+  margin-top: 1.5rem;
+}
+
+.story-image {
+  aspect-ratio: 16 / 5;
+  max-height: 31rem;
+}
+
+/* Experience: remove the artificial air inside the numbered blocks. */
+.experience {
+  gap: clamp(2.25rem, 4.5vw, 5rem);
+}
+
+.experience-intro > p:last-child {
+  margin-top: 1.35rem;
+}
+
+.experience-grid article {
+  padding: clamp(1.5rem, 2.2vw, 2.2rem);
+}
+
+.experience-grid h3 {
+  margin-top: 1.65rem;
+}
+
+.experience-grid p {
+  margin-top: 0.75rem;
+}
+
+/* Menu: let the image follow its content instead of forcing a 34–48rem column. */
+.menu-heading {
+  padding-bottom: clamp(2.25rem, 3vw, 3rem);
+}
+
+.menu-layout {
+  gap: clamp(2.5rem, 4.5vw, 5rem);
+}
+
+.menu-list + .menu-list {
+  margin-top: clamp(2rem, 3vw, 3rem);
+}
+
+.menu-image {
+  position: relative;
+  top: auto;
+  width: 100%;
+  height: auto;
+  max-height: 40rem;
+  aspect-ratio: 4 / 5;
+}
+
+.menu-image img {
+  height: 100%;
+}
+
+.service-ledger article {
+  min-height: 0;
+  padding-top: 1.65rem;
+  padding-bottom: 1.85rem;
+}
+
+.service-ledger h3 {
+  margin-top: 1.6rem;
+}
+
+/* Tea rooms: balance the image height against the text column. */
+.rooms {
+  grid-template-columns: minmax(23rem, 0.9fr) minmax(28rem, 1.1fr);
+  align-items: center;
+  gap: clamp(3rem, 5vw, 5.5rem);
+}
+
+.rooms-gallery {
+  grid-template-columns: minmax(0, 1fr) minmax(8.5rem, 0.42fr);
+  align-items: center;
+}
+
+.rooms-image-main {
+  aspect-ratio: 4 / 5;
+}
+
+.rooms-image-detail {
+  aspect-ratio: 1 / 1;
+}
+
+.rooms-copy {
+  padding-top: 0;
+}
+
+.rooms-lead {
+  margin-top: 1.5rem;
+}
+
+.rooms-list {
+  margin-top: 1.75rem;
+}
+
+.rooms-list li {
+  padding: 0.85rem 0;
+}
+
+.rooms-actions,
+.events-actions,
+.visit-actions {
+  margin-top: 1.8rem;
+}
+
+/* Events and visit: crop media to the text instead of stretching the section. */
+.events,
+.visit {
+  align-items: stretch;
+}
+
+.events-image,
+.visit-media {
+  min-height: 0;
+  aspect-ratio: 4 / 3;
+}
+
+.events-copy,
+.visit-details {
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.events-copy > p {
+  margin-top: 1.45rem;
+}
+
+.event-types {
+  margin-top: 2rem;
+}
+
+/* News, FAQ, closing CTA, and footer: keep rhythm without giant section breaks. */
+.notes-grid {
+  margin-top: 2.25rem;
+}
+
+.press-feature {
+  padding: clamp(1.75rem, 3vw, 3.25rem);
+}
+
+.press-feature h3 {
+  margin-top: 1.35rem;
+}
+
+.press-feature .text-link {
+  margin-top: clamp(1.5rem, 2.5vw, 2.5rem);
+}
+
+.journal {
+  margin-top: clamp(2.25rem, 3.5vw, 3.5rem);
+}
+
+.faq {
+  gap: clamp(2.75rem, 5vw, 5rem);
+}
+
+.faq-item > button {
+  padding-block: 1.25rem;
+}
+
+.visit-grid {
+  margin-top: 2.2rem;
+}
+
+.closing-cta {
+  gap: 1.15rem clamp(2.5rem, 5vw, 5.5rem);
+}
+
+.closing-cta-copy p {
+  margin-top: 1.2rem;
+}
+
+.site-footer {
+  padding-top: clamp(3.5rem, 5vw, 5rem);
+  gap: clamp(1.75rem, 3.5vw, 3.5rem);
+}
+
+.diamond-logo {
+  margin-top: 1.75rem;
+}
+
+@media (max-width: 1180px) {
+  .rooms {
+    grid-template-columns: minmax(21rem, 0.95fr) minmax(25rem, 1.05fr);
+    gap: 3.25rem;
+  }
+
+  .events-image,
+  .visit-media {
+    aspect-ratio: 1 / 1;
+  }
+}
+
+@media (max-width: 900px) {
+  .hero-copy {
+    min-height: auto;
+    padding-top: 5rem;
+    padding-bottom: 3.25rem;
+  }
+
+  .hero-media {
+    min-height: 56vw;
+  }
+
+  .story,
+  .experience,
+  .rooms,
+  .faq,
+  .closing-cta {
+    row-gap: 2.5rem;
+  }
+
+  .story-image {
+    aspect-ratio: 16 / 7;
+  }
+
+  .experience-image,
+  .rooms-gallery {
+    max-width: 50rem;
+  }
+
+  .menu-image {
+    height: auto;
+    max-height: none;
+    aspect-ratio: 16 / 10;
+  }
+
+  .rooms {
+    align-items: start;
+  }
+
+  .rooms-gallery {
+    grid-template-columns: minmax(0, 1fr) minmax(9rem, 0.38fr);
+  }
+
+  .events-image,
+  .visit-media {
+    aspect-ratio: 16 / 9;
+  }
+
+  .events-copy,
+  .visit-details {
+    display: block;
+  }
+
+  .faq {
+    gap: 2.25rem;
+  }
+}
+
+@media (max-width: 620px) {
+  :root {
+    --section-y: 3.25rem;
+    --section-y-compact: 2.75rem;
+  }
+
+  .hero-copy {
+    min-height: auto;
+    padding-top: 3.5rem;
+    padding-bottom: 2.75rem;
+  }
+
+  .hero-facts {
+    margin-top: 2.4rem;
+  }
+
+  .hero-media {
+    min-height: 0;
+    aspect-ratio: 4 / 3;
+  }
+
+  .hero-main-image {
+    height: 100%;
+  }
+
+  .story,
+  .experience,
+  .menu-heading,
+  .menu-layout,
+  .rooms,
+  .events-copy,
+  .notes,
+  .faq,
+  .visit-details,
+  .closing-cta {
+    padding-top: 3.25rem;
+    padding-bottom: 3.25rem;
+  }
+
+  .story-image {
+    min-height: 0;
+    aspect-ratio: 4 / 3;
+  }
+
+  .experience {
+    row-gap: 2rem;
+  }
+
+  .experience-grid article,
+  .experience-grid article:nth-child(2),
+  .experience-grid article:nth-child(3),
+  .experience-grid article:nth-child(4) {
+    padding-block: 1.65rem;
+  }
+
+  .menu-layout {
+    gap: 2.25rem;
+  }
+
+  .menu-image {
+    height: auto;
+    aspect-ratio: 4 / 3;
+  }
+
+  .rooms-gallery {
+    grid-template-columns: 1fr;
+  }
+
+  .rooms-image-main {
+    aspect-ratio: 4 / 3;
+  }
+
+  .rooms-image-detail {
+    display: none;
+  }
+
+  .rooms-actions,
+  .events-actions,
+  .visit-actions {
+    margin-top: 1.5rem;
+  }
+
+  .events-image,
+  .visit-media {
+    aspect-ratio: 4 / 3;
+  }
+
+  .notes-grid {
+    margin-top: 1.75rem;
+  }
+
+  .journal {
+    margin-top: 2rem;
+  }
+
+  .faq {
+    gap: 1.75rem;
+  }
+
+  .closing-cta {
+    gap: 1rem;
+  }
+
+  .site-footer {
+    padding-top: 3.25rem;
+    gap: 1.75rem;
+  }
+}
+
+/* =========================================================
+   FINAL DENSITY + NO-EMPTY-COLUMN PASS
+   Keeps sections content-driven and guarantees media remains visible.
+   ========================================================= */
+
+:root {
+  --section-x: clamp(1.25rem, 4.2vw, 5.5rem);
+  --section-y: clamp(3.25rem, 4.6vw, 5rem);
+  --section-y-compact: clamp(2.5rem, 3.5vw, 3.75rem);
+}
+
+/* Do not allow reveal animation failures to leave image-sized holes. */
+.reveal-ready .image-reveal[data-reveal],
+.reveal-ready .image-reveal[data-reveal].is-visible {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+  clip-path: inset(0 0 0 0);
+}
+
+.image-reveal,
+.image-reveal img {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Slightly tighter spacing between major content groups. */
+.story,
+.experience,
+.rooms,
+.notes,
+.faq,
+.closing-cta {
+  padding-top: var(--section-y);
+  padding-bottom: var(--section-y);
+}
+
+.story,
+.experience,
+.rooms,
+.faq,
+.closing-cta {
+  gap: clamp(2.25rem, 4.5vw, 5rem);
+}
+
+/* Remove tall media ratios that force entire split sections to become oversized. */
+.events,
+.visit {
+  min-height: 0;
+  align-items: stretch;
+}
+
+.events-image,
+.visit-media {
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  aspect-ratio: auto;
+  align-self: stretch;
+  overflow: hidden;
+}
+
+.events-image img,
+.visit-media > img {
+  width: 100%;
+  height: 100%;
+  min-height: 100%;
+  object-fit: cover;
+  opacity: 1;
+  visibility: visible;
+}
+
+/* The right columns now determine section height, while media fills that height. */
+.events-copy,
+.visit-details {
+  min-height: 0;
+  align-self: stretch;
+  justify-content: center;
+  padding-top: var(--section-y);
+  padding-bottom: var(--section-y);
+}
+
+/* Keep visit information broad enough that it does not float in one corner. */
+.visit {
+  grid-template-columns: minmax(26rem, 0.9fr) minmax(34rem, 1.1fr);
+}
+
+.visit-details {
+  padding-right: var(--section-x);
+}
+
+.visit-details h2 {
+  max-width: 9ch;
+  font-size: clamp(3.4rem, 5.15vw, 6.25rem);
+}
+
+.visit-grid {
+  width: 100%;
+  max-width: 52rem;
+  margin-top: 2.25rem;
+  gap: clamp(1.5rem, 3vw, 3rem);
+}
+
+.visit-actions {
+  margin-top: 2rem;
+}
+
+/* Shorten media-heavy sections so their images do not create surplus height. */
+.rooms {
+  grid-template-columns: minmax(24rem, 0.86fr) minmax(29rem, 1.14fr);
+  align-items: center;
+}
+
+.rooms-gallery {
+  max-height: 37rem;
+  align-items: center;
+}
+
+.rooms-image-main {
+  aspect-ratio: 4 / 3;
+  max-height: 35rem;
+}
+
+.rooms-image-detail {
+  aspect-ratio: 1 / 1;
+  max-height: 18rem;
+}
+
+.rooms-copy h2 {
+  font-size: clamp(3.4rem, 5.2vw, 6.2rem);
+}
+
+.menu-layout {
+  padding-top: var(--section-y-compact);
+  padding-bottom: var(--section-y-compact);
+}
+
+.menu-image {
+  max-height: 34rem;
+  aspect-ratio: 4 / 5;
+}
+
+/* Reduce the large internal air pockets inside repeated content blocks. */
+.experience-grid h3 {
+  margin-top: 1.25rem;
+}
+
+.experience-grid article,
+.service-ledger article {
+  padding-top: 1.5rem;
+  padding-bottom: 1.65rem;
+}
+
+.service-ledger h3 {
+  margin-top: 1.25rem;
+}
+
+.notes-grid {
+  margin-top: 2rem;
+}
+
+.journal {
+  margin-top: 2.5rem;
+}
+
+.faq-item > button {
+  padding-top: 1.1rem;
+  padding-bottom: 1.1rem;
+}
+
+.closing-cta {
+  align-items: center;
+}
+
+.site-footer {
+  padding-top: clamp(3rem, 4.5vw, 4.5rem);
+}
+
+@media (max-width: 1180px) {
+  .visit {
+    grid-template-columns: minmax(22rem, 0.85fr) minmax(28rem, 1.15fr);
+  }
+
+  .rooms-gallery {
+    max-height: 33rem;
+  }
+}
+
+@media (max-width: 900px) {
+  .events,
+  .visit {
+    grid-template-columns: 1fr;
+  }
+
+  .events-image,
+  .visit-media {
+    height: auto;
+    min-height: 0;
+    aspect-ratio: 16 / 8.5;
+  }
+
+  .events-image img,
+  .visit-media > img {
+    height: 100%;
+    min-height: 0;
+  }
+
+  .visit-details {
+    padding-right: var(--section-x);
+  }
+
+  .rooms-gallery {
+    max-height: none;
+  }
+
+  .rooms-image-main {
+    max-height: none;
+  }
+
+  .menu-image {
+    max-height: none;
+  }
+}
+
+@media (max-width: 620px) {
+  :root {
+    --section-x: 1.25rem;
+    --section-y: 2.8rem;
+    --section-y-compact: 2.35rem;
+  }
+
+  .story,
+  .experience,
+  .rooms,
+  .notes,
+  .faq,
+  .closing-cta {
+    gap: 1.75rem;
+  }
+
+  .events-image,
+  .visit-media {
+    aspect-ratio: 4 / 3;
+  }
+
+  .visit-details h2,
+  .rooms-copy h2 {
+    font-size: clamp(2.9rem, 15vw, 4.4rem);
+  }
+
+  .visit-grid {
+    margin-top: 1.6rem;
+    gap: 1.3rem;
+  }
+
+  .rooms-gallery {
+    max-height: none;
+  }
+
+  .rooms-image-main {
+    aspect-ratio: 4 / 3;
+    max-height: none;
+  }
+}
+
+@media (min-width: 901px) {
+  .hero-seal {
+    top: clamp(1.35rem, 2.5vw, 2.5rem);
+  }
+
+  .rooms-gallery {
+    max-height: none;
+  }
+
+  .rooms-image-main {
+    aspect-ratio: 4 / 5;
+    max-height: 35rem;
+  }
+}
+
+@media (max-width: 900px) {
+  .rooms {
+    grid-template-columns: minmax(0, 1fr);
+    align-items: start;
+  }
+
+  .rooms-copy {
+    min-width: 0;
+    width: auto;
+  }
+}
+
+/* ===========================================================================
+   ROUTED NAVIGATION + COMPOSITION REPAIR
+   ========================================================================== */
+
+.rooms-gallery {
+  position: relative;
+  isolation: isolate;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  align-items: end;
+  gap: 0;
+  overflow: visible;
+}
+
+.rooms-image-main {
+  grid-column: 1 / 10;
+  grid-row: 1;
+  width: 100%;
+}
+
+.rooms-image-detail {
+  z-index: 2;
+  grid-column: 8 / 13;
+  grid-row: 1;
+  justify-self: end;
+  width: min(100%, 22.5625rem);
+  margin-bottom: clamp(1.25rem, 3vw, 3rem);
+  box-shadow: -1rem 1rem 2.5rem rgb(20 19 15 / 24%);
+}
+
+.site-footer {
+  grid-template-columns:
+    minmax(14rem, 1.1fr)
+    repeat(3, minmax(7rem, 0.48fr))
+    minmax(14rem, 0.92fr);
+  gap: clamp(1.75rem, 3.2vw, 3.5rem);
+}
+
+@media (max-width: 1180px) {
+  .rooms-image-main {
+    grid-column: 1 / 10;
+  }
+
+  .rooms-image-detail {
+    grid-column: 8 / 13;
+    width: min(100%, 18rem);
+  }
+
+  .site-footer {
+    grid-template-columns: minmax(14rem, 1.15fr) repeat(3, minmax(7rem, 0.6fr));
+  }
+
+  .footer-visit {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 900px) {
+  .rooms-gallery {
+    width: min(100%, 48rem);
+  }
+
+  .rooms-image-main {
+    grid-column: 1 / 10;
+  }
+
+  .rooms-image-detail {
+    grid-column: 8 / 13;
+    width: min(100%, 16rem);
+    margin-bottom: 1.5rem;
+  }
+
+  .site-footer {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .footer-brand,
+  .footer-visit {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 620px) {
+  .rooms-gallery {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .rooms-image-main {
+    grid-column: 1;
+  }
+
+  .rooms-image-detail {
+    display: none;
+  }
+}
+
+@media (max-width: 430px) {
+  .site-footer {
+    grid-template-columns: 1fr;
+  }
+
+  .footer-brand,
+  .footer-nav,
+  .footer-visit,
+  .footer-bottom {
+    grid-column: 1;
   }
 }

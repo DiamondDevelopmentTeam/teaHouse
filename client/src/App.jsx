@@ -1,14 +1,20 @@
-import { useEffect, useRef, useState } from 'react';
-import { Link, NavLink } from 'react-router-dom';
+import React, { useEffect, useRef, useState } from 'react';
+import { Link } from 'react-router-dom';
 import './App.css';
-import { business, navigation } from './data/business.js';
+import {
+  business,
+  footerNavigationGroups,
+  navigation,
+  primaryNavigation,
+} from './data/business.js';
 import { Meta } from './Pages.jsx';
+import SiteLink from './components/SiteLink.jsx';
+import useSiteMenu from './components/useSiteMenu.js';
 
 import building from './assets/images/building.webp';
 import cupOfFruits from './assets/images/cupOfFruits.jpg';
 import diamondSuites from './assets/images/DiamondSuitesDownTownOcala.webp';
 import interior from './assets/images/migrated/about/interior.webp';
-import tableOfTeaHouse from './assets/images/tableOfTeaHouse.jpg';
 import teaHouseBanner from './assets/images/teaHouseBanner.webp';
 import teaHouseLogo from './assets/images/TeaHouseLogo.webp';
 import teaService from './assets/images/tea-service.webp';
@@ -19,14 +25,7 @@ const menuLink = '/menus';
 const largePartyLink = '/reservations#large-party';
 const directionsLink = business.directionsUrl;
 
-const primaryNav = [
-  { label: 'Our Story', href: '#about' },
-  { label: 'Tea & Dining', href: '#menus' },
-  { label: 'Gatherings', href: '#events' },
-  { label: 'Visit', href: '#contact' },
-];
-
-const fullNav = [{ label: 'Home', to: '/' }, ...navigation];
+const fullNav = [{ label: 'Home', to: '/', type: 'route' }, ...navigation];
 
 const allDayFavorites = [
   { name: 'Cucumber Sando', price: '$9' },
@@ -103,11 +102,27 @@ function Arrow() {
   );
 }
 
+function SectionEyebrow({ children, tone = 'pink', className = '' }) {
+  const classes = ['eyebrow', tone === 'gold' ? 'eyebrow--gold' : '', className]
+    .filter(Boolean)
+    .join(' ');
+  return <p className={classes}>{children}</p>;
+}
+
+function EditorialCaption({ label, children }) {
+  return (
+    <figcaption className="editorial-caption">
+      <span>{label}</span>
+      {children}
+    </figcaption>
+  );
+}
+
 function App() {
   const [isScrolled, setIsScrolled] = useState(false);
-  const [menuOpen, setMenuOpen] = useState(false);
   const [openFaq, setOpenFaq] = useState(0);
   const menuCloseRef = useRef(null);
+  const { menuOpen, closeMenu, toggleMenu } = useSiteMenu(menuCloseRef);
 
   useEffect(() => {
     let frame;
@@ -136,7 +151,7 @@ function App() {
     const elements = document.querySelectorAll('[data-reveal]');
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-    if (reducedMotion) {
+    if (reducedMotion || !('IntersectionObserver' in window)) {
       elements.forEach((element) => element.classList.add('is-visible'));
       return undefined;
     }
@@ -150,32 +165,17 @@ function App() {
           }
         });
       },
-      { threshold: 0.12, rootMargin: '0px 0px -8% 0px' },
+      { threshold: 0.04, rootMargin: '0px 0px 8% 0px' },
     );
 
     elements.forEach((element) => observer.observe(element));
-    return () => observer.disconnect();
+    document.documentElement.classList.add('reveal-ready');
+    return () => {
+      observer.disconnect();
+      document.documentElement.classList.remove('reveal-ready');
+    };
   }, []);
 
-  useEffect(() => {
-    if (!menuOpen) return undefined;
-
-    const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-    menuCloseRef.current?.focus();
-
-    const handleKeyDown = (event) => {
-      if (event.key === 'Escape') setMenuOpen(false);
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    return () => {
-      document.body.style.overflow = previousOverflow;
-      window.removeEventListener('keydown', handleKeyDown);
-    };
-  }, [menuOpen]);
-
-  const closeMenu = () => setMenuOpen(false);
   return (
     <div className="site-shell">
       <Meta
@@ -193,10 +193,8 @@ function App() {
           <BrandMark compact={isScrolled} onClick={closeMenu} />
 
           <nav className="primary-nav" aria-label="Primary navigation">
-            {primaryNav.map((item) => (
-              <a key={item.href} href={item.href}>
-                {item.label}
-              </a>
+            {primaryNavigation.map((item) => (
+              <SiteLink key={item.to} item={item} active />
             ))}
           </nav>
 
@@ -207,7 +205,7 @@ function App() {
             <button
               className="menu-toggle"
               type="button"
-              onClick={() => setMenuOpen((open) => !open)}
+              onClick={toggleMenu}
               aria-expanded={menuOpen}
               aria-controls="site-menu"
               aria-label="Open site menu"
@@ -241,10 +239,10 @@ function App() {
           <p className="eyebrow">Explore 1890</p>
           <nav aria-label="Full navigation">
             {fullNav.map((item, index) => (
-              <NavLink key={item.label} to={item.to} onClick={closeMenu}>
+              <SiteLink key={item.label} item={item} active onClick={closeMenu}>
                 <span>{String(index + 1).padStart(2, '0')}</span>
                 {item.label}
-              </NavLink>
+              </SiteLink>
             ))}
           </nav>
 
@@ -258,7 +256,7 @@ function App() {
       <main id="main-content">
         <section id="home" className="hero" aria-labelledby="hero-title">
           <div className="hero-copy">
-            <p className="eyebrow hero-kicker">Tea room · Restaurant · Catering</p>
+            <SectionEyebrow className="hero-kicker">Tea room · Restaurant · Catering</SectionEyebrow>
             <h1 id="hero-title">
               A beautiful reason
               <em>to linger.</em>
@@ -283,6 +281,10 @@ function App() {
                 <span>Open</span>
                 <p>Wednesday–Sunday</p>
               </div>
+            </div>
+            <div className="hero-seal" aria-hidden="true">
+              <span>1890</span>
+              <i>Tea House · Ocala</i>
             </div>
           </div>
 
@@ -310,7 +312,7 @@ function App() {
 
         <section id="about" className="story section-pad" aria-labelledby="story-title">
           <div className="story-heading" data-reveal>
-            <p className="eyebrow">An everyday retreat</p>
+            <SectionEyebrow>An everyday retreat</SectionEyebrow>
             <h2 id="story-title">
               Historic character.
               <em>Modern hospitality.</em>
@@ -330,6 +332,7 @@ function App() {
             <p>
               That balance is the heart of 1890: a memorable setting with the ease of a neighborhood welcome, designed for everyday visits as much as celebrations.
             </p>
+            <blockquote>“A memorable setting with the ease of a neighborhood welcome.”</blockquote>
             <div className="story-actions">
               <Link className="text-link" to="/about">
                 Read our story <Arrow />
@@ -349,16 +352,15 @@ function App() {
               loading="lazy"
               decoding="async"
             />
-            <figcaption>
-              <span>Downtown Ocala</span>
+            <EditorialCaption label="Downtown Ocala">
               The Tea House at Diamond Suites on Silver Springs Boulevard
-            </figcaption>
+            </EditorialCaption>
           </figure>
         </section>
 
         <section className="experience section-pad" aria-labelledby="experience-title">
           <div className="experience-intro" data-reveal>
-            <p className="eyebrow">The 1890 experience</p>
+            <SectionEyebrow>The 1890 experience</SectionEyebrow>
             <h2 id="experience-title">Choose your own kind of pause.</h2>
             <p>
               The Tea House can be a quick meeting place, a leisurely lunch, an afternoon ritual, or the setting for a milestone. Each visit starts with the same invitation: settle in and stay awhile.
@@ -374,9 +376,10 @@ function App() {
               loading="lazy"
               decoding="async"
             />
-            <figcaption>Rooms with their own character, ready for tea, lunch, and conversation.</figcaption>
+            <EditorialCaption label="Inside 1890">Rooms with their own character, ready for tea, lunch, and conversation.</EditorialCaption>
           </figure>
 
+          <p className="experience-ledger-label" data-reveal>Four ways to take your time</p>
           <div className="experience-grid">
             <article data-reveal>
               <span>01</span>
@@ -403,7 +406,7 @@ function App() {
 
         <section id="menus" className="menu-section" aria-labelledby="menu-title">
           <div className="menu-heading section-pad" data-reveal>
-            <p className="eyebrow eyebrow--gold">From the kitchen</p>
+            <SectionEyebrow tone="gold">From the kitchen</SectionEyebrow>
             <h2 id="menu-title">A menu made to wander through.</h2>
             <p>
               Pair a pot or favorite pour with something savory, something sweet, or a charcuterie board for the whole table. The current menus make room for light lunches, lingering afternoons, and celebratory treats.
@@ -455,7 +458,7 @@ function App() {
                 loading="lazy"
                 decoding="async"
               />
-              <figcaption>Signature charcuterie cup</figcaption>
+              <EditorialCaption label="From the menu">Signature charcuterie cup</EditorialCaption>
             </figure>
           </div>
 
@@ -481,6 +484,7 @@ function App() {
                 loading="lazy"
                 decoding="async"
               />
+              <EditorialCaption label="Private rooms">A setting made for conversation and occasion.</EditorialCaption>
             </figure>
             <figure className="rooms-image-detail image-reveal">
               <img
@@ -491,11 +495,12 @@ function App() {
                 loading="lazy"
                 decoding="async"
               />
+              <EditorialCaption label="Tea service">Details designed for an unhurried table.</EditorialCaption>
             </figure>
           </div>
 
           <div className="rooms-copy" data-reveal>
-            <p className="eyebrow">Private tea rooms</p>
+            <SectionEyebrow>Private tea rooms</SectionEyebrow>
             <h2 id="rooms-title">
               Your room.
               <em>Your pace.</em>
@@ -513,7 +518,7 @@ function App() {
                 Reserve for 1–11 guests <Arrow />
               </a>
               <Link className="text-link" to={largePartyLink}>
-                Planning for 12+? <Arrow />
+                Planning for 12+? Send a group inquiry <Arrow />
               </Link>
             </div>
           </div>
@@ -522,8 +527,8 @@ function App() {
         <section id="events" className="events" aria-labelledby="events-title">
           <div className="events-image image-reveal" data-reveal>
             <img
-              src={tableOfTeaHouse}
-              alt="A private table set with a floral tea service"
+              src={teaHouseBanner}
+              alt="Wine and a charcuterie board prepared for an 1890 Tea House gathering"
               width="750"
               height="1000"
               loading="lazy"
@@ -531,19 +536,19 @@ function App() {
             />
           </div>
           <div className="events-copy section-pad" data-reveal>
-            <p className="eyebrow eyebrow--gold">Events & catering</p>
+            <SectionEyebrow tone="gold">Events & catering</SectionEyebrow>
             <h2 id="events-title">Bring the occasion. We’ll set the scene.</h2>
             <p>
               From bridal showers and birthdays to book clubs, business lunches, and gatherings elsewhere, 1890 offers an inviting setting and catering options for occasions that deserve thoughtful details.
             </p>
             <div className="event-types">
               <article>
-                <span>Gather here</span>
+                <span>01 · Gather here</span>
                 <h3>Private celebrations</h3>
                 <p>Ask about tea rooms and event options for meaningful moments, meetings, and larger tables.</p>
               </article>
               <article>
-                <span>Bring 1890 to you</span>
+                <span>02 · Bring 1890 to you</span>
                 <h3>Catering</h3>
                 <p>Share your date, guest count, and menu needs so the team can discuss current catering options.</p>
               </article>
@@ -566,13 +571,14 @@ function App() {
 
         <section id="news" className="notes section-pad" aria-labelledby="notes-title">
           <div className="notes-heading" data-reveal>
-            <p className="eyebrow eyebrow--gold">News & notes</p>
+            <SectionEyebrow tone="gold">Stories & press</SectionEyebrow>
             <h2 id="notes-title">Around the tea table.</h2>
+            <p>Local coverage and Tea House journal stories, gathered into one editorial shelf.</p>
           </div>
 
           <div className="notes-grid">
             <article className="press-feature" data-reveal>
-              <span>In the press · January 2026</span>
+              <span>Press · January 2026</span>
               <h3>1890 Tea House opens a new Ocala spot for afternoon tea and small plates.</h3>
               <p>Ocala-News introduced the tea house, its private rooms, patio, and menu to the community.</p>
               <a
@@ -586,7 +592,7 @@ function App() {
             </article>
 
             <article className="press-feature press-feature--dark" data-reveal>
-              <span>In the press · January 2026</span>
+              <span>Press · January 2026</span>
               <h3>Historic charm meets modern dining in downtown Ocala.</h3>
               <p>352today took a closer look at the tea service, menu, patio, and private room experience.</p>
               <a
@@ -602,7 +608,7 @@ function App() {
 
           <div id="journal" className="journal" data-reveal>
             <div className="journal-title">
-              <p className="eyebrow">From the blog</p>
+              <SectionEyebrow>Journal</SectionEyebrow>
               <h3>Stories steeped in tradition.</h3>
             </div>
             <Link to="/journal/why-tea-houses-are-having-a-moment-and-why-it-makes-perfect-sense">
@@ -620,7 +626,7 @@ function App() {
 
         <section id="faq" className="faq section-pad" aria-labelledby="faq-title">
           <div className="faq-intro" data-reveal>
-            <p className="eyebrow">Good to know</p>
+            <SectionEyebrow>Good to know</SectionEyebrow>
             <h2 id="faq-title">Before you visit.</h2>
             <p>Find quick answers about reservations, dietary needs, gatherings, and planning ahead.</p>
             <Link className="text-link" to="/contact">
@@ -669,7 +675,7 @@ function App() {
           </div>
 
           <div id="location" className="visit-details section-pad" data-reveal>
-            <p className="eyebrow eyebrow--gold">Come take your time</p>
+            <SectionEyebrow tone="gold">Come take your time</SectionEyebrow>
             <h2 id="visit-title">Your table is waiting.</h2>
 
             <div className="visit-grid">
@@ -700,14 +706,14 @@ function App() {
         </section>
 
         <section className="closing-cta section-pad" aria-labelledby="closing-title">
-          <p className="eyebrow" data-reveal>Plan your visit</p>
+          <SectionEyebrow className="closing-label">Plan your visit</SectionEyebrow>
           <div className="closing-cta-copy" data-reveal>
             <h2 id="closing-title">A table, a room, or an occasion of your own.</h2>
             <p>Browse what is being served, reserve a smaller table, or tell the Tea House team what you are planning.</p>
           </div>
           <div className="closing-cta-actions" data-reveal>
-            <Link className="button button--ink" to="/menus">View the menus <Arrow /></Link>
-            <Link className="button button--outline-ink" to="/reservations">Reserve a table <Arrow /></Link>
+            <a className="button button--ink" href={reservationLink} target="_blank" rel="noreferrer">Reserve a table <Arrow /></a>
+            <Link className="button button--outline-ink" to="/menus">View the menus <Arrow /></Link>
             <Link className="text-link" to={largePartyLink}>Plan a gathering <Arrow /></Link>
           </div>
         </section>
@@ -728,28 +734,14 @@ function App() {
           />
         </div>
 
-        <div className="footer-nav">
-          <p>Explore</p>
-          {fullNav.slice(0, 6).map((item) => (
-            item.external ? (
-              <a key={item.label} href={item.href} target="_blank" rel="noreferrer">
-                {item.label}
-              </a>
-            ) : (
-              <Link key={item.label} to={item.to}>{item.label}</Link>
-            )
-          ))}
-        </div>
-
-        <div className="footer-nav">
-          <p>More</p>
-          {fullNav.slice(6).map((item) => (
-            <Link key={item.label} to={item.to}>{item.label}</Link>
-          ))}
-          <Link to={largePartyLink}>Event inquiry</Link>
-          <Link to="/privacy">Privacy</Link>
-          <Link to="/terms">Terms</Link>
-        </div>
+        {footerNavigationGroups.map((group) => (
+          <div className="footer-nav" key={group.label}>
+            <p>{group.label}</p>
+            {group.items.map((item) => (
+              <SiteLink key={item.to} item={item} />
+            ))}
+          </div>
+        ))}
 
         <div className="footer-visit">
           <p>Visit</p>
@@ -770,6 +762,10 @@ function App() {
 
         <div className="footer-bottom">
           <p>© {new Date().getFullYear()} 1890 Tea House. All rights reserved.</p>
+          <nav className="footer-legal" aria-label="Legal">
+            <Link to="/privacy">Privacy</Link>
+            <Link to="/terms">Terms</Link>
+          </nav>
           <a href="#home">Back to top <span aria-hidden="true">↑</span></a>
         </div>
       </footer>

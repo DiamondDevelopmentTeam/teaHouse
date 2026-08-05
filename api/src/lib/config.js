@@ -110,3 +110,19 @@ export function loadConfig(environment = process.env) {
     allowedRecaptchaHostnames,
   };
 }
+
+export function loadServerApplicationConfig(environment = process.env) {
+  const config = loadConfig(environment);
+  const recipient = typeof environment.SERVER_APPLICATION_RECIPIENT_EMAIL === 'string'
+    ? environment.SERVER_APPLICATION_RECIPIENT_EMAIL.trim().toLowerCase()
+    : '';
+
+  if (!recipient || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(recipient)) {
+    throw new ConfigurationError(['SERVER_APPLICATION_RECIPIENT_EMAIL']);
+  }
+
+  return {
+    ...config,
+    serverApplicationRecipientEmail: recipient,
+  };
+}

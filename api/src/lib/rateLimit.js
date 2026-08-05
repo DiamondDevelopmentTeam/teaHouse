@@ -39,3 +39,29 @@ export function createRateLimiter({
 }
 
 export const inquiryRateLimiter = createRateLimiter();
+export const serverApplicationRateLimiter = createRateLimiter({
+  limit: 3,
+  windowMs: 30 * 60 * 1000,
+});
+
+export function createDuplicateGuard({ windowMs = 20 * 60 * 1000, now = Date.now } = {}) {
+  const submissions = new Map();
+  return {
+    claim(key) {
+      const currentTime = now();
+      const existing = submissions.get(key);
+      if (existing && existing.expiresAt > currentTime) return false;
+      submissions.set(key, { state: 'pending', expiresAt: currentTime + windowMs });
+      return true;
+    },
+    release(key) {
+      const existing = submissions.get(key);
+      if (existing?.state === 'pending') submissions.delete(key);
+    },
+    complete(key) {
+      submissions.set(key, { state: 'complete', expiresAt: now() + windowMs });
+    },
+  };
+}
+
+export const serverApplicationDuplicateGuard = createDuplicateGuard();
