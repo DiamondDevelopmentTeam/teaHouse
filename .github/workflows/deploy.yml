@@ -17,9 +17,17 @@ concurrency:
 
 env:
   VITE_BASE_PATH: /teaHouse/
-  VITE_INQUIRY_API_URL: ${{ vars.VITE_INQUIRY_API_URL }}
-  VITE_SERVER_APPLICATION_API_URL: ${{ vars.VITE_SERVER_APPLICATION_API_URL }}
+
+  # Repository variables are preferred. The Azure Function URLs are public
+  # configuration values, so these fallbacks are safe to include.
+  VITE_INQUIRY_API_URL: ${{ vars.VITE_INQUIRY_API_URL || 'https://diamondpeo-webforms-api-chd0eed4hyhnemft.westus2-01.azurewebsites.net/api/send-inquiry' }}
+
+  VITE_SERVER_APPLICATION_API_URL: ${{ vars.VITE_SERVER_APPLICATION_API_URL || 'https://diamondpeo-webforms-api-chd0eed4hyhnemft.westus2-01.azurewebsites.net/api/send-server-application' }}
+
   VITE_CONTENT_API_BASE_URL: ${{ vars.VITE_CONTENT_API_BASE_URL }}
+
+  # This must be configured under:
+  # Settings -> Secrets and variables -> Actions -> Variables
   VITE_RECAPTCHA_SITE_KEY: ${{ vars.VITE_RECAPTCHA_SITE_KEY }}
 
 jobs:
@@ -49,6 +57,112 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Diagnose public configuration
+        shell: bash
+        run: |
+          echo "Repository: $GITHUB_REPOSITORY"
+          echo "Base path: $VITE_BASE_PATH"
+
+          if [ -n "$VITE_INQUIRY_API_URL" ]; then
+            echo "Inquiry endpoint configured"
+          else
+            echo "Inquiry endpoint missing"
+          fi
+
+          if [ -n "$VITE_SERVER_APPLICATION_API_URL" ]; then
+            echo "Server application endpoint configured"
+          else
+            echo "Server application endpoint missing"
+          fi
+
+          if [ -n "$VITE_CONTENT_API_BASE_URL" ]; then
+            echo "Content API base URL configured"
+          else
+            echo "Content API base URL not configured"
+          fi
+
+          if [ -n "$VITE_RECAPTCHA_SITE_KEY" ]; then
+            echo "reCAPTCHA site key configured"
+            echo "reCAPTCHA key length: ${#VITE_RECAPTCHA_SITE_KEY}"
+          else
+            echo "reCAPTCHA site key missing"
+          fi
+
+      - name: Validate public inquiry endpoint
+        run: |
+          node -e "
+          const value = String(process.env.VITE_INQUIRY_API_URL || '').trim();
+
+          if (!value) {
+            throw new Error('VITE_INQUIRY_API_URL is required');
+          }
+
+          const url = new URL(value);
+
+          if (
+            url.protocol !== 'https:' ||
+            url.pathname !== '/api/send-inquiry'
+          ) {
+            throw new Error(
+              'VITE_INQUIRY_API_URL must be an HTTPS /api/send-inquiry endpoint'
+            );
+          }
+
+          console.log('Inquiry endpoint validated:', url.origin + url.pathname);
+          "
+
+      - name: Validate public server application endpoint
+        run: |
+          node -e "
+          const value = String(
+            process.env.VITE_SERVER_APPLICATION_API_URL || ''
+          ).trim();
+
+          if (!value) {
+            throw new Error(
+              'VITE_SERVER_APPLICATION_API_URL is required'
+            );
+          }
+
+          const url = new URL(value);
+
+          if (
+            url.protocol !== 'https:' ||
+            url.pathname !== '/api/send-server-application'
+          ) {
+            throw new Error(
+              'VITE_SERVER_APPLICATION_API_URL must be an HTTPS /api/send-server-application endpoint'
+            );
+          }
+
+          console.log(
+            'Server application endpoint validated:',
+            url.origin + url.pathname
+          );
+          "
+
+      - name: Validate public reCAPTCHA key
+        run: |
+          node -e "
+          const value = String(
+            process.env.VITE_RECAPTCHA_SITE_KEY || ''
+          ).trim();
+
+          if (!value) {
+            throw new Error(
+              'VITE_RECAPTCHA_SITE_KEY is required. Configure it under GitHub repository Settings -> Secrets and variables -> Actions -> Variables.'
+            );
+          }
+
+          if (value.length < 20) {
+            throw new Error(
+              'VITE_RECAPTCHA_SITE_KEY appears to be invalid or incomplete'
+            );
+          }
+
+          console.log('reCAPTCHA site key validated');
+          "
+
       - name: Lint source
         run: npm run lint
 
@@ -61,32 +175,6 @@ jobs:
       - name: Audit images
         run: npm run audit:images
 
-      - name: Diagnose public configuration
-        env:
-          KEY_FROM_VARIABLE: ${{ vars.VITE_RECAPTCHA_SITE_KEY }}
-        run: |
-          echo "Repository: $GITHUB_REPOSITORY"
-
-          if [ -n "$KEY_FROM_VARIABLE" ]; then
-            echo "reCAPTCHA repository variable found"
-          else
-            echo "reCAPTCHA repository variable missing"
-          fi
-
-          echo "Final reCAPTCHA key length: ${#VITE_RECAPTCHA_SITE_KEY}"
-
-      - name: Validate public inquiry endpoint
-        run: |
-          node -e "const value=String(process.env.VITE_INQUIRY_API_URL || '').trim(); if(!value) throw new Error('Repository variable VITE_INQUIRY_API_URL is required'); const url=new URL(value); if(url.protocol !== 'https:' || url.pathname !== '/api/send-inquiry') throw new Error('VITE_INQUIRY_API_URL must be an HTTPS /api/send-inquiry endpoint');"
-
-      - name: Validate public server application endpoint
-        run: |
-          node -e "const value=String(process.env.VITE_SERVER_APPLICATION_API_URL || '').trim(); if(!value) throw new Error('VITE_SERVER_APPLICATION_API_URL is required. Configure it in GitHub repository -> Settings -> Secrets and variables -> Actions -> Variables -> VITE_SERVER_APPLICATION_API_URL'); const url=new URL(value); if(url.protocol !== 'https:' || url.pathname !== '/api/send-server-application') throw new Error('VITE_SERVER_APPLICATION_API_URL must be an HTTPS /api/send-server-application endpoint');"
-
-      - name: Validate public reCAPTCHA key
-        run: |
-          node -e "const value=String(process.env.VITE_RECAPTCHA_SITE_KEY || '').trim(); if(!value) throw new Error('VITE_RECAPTCHA_SITE_KEY is required. Configure it in GitHub repository -> Settings -> Secrets and variables -> Actions -> Variables -> VITE_RECAPTCHA_SITE_KEY');"
-
       - name: Build the site
         run: npm run build
 
@@ -95,6 +183,21 @@ jobs:
 
       - name: Verify form endpoint and secret isolation
         run: npm run verify:forms
+
+      - name: Verify build output
+        shell: bash
+        run: |
+          if [ ! -d "dist" ]; then
+            echo "client/dist was not created"
+            exit 1
+          fi
+
+          if [ ! -f "dist/index.html" ]; then
+            echo "client/dist/index.html was not created"
+            exit 1
+          fi
+
+          echo "GitHub Pages build output verified"
 
       - name: Upload GitHub Pages artifact
         uses: actions/upload-pages-artifact@v3
