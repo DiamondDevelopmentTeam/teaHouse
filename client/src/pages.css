@@ -121,9 +121,12 @@ a.page-button--dark:visited {
 
 .page-hero {
   display: grid;
-  grid-template-columns: minmax(0, 0.82fr) minmax(0, 1.18fr);
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
   align-items: stretch;
-  min-height: clamp(38rem, 47vw, 49rem);
+  width: 100%;
+  height: calc(100svh - 6rem);
+  min-height: 42rem;
+  overflow: hidden;
   background: var(--paper);
 }
 
@@ -131,7 +134,10 @@ a.page-button--dark:visited {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  padding: clamp(3.25rem, 5vw, 6rem) var(--section-x);
+  min-width: 0;
+  min-height: 0;
+  padding: clamp(4rem, 7vw, 6.5rem) var(--section-x)
+    clamp(3.5rem, 5vw, 5rem);
 }
 
 .page-hero h1,
@@ -160,6 +166,7 @@ a.page-button--dark:visited {
 
 .page-hero__media {
   min-width: 0;
+  min-height: 0;
   height: 100%;
   overflow: hidden;
   background: var(--paper);
@@ -692,21 +699,28 @@ a.page-button--dark:visited {
   }
 }
 
-@media (max-width: 800px) {
+@media (max-width: 900px) {
   .page-hero {
     grid-template-columns: 1fr;
+    height: auto;
     min-height: 0;
+    overflow: visible;
   }
 
   .page-hero__copy {
-    padding: 3.75rem var(--section-x);
+    min-height: auto;
+    padding-top: 5rem;
+    padding-bottom: 3.25rem;
   }
 
   .page-hero__media {
     height: auto;
-    aspect-ratio: 4 / 3;
+    min-height: 56vw;
+    aspect-ratio: 16 / 9;
   }
+}
 
+@media (max-width: 800px) {
   .page-split,
   .page-image-ledger,
   .page-menu-feature,
@@ -738,6 +752,17 @@ a.page-button--dark:visited {
 }
 
 @media (max-width: 620px) {
+  .page-hero__copy {
+    min-height: auto;
+    padding-top: 3.5rem;
+    padding-bottom: 2.75rem;
+  }
+
+  .page-hero__media {
+    min-height: 0;
+    aspect-ratio: 4 / 3;
+  }
+
   .page-site > main {
     padding-top: 4.4rem;
   }
@@ -973,9 +998,12 @@ a.page-button--dark:visited {
 }
 
 .page-event-card img {
+  display: block;
   width: 100%;
-  max-height: 46rem;
-  object-fit: contain;
+  height: clamp(18rem, 32vw, 30rem);
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  object-position: center;
   background: #f5efe5;
 }
 
@@ -1177,50 +1205,12 @@ a.page-button--dark:visited {
   text-transform: uppercase;
 }
 
-/* Keep the Journal hero refined without changing the other page heroes. */
-.journal-hero {
-  min-height: clamp(28rem, 36vw, 37rem);
-  grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
-}
-
-.journal-hero .page-hero__copy {
-  padding-top: clamp(3rem, 4vw, 4.5rem);
-  padding-bottom: clamp(3rem, 4vw, 4.5rem);
-}
-
-.journal-hero .page-hero__media {
-  min-height: 0;
-  max-height: clamp(28rem, 36vw, 37rem);
-}
-
-.journal-hero .page-hero__media img {
-  object-fit: cover;
-  object-position: center 42%;
-}
-
 /* Give Journal cards a consistent editorial crop. */
 .page-journal-grid img {
   display: block;
   height: clamp(12rem, 17vw, 17rem);
   aspect-ratio: auto;
   object-position: center;
-}
-
-@media (max-width: 800px) {
-  .journal-hero {
-    grid-template-columns: 1fr;
-    min-height: 0;
-  }
-
-  .journal-hero .page-hero__media {
-    height: clamp(17rem, 62vw, 27rem);
-    max-height: none;
-    aspect-ratio: auto;
-  }
-
-  .journal-hero .page-hero__media img {
-    object-position: center 38%;
-  }
 }
 
 @media (max-width: 720px) {
@@ -1534,14 +1524,23 @@ a.page-button--dark:visited {
 /* Server application */
 .application-hero {
   display: grid;
-  grid-template-columns: minmax(0, 1.08fr) minmax(22rem, 0.92fr);
-  min-height: 0;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  align-items: stretch;
+  width: 100%;
+  height: calc(100svh - 6rem);
+  min-height: 42rem;
+  overflow: hidden;
   background: var(--paper);
 }
 
 .application-hero__copy {
-  align-self: center;
-  padding: clamp(3.25rem, 6vw, 6rem) var(--section-x);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 0;
+  min-height: 0;
+  padding: clamp(4rem, 7vw, 6.5rem) var(--section-x)
+    clamp(3.5rem, 5vw, 5rem);
 }
 
 .application-hero h1 {
@@ -1564,7 +1563,9 @@ a.page-button--dark:visited {
 .application-hero__media {
   position: relative;
   min-width: 0;
-  max-height: 36rem;
+  min-height: 0;
+  height: 100%;
+  max-height: none;
   overflow: hidden;
   background: var(--sage);
 }
@@ -1595,10 +1596,12 @@ a.page-button--dark:visited {
 }
 
 .application-hero__media img {
+  display: block;
   width: 100%;
   height: 100%;
-  min-height: 26rem;
+  min-height: 100%;
   object-fit: cover;
+  object-position: center;
 }
 
 .application-hero__media > span {
@@ -1994,14 +1997,26 @@ a.page-button--dark:visited {
 @media (max-width: 900px) {
   .application-hero {
     grid-template-columns: 1fr;
+    height: auto;
+    min-height: 0;
+    overflow: visible;
+  }
+
+  .application-hero__copy {
+    min-height: auto;
+    padding-top: 5rem;
+    padding-bottom: 3.25rem;
   }
 
   .application-hero__media {
-    max-height: 28rem;
+    height: auto;
+    min-height: 56vw;
+    max-height: none;
+    aspect-ratio: 16 / 9;
   }
 
   .application-hero__media img {
-    min-height: 22rem;
+    min-height: 100%;
   }
 
   .application-intro,
@@ -2020,6 +2035,16 @@ a.page-button--dark:visited {
 }
 
 @media (max-width: 700px) {
+  .application-hero__copy {
+    padding-top: 3.5rem;
+    padding-bottom: 2.75rem;
+  }
+
+  .application-hero__media {
+    min-height: 0;
+    aspect-ratio: 4 / 3;
+  }
+
   .application-fields,
   .application-check-grid,
   .application-submit {
