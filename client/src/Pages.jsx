@@ -613,7 +613,7 @@ export function JournalPage() {
   return (
     <PageShell>
       <Meta title="Tea House Journal" description="Read every 1890 Tea House story about tea culture, Ocala dining, celebrations, and timeless rituals." path="/journal" image={posts[0].image} schema={[breadcrumbSchema([['Home', '/'], ['Journal', '/journal']])]} />
-      <PageHero eyebrow="Tea House Journal" title="Stories steeped in tradition." intro="Notes on tea culture, hospitality, gatherings, and the rituals that make time around a table feel special." image="service" />
+      <PageHero eyebrow="Tea House Journal" title="Stories steeped in tradition." intro="Notes on tea culture, hospitality, gatherings, and the rituals that make time around a table feel special." image="service" className="journal-hero" />
       <section className="page-section page-journal-grid">
         {posts.map((post) => <article key={post.slug}><Link to={`/journal/${post.slug}`}><OptimizedImage src={post.image} alt={post.imageAlt} width={post.width} height={post.height} sizes="(max-width: 700px) 100vw, 31vw" /><div><time dateTime={post.date}>{post.dateDisplay}</time><h2>{post.title}</h2><p>{post.excerpt}</p><strong>Read article →</strong></div></Link></article>)}
       </section>

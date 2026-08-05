@@ -1177,6 +1177,58 @@ a.page-button--dark:visited {
   text-transform: uppercase;
 }
 
+/* Keep the Journal hero refined without changing the other page heroes. */
+.journal-hero {
+  min-height: clamp(28rem, 36vw, 37rem);
+  grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
+}
+
+.journal-hero .page-hero__copy {
+  padding-top: clamp(3rem, 4vw, 4.5rem);
+  padding-bottom: clamp(3rem, 4vw, 4.5rem);
+}
+
+.journal-hero .page-hero__media {
+  min-height: 0;
+  max-height: clamp(28rem, 36vw, 37rem);
+}
+
+.journal-hero .page-hero__media img {
+  object-fit: cover;
+  object-position: center 42%;
+}
+
+/* Give Journal cards a consistent editorial crop. */
+.page-journal-grid img {
+  display: block;
+  height: clamp(12rem, 17vw, 17rem);
+  aspect-ratio: auto;
+  object-position: center;
+}
+
+@media (max-width: 800px) {
+  .journal-hero {
+    grid-template-columns: 1fr;
+    min-height: 0;
+  }
+
+  .journal-hero .page-hero__media {
+    height: clamp(17rem, 62vw, 27rem);
+    max-height: none;
+    aspect-ratio: auto;
+  }
+
+  .journal-hero .page-hero__media img {
+    object-position: center 38%;
+  }
+}
+
+@media (max-width: 720px) {
+  .page-journal-grid img {
+    height: clamp(13rem, 58vw, 20rem);
+  }
+}
+
 .page-faq-list article {
   border-top: 1px solid var(--page-line);
 }
