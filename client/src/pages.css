@@ -2270,3 +2270,270 @@ a.reservations-hero__secondary:visited {
     transform: translate(0.5rem, 0.5rem);
   }
 }
+/* ===========================================================================
+   CLIENT FEEDBACK PASS · ROUTED PAGES
+   Black, white, and hot pink with softer cards and a larger Pink Tea Room.
+   =========================================================================== */
+
+:root {
+  --page-line: rgb(9 9 9 / 13%);
+  --cream: #ffffff;
+}
+
+.page-site {
+  background: var(--white);
+}
+
+.page-button,
+a.page-button:visited {
+  border-radius: 999px;
+}
+
+/* Remove the hard spreadsheet-like card treatment. */
+.page-card-grid,
+.page-image-ledger .page-card-grid,
+.page-menu-viewer-grid,
+.page-menu-sections,
+.page-press-grid,
+.page-journal-grid {
+  gap: clamp(1rem, 2vw, 1.6rem);
+  border: 0;
+  background: transparent;
+}
+
+.page-card,
+.page-card-grid > article,
+.page-menu-document,
+.page-menu-sections > article,
+.page-press-grid article,
+.page-journal-grid article {
+  border: 0;
+  border-radius: 1.35rem;
+  background: #fafafa;
+  box-shadow: 0 1rem 2.5rem rgb(9 9 9 / 6%);
+  overflow: hidden;
+}
+
+.page-image-ledger,
+.page-menu-feature {
+  border-radius: 1.5rem;
+  overflow: hidden;
+}
+
+.page-event-card {
+  margin-bottom: clamp(1rem, 2vw, 1.5rem);
+  padding: clamp(1.25rem, 2.5vw, 2rem);
+  border: 0;
+  border-radius: 1.5rem;
+  background: #fafafa;
+  box-shadow: 0 1rem 2.5rem rgb(9 9 9 / 6%);
+}
+
+.page-event-card:last-child {
+  border-bottom: 0;
+}
+
+/* Feature the first, pink-accented Tea Room and enlarge all room imagery. */
+.page-room-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(1.25rem, 2.8vw, 2.25rem);
+  border: 0;
+  background: transparent;
+}
+
+.page-room-grid article {
+  display: grid;
+  grid-template-rows: clamp(25rem, 31vw, 32rem) auto;
+  border-radius: 1.5rem;
+  background: #fafafa;
+  box-shadow: 0 1rem 2.75rem rgb(9 9 9 / 7%);
+  overflow: hidden;
+}
+
+.page-room-grid article:first-child {
+  grid-column: 1 / -1;
+  grid-template-columns: minmax(0, 1.35fr) minmax(19rem, 0.65fr);
+  grid-template-rows: clamp(35rem, 44vw, 45rem);
+}
+
+.page-room-grid article:first-child img {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+.page-room-grid article:first-child > div {
+  grid-column: 2;
+  grid-row: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: clamp(2rem, 4vw, 4rem);
+  background: var(--ink);
+}
+
+.page-room-grid article:first-child h2,
+.page-room-grid article:first-child p,
+.page-room-grid article:first-child ul,
+.page-room-grid article:first-child .page-text-link {
+  color: var(--white);
+}
+
+.page-room-grid article:first-child h2 {
+  font-size: clamp(2.6rem, 4vw, 4.75rem);
+  line-height: 0.98;
+}
+
+.page-room-grid article:first-child .page-text-link {
+  margin-top: auto;
+  text-decoration-color: var(--pink);
+}
+
+.page-room-grid img {
+  object-position: center;
+}
+
+/* Keep success states inside the requested palette instead of green. */
+.page-form-status.is-success {
+  color: var(--pink-dark);
+}
+
+.application-status.is-success {
+  border-left-color: var(--pink);
+  color: var(--ink);
+  background: rgb(255 47 146 / 10%);
+}
+
+.application-privacy,
+.application-hero__media {
+  background: var(--ink);
+}
+
+.reservations-hero__media,
+.page-lightbox__figure img,
+.journal-article__hero,
+.page-story-grid > .optimized-image {
+  border-radius: 1.35rem;
+}
+
+@media (max-width: 900px) {
+  .page-room-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .page-room-grid article:first-child {
+    grid-column: 1;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: clamp(30rem, 70vw, 40rem) auto;
+  }
+
+  .page-room-grid article:first-child img,
+  .page-room-grid article:first-child > div {
+    grid-column: 1;
+  }
+
+  .page-room-grid article:first-child img {
+    grid-row: 1;
+  }
+
+  .page-room-grid article:first-child > div {
+    grid-row: 2;
+  }
+}
+
+@media (max-width: 620px) {
+  .page-card,
+  .page-card-grid > article,
+  .page-menu-document,
+  .page-menu-sections > article,
+  .page-event-card,
+  .page-room-grid article,
+  .page-press-grid article,
+  .page-journal-grid article {
+    border-radius: 1rem;
+  }
+
+  .page-room-grid article,
+  .page-room-grid article:first-child {
+    grid-template-rows: 24rem auto;
+  }
+}
+
+/* ===========================================================================
+   ROUTED COVER SEPARATION · HOT PINK DETAIL + SOFT IMAGE TRANSITION
+   =========================================================================== */
+
+.page-hero,
+.application-hero,
+.reservations-hero {
+  border-bottom: 1px solid rgb(255 47 146 / 26%);
+}
+
+.page-hero__media {
+  position: relative;
+  isolation: isolate;
+}
+
+.page-hero__media::before {
+  position: absolute;
+  inset: 0 auto 0 0;
+  z-index: 2;
+  width: clamp(3.5rem, 6vw, 7rem);
+  background: linear-gradient(90deg, var(--paper) 0%, rgb(255 255 255 / 60%) 28%, transparent 100%);
+  content: '';
+  pointer-events: none;
+}
+
+.page-hero__media::after {
+  position: absolute;
+  top: clamp(2rem, 8%, 4.5rem);
+  bottom: clamp(2rem, 8%, 4.5rem);
+  left: 0;
+  z-index: 3;
+  width: 1px;
+  background: linear-gradient(transparent, var(--pink), transparent);
+  content: '';
+  pointer-events: none;
+}
+
+/* The server-application cover already has corner marks; add a clearer seam. */
+.application-hero__media {
+  box-shadow: inset 2px 0 0 rgb(255 47 146 / 62%);
+}
+
+.application-hero__media img {
+  -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 4.5rem, #000 100%);
+  mask-image: linear-gradient(90deg, transparent 0, #000 4.5rem, #000 100%);
+}
+
+/* Reservation cover keeps its frame, with a pink underline tying it to other covers. */
+.reservations-hero__inner {
+  position: relative;
+}
+
+.reservations-hero__inner::after {
+  position: absolute;
+  right: 0;
+  bottom: clamp(-2rem, -2vw, -1rem);
+  width: min(11rem, 24vw);
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--pink));
+  content: '';
+  pointer-events: none;
+}
+
+@media (max-width: 900px) {
+  .page-hero__media::before,
+  .page-hero__media::after {
+    display: none;
+  }
+
+  .application-hero__media {
+    box-shadow: inset 0 2px 0 rgb(255 47 146 / 62%);
+  }
+
+  .application-hero__media img {
+    -webkit-mask-image: none;
+    mask-image: none;
+  }
+}

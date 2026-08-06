@@ -7,6 +7,232 @@ import pinkTea from '../assets/images/migrated/journal/pink-tea.webp';
 
 export const journalPosts = [
   {
+    slug: 'how-to-plan-the-perfect-birthday-tea-party-in-ocala',
+    title: 'How to Plan the Perfect Birthday Tea Party in Ocala',
+    date: '2026-08-06',
+    dateDisplay: 'August 6, 2026',
+    excerpt:
+      'A birthday tea party turns a familiar celebration into an elegant, relaxed experience filled with beautiful details and meaningful conversation.',
+    image: bridalShower,
+    imageAlt: 'Elegant tea party table prepared for a birthday celebration',
+    width: 1145,
+    height: 763,
+    sections: [
+      {
+        paragraphs: [
+          'A birthday celebration does not need to be loud or complicated to feel special. A thoughtfully planned tea party creates space for conversation, beautiful food, and the small details that guests remember long after the candles are blown out.',
+          'At 1890 Tea House in historic downtown Ocala, a birthday can feel polished and personal without losing the warmth of gathering around a table with the people who matter most.',
+        ],
+      },
+      {
+        heading: 'Choose the Right Guest List',
+        paragraphs: [
+          'Begin by deciding what kind of celebration the guest of honor would enjoy. A smaller gathering can feel intimate and conversational, while a larger party brings together friends and family from different parts of their life.',
+          'Tea parties work especially well for mixed-age groups because guests can enjoy the experience at their own pace.',
+        ],
+      },
+      {
+        heading: 'Build the Celebration Around the Guest of Honor',
+        paragraphs: [
+          'A meaningful theme can come from a favorite color, flower, season, book, or travel memory. The goal is not to cover every surface with decorations, but to choose a few details that make the table feel personal.',
+          'Fresh flowers, handwritten place cards, a framed photograph, or a small keepsake at each setting can make the celebration feel carefully considered.',
+        ],
+      },
+      {
+        heading: 'Plan a Menu with Variety',
+        paragraphs: [
+          'A well-rounded tea party menu offers a balance of savory bites, fresh flavors, warm scones, desserts, and teas that guests can explore throughout the celebration.',
+          'Providing several smaller selections gives everyone a chance to discover a favorite while keeping the meal light, social, and easy to enjoy.',
+        ],
+      },
+      {
+        heading: 'Add One Memorable Activity',
+        paragraphs: [
+          'A single thoughtful activity can bring the group together without making the afternoon feel over-scheduled.',
+        ],
+        list: [
+          'Ask guests to write a birthday wish or favorite memory',
+          'Create a simple photo area near the tea table',
+          'Share a toast before dessert is served',
+          'Choose a tea for the table to taste together',
+          'Present a small group gift or memory book',
+        ],
+      },
+      {
+        heading: 'Celebrate at 1890 Tea House',
+        paragraphs: [
+          'With its historic downtown setting, handcrafted menu, specialty teas, and welcoming atmosphere, 1890 Tea House offers a distinctive place to celebrate birthdays of every kind.',
+          'Whether the occasion is a milestone birthday or simply a reason to gather, afternoon tea gives the day a slower rhythm and a little extra sparkle.',
+        ],
+      },
+    ],
+  },
+  {
+    slug: 'afternoon-tea-etiquette-a-simple-guide-for-first-time-guests',
+    title: 'Afternoon Tea Etiquette: A Simple Guide for First-Time Guests',
+    date: '2026-08-03',
+    dateDisplay: 'August 3, 2026',
+    excerpt:
+      'Afternoon tea is less about strict rules and more about slowing down, sharing the table, and enjoying each course with confidence.',
+    image: teaTradition,
+    imageAlt: 'Traditional afternoon tea service arranged with delicate china and flowers',
+    width: 1600,
+    height: 1600,
+    sections: [
+      {
+        paragraphs: [
+          'Trying afternoon tea for the first time can feel wonderfully exciting, but the beautiful china and tiered trays sometimes make guests wonder whether there are rules they are expected to know.',
+          'The good news is that afternoon tea is meant to be enjoyed. A few simple customs can help you feel comfortable, but thoughtful conversation and a relaxed pace matter far more than perfection.',
+        ],
+      },
+      {
+        heading: 'Start with the Tea',
+        paragraphs: [
+          'Take a moment to explore the tea selection and choose a flavor that fits your mood. Black teas tend to be bold and familiar, while green, floral, herbal, and fruit blends can offer lighter or more aromatic options.',
+          'Allow the tea to steep, then taste it before adding milk, lemon, or sweetener. This gives you a better sense of its natural flavor.',
+        ],
+      },
+      {
+        heading: 'How to Hold the Cup',
+        paragraphs: [
+          'Hold the handle gently rather than wrapping both hands around the cup. There is no need to lift or extend your pinky finger.',
+          'When you take a sip, bring the cup to you and return it to the saucer between sips. The goal is simply to move comfortably and avoid rushing.',
+        ],
+      },
+      {
+        heading: 'Enjoy the Food at Your Own Pace',
+        paragraphs: [
+          'Afternoon tea is often served with savory selections, scones, and sweets. Many guests begin with the savory items, continue with scones, and finish with dessert, but the experience does not need to feel rigid.',
+          'Take small portions, try different pairings, and give yourself time to enjoy the presentation as well as the flavors.',
+        ],
+      },
+      {
+        heading: 'Scones, Jam, and Clotted Cream',
+        paragraphs: [
+          'Break a scone into smaller pieces rather than cutting the entire scone like a sandwich. Add jam and clotted cream to each piece as you enjoy it.',
+          'Whether you prefer jam first or cream first is entirely up to you. The best method is the one that tastes best at your table.',
+        ],
+      },
+      {
+        heading: 'The Most Important Rule',
+        paragraphs: [
+          'Afternoon tea is a social experience. Put the phone away when you can, listen generously, and let the conversation unfold without watching the clock.',
+          'At 1890 Tea House, guests are invited to enjoy the tradition without feeling intimidated by it. Come curious, come comfortable, and let the table do the rest.',
+        ],
+      },
+    ],
+  },
+  {
+    slug: 'a-relaxing-afternoon-in-downtown-ocala-food-shopping-and-tea',
+    title: 'A Relaxing Afternoon in Downtown Ocala: Food, Shopping, and Tea',
+    date: '2026-07-31',
+    dateDisplay: 'July 31, 2026',
+    excerpt:
+      'Historic downtown Ocala offers an easygoing blend of local shopping, welcoming public spaces, and a memorable tea house experience.',
+    image: restaurantsOcala,
+    imageAlt: 'Tea, sandwiches, fruit, and sweets arranged for lunch in downtown Ocala',
+    width: 1145,
+    height: 763,
+    sections: [
+      {
+        paragraphs: [
+          'Some of the best afternoons are not built around a packed itinerary. They begin with a walk, a few interesting storefronts, and enough time to stop when something catches your attention.',
+          'Historic downtown Ocala is well suited for that kind of day. Its local businesses, public spaces, architecture, and dining options make it easy to turn a simple outing into a relaxed experience.',
+        ],
+      },
+      {
+        heading: 'Begin with a Leisurely Walk',
+        paragraphs: [
+          'Start by exploring the downtown area on foot. A slower pace gives you time to notice historic details, browse window displays, and decide where the afternoon should lead.',
+          'Downtown outings are especially enjoyable when the plan leaves room for discovery rather than moving from one reservation to the next.',
+        ],
+      },
+      {
+        heading: 'Browse Local Shops',
+        paragraphs: [
+          'Independent boutiques and specialty shops can make a downtown visit feel more personal than a traditional shopping trip. Look for gifts, clothing, home accents, art, and small treasures that reflect the character of the area.',
+          'Even a short browse can become part of the memory, especially when the day is shared with a friend or visiting family member.',
+        ],
+      },
+      {
+        heading: 'Pause for Lunch or Afternoon Tea',
+        paragraphs: [
+          'A visit to 1890 Tea House adds a distinctive centerpiece to the afternoon. Guests can settle into a welcoming setting and enjoy freshly prepared lunch selections, specialty teas, pastries, desserts, and other thoughtfully presented favorites.',
+          'The experience works equally well for a casual catch-up, a birthday outing, a mother-daughter afternoon, or a quiet break during a day downtown.',
+        ],
+      },
+      {
+        heading: 'Leave Time to Linger',
+        paragraphs: [
+          'The pleasure of a downtown afternoon often comes from not needing to hurry. Let lunch stretch a little longer, order another tea, or take a final walk before heading home.',
+          'A good outing should leave you refreshed rather than exhausted, with a few photographs, a favorite flavor, and a reason to return.',
+        ],
+      },
+      {
+        heading: 'Make 1890 Tea House Part of the Day',
+        paragraphs: [
+          'Located in historic downtown Ocala, 1890 Tea House brings together food, atmosphere, and hospitality in a setting designed for unhurried connection.',
+          'It is a natural stop for visitors exploring the area and for locals who want to rediscover their own downtown one cup at a time.',
+        ],
+      },
+    ],
+  },
+  {
+    slug: 'how-to-pair-tea-with-scones-sandwiches-and-desserts',
+    title: 'How to Pair Tea with Scones, Sandwiches, and Desserts',
+    date: '2026-07-29',
+    dateDisplay: 'July 29, 2026',
+    excerpt:
+      'The right tea pairing can brighten delicate sandwiches, balance rich desserts, and make a warm scone even more satisfying.',
+    image: scones,
+    imageAlt: 'Fresh scones with jam and clotted cream beside a cup of tea',
+    width: 1600,
+    height: 1067,
+    sections: [
+      {
+        paragraphs: [
+          'Tea pairing does not need to be complicated. Much like choosing a sauce or seasoning, the goal is to find flavors that complement one another without letting either the tea or the food disappear.',
+          'A few simple ideas can help you choose a cup that feels just right with savory sandwiches, warm scones, fruit, chocolate, or delicate pastries.',
+        ],
+      },
+      {
+        heading: 'Black Tea with Savory Bites',
+        paragraphs: [
+          'Full-bodied black teas pair naturally with tea sandwiches, cheese, charcuterie, and other savory selections. Their deeper flavor can stand beside richer ingredients without becoming lost.',
+          'English Breakfast and Earl Grey are familiar starting points for guests who want a classic afternoon tea pairing.',
+        ],
+      },
+      {
+        heading: 'Green and Floral Teas with Lighter Flavors',
+        paragraphs: [
+          'Green, jasmine, and floral teas work well with cucumber sandwiches, fruit, lighter pastries, and fresh salads. Their delicate character can brighten subtle ingredients rather than overpowering them.',
+          'These teas are especially refreshing when the menu includes citrus, herbs, berries, or soft cheeses.',
+        ],
+      },
+      {
+        heading: 'Scones Welcome Many Styles of Tea',
+        paragraphs: [
+          'Warm scones, jam, and clotted cream can pair with almost any favorite tea. A bold black tea balances the richness of the cream, while a fruit or floral blend can echo the sweetness of the jam.',
+          'Try a small sip after each bite and notice how the flavors change together. That little experiment is part of the fun.',
+        ],
+      },
+      {
+        heading: 'Dessert Pairings',
+        paragraphs: [
+          'Chocolate desserts often pair well with robust or spiced teas, while vanilla, lemon, and fruit desserts can shine beside lighter black, green, floral, or fruit-forward blends.',
+          'When a dessert is especially sweet, choose a tea with enough character to create contrast instead of adding more sweetness.',
+        ],
+      },
+      {
+        heading: 'Let Curiosity Choose the Cup',
+        paragraphs: [
+          'There is no single correct pairing. Personal taste matters, and sometimes the most memorable combination is the one you did not expect.',
+          'At 1890 Tea House, the table is an invitation to sample, compare, and find a new favorite at your own pace.',
+        ],
+      },
+    ],
+  },
+  {
     slug: 'tea-party-bridal-shower-ideas-create-a-celebration-everyone-will-remember',
     title: 'Tea Party Bridal Shower Ideas: Create a Celebration Everyone Will Remember',
     date: '2026-07-27',

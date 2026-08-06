@@ -14,6 +14,7 @@ import {
   JournalPage,
   LegalPage,
   MenusPage,
+  NewsArticlePage,
   NewsPage,
   NotFoundPage,
   ReservationsPage,
@@ -70,6 +71,7 @@ export function SiteRoutes() {
       <Route path="/reservations" element={<ReservationsPage />} />
       <Route path="/tea-rooms" element={<TeaRoomsPage />} />
       <Route path="/news" element={<NewsPage />} />
+      <Route path="/news/:slug" element={<NewsArticlePage />} />
       <Route path="/gallery" element={<GalleryPage />} />
       <Route path="/faqs" element={<FAQPage />} />
       <Route path="/faq" element={<FAQPage />} />

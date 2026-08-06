@@ -50,7 +50,8 @@ describe('site routing', () => {
     ['/server-application', /Hospitality begins with a warm welcome/i],
     ['/privacy', /Privacy Policy/i],
     ['/terms', /Terms and Conditions/i],
-    ['/journal/why-tea-houses-are-having-a-moment-and-why-it-makes-perfect-sense', /Why Tea Houses Are Having a Moment/i],
+    ['/journal/how-to-build-an-afternoon-tea-that-feels-effortless', /How to Build an Afternoon Tea/i],
+    ['/news/the-tea-house-journal-is-now-open', /The Tea House Journal is now open/i],
   ])('renders %s as a routed page', (path, heading) => {
     renderRoute(path);
     expect(screen.getByRole('heading', { level: 1, name: heading })).toBeTruthy();

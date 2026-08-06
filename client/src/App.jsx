@@ -363,7 +363,8 @@ function App() {
             <SectionEyebrow>The 1890 experience</SectionEyebrow>
             <h2 id="experience-title">Choose your own kind of pause.</h2>
             <p>
-              The Tea House can be a quick meeting place, a leisurely lunch, an afternoon ritual, or the setting for a milestone. Each visit starts with the same invitation: settle in and stay awhile.
+The Tea House can be a quiet stop for tea or coffee, a relaxed place to enjoy lunch with sandwiches, charcuterie, and something sweet, or an afternoon destination where conversation is allowed to unfold without feeling rushed. It can also become the setting for a birthday, bridal shower, private gathering, business meeting, or meaningful milestone shared with the people who matter most. Whether you choose an individually styled Tea Room, a table on the patio when available, or a cozy spot for two, each visit offers its own rhythm. Come for a quick cup, stay for dessert, make an afternoon of it, or turn the occasion into a memory. Every experience begins with the same invitation: settle in, savor each detail, and stay awhile.
+
             </p>
           </div>
 
@@ -571,54 +572,44 @@ function App() {
 
         <section id="news" className="notes section-pad" aria-labelledby="notes-title">
           <div className="notes-heading" data-reveal>
-            <SectionEyebrow tone="gold">Stories & press</SectionEyebrow>
+            <SectionEyebrow tone="gold">Stories & updates</SectionEyebrow>
             <h2 id="notes-title">Around the tea table.</h2>
-            <p>Local coverage and Tea House journal stories, gathered into one editorial shelf.</p>
+            <p>Original news from the house and first-party Journal stories, written for 1890.</p>
           </div>
 
           <div className="notes-grid">
             <article className="press-feature" data-reveal>
-              <span>Press · January 2026</span>
-              <h3>1890 Tea House opens a new Ocala spot for afternoon tea and small plates.</h3>
-              <p>Ocala-News introduced the tea house, its private rooms, patio, and menu to the community.</p>
-              <a
-                className="text-link"
-                href="https://www.ocala-news.com/2026/01/21/1890-tea-house-opens-new-ocala-spot-for-charcuterie-afternoon-tea/"
-                target="_blank"
-                rel="noreferrer"
-              >
-                Read on Ocala-News <Arrow />
-              </a>
+              <span>From 1890 · August 2026</span>
+              <h3>The Tea House Journal is now open.</h3>
+              <p>A new collection explores tea culture, thoughtful gatherings, and the small rituals that make time around a table feel special.</p>
+              <Link className="text-link" to="/news/the-tea-house-journal-is-now-open">
+                Read the update <Arrow />
+              </Link>
             </article>
 
             <article className="press-feature press-feature--dark" data-reveal>
-              <span>Press · January 2026</span>
-              <h3>Historic charm meets modern dining in downtown Ocala.</h3>
-              <p>352today took a closer look at the tea service, menu, patio, and private room experience.</p>
-              <a
-                className="text-link text-link--light"
-                href="https://352today.com/news/257752-352eats-1890-tea-house-merges-historic-charm-and-modern-dining-in-ocala/"
-                target="_blank"
-                rel="noreferrer"
-              >
-                Read on 352today <Arrow />
-              </a>
+              <span>House update · August 2026</span>
+              <h3>A simpler way to plan private gatherings.</h3>
+              <p>Reservations, Tea Room information, and larger-party planning now live in one clear experience.</p>
+              <Link className="text-link text-link--light" to="/news/a-simpler-way-to-plan-private-gatherings">
+                Read the update <Arrow />
+              </Link>
             </article>
           </div>
 
           <div id="journal" className="journal" data-reveal>
             <div className="journal-title">
               <SectionEyebrow>Journal</SectionEyebrow>
-              <h3>Stories steeped in tradition.</h3>
+              <h3>Original stories for slower moments.</h3>
             </div>
-            <Link to="/journal/why-tea-houses-are-having-a-moment-and-why-it-makes-perfect-sense">
-              <span>June 29, 2026</span>
-              <strong>Why Tea Houses Are Having a Moment</strong>
+            <Link to="/journal/how-to-build-an-afternoon-tea-that-feels-effortless">
+              <span>August 5, 2026</span>
+              <strong>How to Build an Afternoon Tea That Feels Effortless</strong>
               <Arrow />
             </Link>
-            <Link to="/journal/scones-clotted-cream-the-delicious-story-behind-a-timeless-pairing">
-              <span>April 22, 2026</span>
-              <strong>Scones & Clotted Cream: A Timeless Pairing</strong>
+            <Link to="/journal/the-art-of-the-tea-table-small-details-that-change-the-mood">
+              <span>July 22, 2026</span>
+              <strong>The Art of the Tea Table</strong>
               <Arrow />
             </Link>
           </div>
@@ -722,7 +713,7 @@ function App() {
       <footer className="site-footer section-pad">
         <div className="footer-brand">
           <BrandMark />
-          <p>Tea, dining, private rooms, and catering in downtown Ocala.</p>
+          {/* <p>Tea, dining, private rooms, and catering in downtown Ocala.</p> */}
           <img
             className="diamond-logo"
             src={diamondSuites}

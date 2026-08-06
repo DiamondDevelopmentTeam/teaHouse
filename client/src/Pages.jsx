@@ -47,7 +47,7 @@ export function Meta({ title, description, path = '/', image = building, schema 
     const socialImage = new URL(image, window.location.origin).href;
     document.title = pageTitle;
     upsertMeta('meta[name="description"]', { name: 'description', content: description });
-    upsertMeta('meta[property="og:type"]', { property: 'og:type', content: path.startsWith('/journal/') ? 'article' : 'website' });
+    upsertMeta('meta[property="og:type"]', { property: 'og:type', content: path.startsWith('/journal/') || path.startsWith('/news/') ? 'article' : 'website' });
     upsertMeta('meta[property="og:title"]', { property: 'og:title', content: pageTitle });
     upsertMeta('meta[property="og:description"]', { property: 'og:description', content: description });
     upsertMeta('meta[property="og:url"]', { property: 'og:url', content: canonicalUrl });
@@ -253,11 +253,21 @@ export function AboutPage() {
         <OptimizedImage src={patio} alt="The black, white, and pink Tea House and patio" width={1200} height={1600} sizes="(max-width: 800px) 100vw, 46vw" />
         <div className="page-prose">
           <p className="page-eyebrow">Rooted in history</p>
+
           <h2>A landmark setting with a fresh chapter.</h2>
-          <p>1890 Tea House is located inside the Diamond Suites Downtown Ocala, surrounded by history and character. Timeless architecture frames a modern interpretation of traditional tea service, while the outdoor patio feels like a small garden retreat.</p>
+          <p>1890 Tea House is located inside Diamond Suites Downtown Ocala, surrounded by history, character, and the unmistakable architecture of the black, white, and pink house on Silver Springs Boulevard.</p>
+          <p>That historic backdrop now frames a modern interpretation of traditional tea service, with thoughtfully prepared food, curated drinks, private rooms, and an outdoor patio that feels like a small garden retreat.</p>
+
+          <h2>A house made for lingering.</h2>
+          <p>Every part of the experience is designed to invite guests to slow down. Settle in with a pot of tea, meet a friend for lunch, share a board over conversation, or stay for dessert without feeling rushed.</p>
+
           <h2>For gatherings big and small.</h2>
-          <p>Private Tea Rooms and outdoor spaces welcome bridal showers, birthdays, book clubs, business gatherings, and the everyday pleasure of meeting a friend.</p>
-          <p>The experience pairs tea-house tradition with Ocala flavor: gourmet but approachable plates, boards, pastries, and gracious hospitality.</p>
+          <p>Private Tea Rooms and outdoor spaces welcome bridal showers, birthdays, book clubs, business gatherings, family visits, and the everyday pleasure of meeting someone you have not seen in a while.</p>
+          <p>Guests can build an occasion around tea sandwiches, charcuterie, pastries, desserts, tea service, coffee, wine, and other selections from the current menu.</p>
+
+          <h2>Hospitality with an Ocala point of view.</h2>
+          <p>The experience pairs tea-house tradition with approachable flavor and a warm neighborhood welcome. Thoughtful service, memorable rooms, and a menu made for sharing give each visit its own rhythm.</p>
+          <p>Whether the plan is a quiet cup, a leisurely meal, or a room filled with people worth celebrating, 1890 is a place to arrive, settle in, and take your time.</p>
         </div>
       </section>
       <CTA />
@@ -575,10 +585,83 @@ export function NewsPage() {
   const news = contentService.getNews();
   return (
     <PageShell>
-      <Meta title="News" description="Read all current press coverage and announcements about 1890 Tea House." path="/news" image={news[0].image} schema={[breadcrumbSchema([['Home', '/'], ['News', '/news']])]} />
-      <PageHero eyebrow="News and press" title="1890 in the community." intro="Stories from local publications about the house, the menu, and a new gathering place in downtown Ocala." image="building" />
+      <Meta title="News" description="Read original announcements and updates from 1890 Tea House." path="/news" image={news[0].image} schema={[breadcrumbSchema([['Home', '/'], ['News', '/news']])]} />
+      <PageHero eyebrow="News from 1890" title="What’s happening around the house." intro="Original announcements, website updates, and thoughtful notes from the Tea House team." image="building" />
       <section className="page-section page-press-grid">
-        {news.map((item) => <article key={item.href}><div className="page-press-media"><OptimizedImage src={item.image} alt={item.imageAlt} width={item.width} height={item.height} sizes="(max-width: 720px) 100vw, (max-width: 1000px) 50vw, 33vw" /></div><div className="page-press-content"><p>{item.publication} · <time dateTime={item.date}>{item.dateDisplay}</time></p><h2>{item.headline}</h2><p>{item.summary}</p><ExternalLink href={item.href}>Read at {item.publication}</ExternalLink></div></article>)}
+        {news.map((item) => (
+          <article key={item.slug}>
+            <div className="page-press-media">
+              <OptimizedImage src={item.image} alt={item.imageAlt} width={item.width} height={item.height} sizes="(max-width: 720px) 100vw, (max-width: 1000px) 50vw, 33vw" />
+            </div>
+            <div className="page-press-content">
+              <p>{item.category} · <time dateTime={item.date}>{item.dateDisplay}</time></p>
+              <h2>{item.headline}</h2>
+              <p>{item.summary}</p>
+              <Link className="page-text-link" to={`/news/${item.slug}`}>Read update →</Link>
+            </div>
+          </article>
+        ))}
+      </section>
+      <CTA />
+    </PageShell>
+  );
+}
+
+export function NewsArticlePage() {
+  const { slug } = useParams();
+  const news = contentService.getNews();
+  const item = contentService.getNewsPost(slug);
+  if (!item) return <NotFoundPage />;
+
+  const index = news.findIndex((entry) => entry.slug === slug);
+  const previous = news[index + 1];
+  const next = news[index - 1];
+  const related = news.filter((entry) => entry.slug !== slug).slice(0, 3);
+  const schema = {
+    '@context': 'https://schema.org',
+    '@type': 'Article',
+    headline: item.headline,
+    datePublished: item.date,
+    image: new URL(item.image, window.location.origin).href,
+    author: { '@type': 'Organization', name: business.name },
+    publisher: { '@type': 'Organization', name: business.name },
+    mainEntityOfPage: `${siteUrl}/news/${item.slug}`,
+  };
+
+  return (
+    <PageShell>
+      <Meta title={item.headline} description={item.summary} path={`/news/${item.slug}`} image={item.image} schema={[schema, breadcrumbSchema([['Home', '/'], ['News', '/news'], [item.headline, `/news/${item.slug}`]])]} />
+      <article className="journal-article">
+        <header>
+          <p className="page-eyebrow">{item.category}</p>
+          <h1>{item.headline}</h1>
+          <time dateTime={item.date}>{item.dateDisplay}</time>
+        </header>
+        <OptimizedImage className="journal-article__hero" src={item.image} alt={item.imageAlt} width={item.width} height={item.height} eager sizes="(max-width: 900px) 100vw, 1100px" />
+        <div className="journal-article__body">
+          {item.sections.map((section, sectionIndex) => (
+            <section key={section.heading || sectionIndex}>
+              {section.heading ? <h2>{section.heading}</h2> : null}
+              {section.paragraphs.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}
+              {section.list ? <ul>{section.list.map((listItem) => <li key={listItem}>{listItem}</li>)}</ul> : null}
+            </section>
+          ))}
+        </div>
+        <nav className="journal-pagination" aria-label="News article navigation">
+          {previous ? <Link to={`/news/${previous.slug}`}><span>Previous</span>{previous.headline}</Link> : <span />}
+          {next ? <Link to={`/news/${next.slug}`}><span>Next</span>{next.headline}</Link> : <span />}
+        </nav>
+      </article>
+      <section className="page-section">
+        <SectionTitle eyebrow="More from 1890" title="Related updates." />
+        <div className="page-related-grid">
+          {related.map((entry) => (
+            <Link key={entry.slug} to={`/news/${entry.slug}`}>
+              <time dateTime={entry.date}>{entry.dateDisplay}</time>
+              <h3>{entry.headline}</h3>
+            </Link>
+          ))}
+        </div>
       </section>
       <CTA />
     </PageShell>
@@ -612,8 +695,8 @@ export function JournalPage() {
   const posts = contentService.getJournalPosts();
   return (
     <PageShell>
-      <Meta title="Tea House Journal" description="Read every 1890 Tea House story about tea culture, Ocala dining, celebrations, and timeless rituals." path="/journal" image={posts[0].image} schema={[breadcrumbSchema([['Home', '/'], ['Journal', '/journal']])]} />
-      <PageHero eyebrow="Tea House Journal" title="Stories steeped in tradition." intro="Notes on tea culture, hospitality, gatherings, and the rituals that make time around a table feel special." image="service" className="journal-hero" />
+      <Meta title="Tea House Journal" description="Read original 1890 Tea House stories about tea culture, hosting, celebrations, and the art of taking your time." path="/journal" image={posts[0].image} schema={[breadcrumbSchema([['Home', '/'], ['Journal', '/journal']])]} />
+      <PageHero eyebrow="The 1890 Journal" title="Original stories for slower moments." intro="First-party notes on tea culture, gracious hosting, thoughtful gatherings, and the pleasure of taking your time." image="service" className="journal-hero" />
       <section className="page-section page-journal-grid">
         {posts.map((post) => <article key={post.slug}><Link to={`/journal/${post.slug}`}><OptimizedImage src={post.image} alt={post.imageAlt} width={post.width} height={post.height} sizes="(max-width: 700px) 100vw, 31vw" /><div><time dateTime={post.date}>{post.dateDisplay}</time><h2>{post.title}</h2><p>{post.excerpt}</p><strong>Read article →</strong></div></Link></article>)}
       </section>

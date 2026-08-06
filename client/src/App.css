@@ -3740,3 +3740,927 @@ a.button--outline-ink:visited {
     grid-column: 1;
   }
 }
+
+/* ===========================================================================
+   CLIENT FEEDBACK PASS · BLACK / WHITE / HOT PINK
+   Larger branding, softer compositions, and a more prominent Pink Tea Room.
+   =========================================================================== */
+
+:root {
+  --ink: #090909;
+  --ink-soft: #171717;
+  --paper: #ffffff;
+  --paper-light: #ffffff;
+  --white: #ffffff;
+  --gold: #ff2f92;
+  --gold-bright: #ff4fa3;
+  --pink: #ff2f92;
+  --pink-dark: #d90068;
+  --sage: #090909;
+  --muted: #575757;
+  --line: rgb(9 9 9 / 14%);
+  --line-light: rgb(255 255 255 / 24%);
+  --rule-gold: rgb(255 47 146 / 58%);
+  --rule-pink: rgb(255 47 146 / 52%);
+}
+
+body,
+.site-shell,
+.story,
+.experience,
+.rooms,
+.faq,
+.closing-cta {
+  background: var(--white);
+}
+
+/* Give the brand more visual authority in both headers and footers. */
+.header-inner {
+  grid-template-columns: minmax(13rem, 15.5rem) 1fr auto;
+}
+
+.site-header .brand-mark {
+  width: clamp(13rem, 14vw, 15rem);
+}
+
+.site-header .brand-mark img {
+  height: 4.35rem;
+}
+
+.site-header .brand-mark--compact {
+  width: 11rem;
+}
+
+.site-header .brand-mark--compact img {
+  height: 3.15rem;
+}
+
+.menu-panel .brand-mark,
+.footer-brand .brand-mark {
+  width: clamp(14rem, 18vw, 17rem);
+}
+
+/* Round interactive controls so the interface feels less rigid. */
+.button,
+.header-reserve,
+.page-button {
+  border-radius: 999px;
+}
+
+.header-reserve {
+  padding-inline: 1.35rem;
+}
+
+/* Replace rigid ledger boxes with separated, softer content islands. */
+.experience-grid {
+  gap: clamp(0.8rem, 1.4vw, 1.25rem);
+  border: 0;
+}
+
+.experience-grid article,
+.experience-grid article:nth-child(even) {
+  border: 0;
+  border-top: 3px solid var(--pink);
+  border-radius: 1.35rem;
+  background: #fafafa;
+  box-shadow: 0 1rem 2.5rem rgb(9 9 9 / 6%);
+}
+
+.experience-grid article::before {
+  display: none;
+}
+
+.service-ledger {
+  gap: clamp(0.8rem, 1.4vw, 1.25rem);
+  padding-top: clamp(1.5rem, 3vw, 2.5rem);
+  padding-bottom: clamp(1.5rem, 3vw, 2.5rem);
+  border: 0;
+}
+
+.service-ledger article,
+.service-ledger article:first-child {
+  border: 0;
+  border-radius: 1.35rem;
+  background: #171717;
+}
+
+.service-ledger article > span,
+.service-ledger h3 {
+  color: var(--white);
+}
+
+.service-ledger p {
+  color: rgb(255 255 255 / 66%);
+}
+
+.notes {
+  background: var(--ink);
+}
+
+.notes-grid {
+  gap: clamp(1rem, 2vw, 1.5rem);
+}
+
+.press-feature {
+  border-radius: 1.5rem;
+  background: var(--pink);
+}
+
+.press-feature--dark {
+  background: #171717;
+}
+
+.journal {
+  gap: clamp(1rem, 2vw, 1.5rem);
+  border: 0;
+}
+
+.journal-title,
+.journal > a {
+  border: 0;
+  border-radius: 1.35rem;
+}
+
+.journal-title {
+  color: var(--white);
+  background: var(--pink);
+}
+
+.journal > a {
+  color: var(--ink);
+  background: var(--white);
+}
+
+.journal > a > span {
+  color: var(--pink-dark);
+}
+
+/* Let photography breathe without hard square corners everywhere. */
+.story-image,
+.experience-image,
+.menu-image,
+.rooms-image-main,
+.rooms-image-detail,
+.events-image,
+.visit-media {
+  border-radius: clamp(1rem, 1.6vw, 1.6rem);
+}
+
+/* Make the Pink Tea Room a true focal point instead of a small inset. */
+.rooms {
+  grid-template-columns: minmax(34rem, 1.18fr) minmax(24rem, 0.82fr);
+  gap: clamp(3rem, 6vw, 7rem);
+}
+
+.rooms-gallery {
+  width: 100%;
+  height: clamp(38rem, 45vw, 48rem);
+}
+
+.rooms-image-main {
+  grid-column: 1 / 11;
+  height: 100%;
+  max-height: none;
+  aspect-ratio: auto;
+  overflow: hidden;
+}
+
+.rooms-image-main img {
+  object-position: center 58%;
+}
+
+.rooms-image-detail {
+  grid-column: 9 / 13;
+  width: min(100%, 20rem);
+  margin-bottom: clamp(1.5rem, 3vw, 3.25rem);
+  overflow: hidden;
+}
+
+.events {
+  background: var(--pink-dark);
+}
+
+.site-footer {
+  border-top-color: var(--pink);
+  background: var(--ink);
+}
+
+.footer-nav > p,
+.footer-visit > p,
+.footer-socials a {
+  color: var(--pink);
+}
+
+@media (max-width: 1180px) {
+  .header-inner {
+    grid-template-columns: minmax(11.5rem, 13.5rem) 1fr auto;
+  }
+
+  .site-header .brand-mark {
+    width: 13rem;
+  }
+
+  .rooms {
+    grid-template-columns: minmax(29rem, 1.08fr) minmax(22rem, 0.92fr);
+  }
+
+  .rooms-gallery {
+    height: clamp(36rem, 49vw, 43rem);
+  }
+}
+
+@media (max-width: 900px) {
+  .header-inner {
+    grid-template-columns: minmax(10rem, 12rem) 1fr auto;
+  }
+
+  .site-header .brand-mark {
+    width: 11.5rem;
+  }
+
+  .rooms {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .rooms-gallery {
+    width: min(100%, 52rem);
+    height: clamp(34rem, 78vw, 44rem);
+  }
+}
+
+@media (max-width: 620px) {
+  .header-inner {
+    grid-template-columns: minmax(8rem, 9rem) 1fr auto;
+  }
+
+  .site-header .brand-mark,
+  .site-header .brand-mark--compact {
+    width: 8.8rem;
+  }
+
+  .site-header .brand-mark img,
+  .site-header .brand-mark--compact img {
+    height: 3.25rem;
+  }
+
+  .rooms-gallery {
+    height: auto;
+  }
+
+  .rooms-image-main {
+    height: auto;
+    aspect-ratio: 3 / 4;
+  }
+
+  .experience-grid,
+  .service-ledger,
+  .notes-grid,
+  .journal {
+    gap: 0.9rem;
+  }
+}
+
+/* ===========================================================================
+   CLIENT REVIEW PASS · SOFT IMAGE FADES + EDITORIAL SEPARATION
+   Removes the bubble treatment from split photography, balances Stories &
+   Press, strengthens cover transitions, and gives the logo more presence.
+   =========================================================================== */
+
+/* Slightly larger branding without crowding the navigation. */
+.header-inner {
+  grid-template-columns: minmax(15rem, 17.5rem) 1fr auto;
+}
+
+.site-header .brand-mark {
+  width: clamp(15rem, 16vw, 17rem);
+}
+
+.site-header .brand-mark img {
+  height: 4.85rem;
+}
+
+.site-header .brand-mark--compact {
+  width: 13.75rem;
+}
+
+.site-header .brand-mark--compact img {
+  height: 4rem;
+}
+
+.menu-panel .brand-mark,
+.footer-brand .brand-mark {
+  width: clamp(15.5rem, 19vw, 18.5rem);
+}
+
+/* Homepage cover: soften the seam between the black copy and photography. */
+.hero-media {
+  isolation: isolate;
+}
+
+.hero-media::after {
+  inset: 0 auto 0 0;
+  z-index: 2;
+  width: clamp(4.5rem, 7vw, 8rem);
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    var(--ink) 0%,
+    rgb(9 9 9 / 64%) 28%,
+    rgb(9 9 9 / 18%) 66%,
+    transparent 100%
+  );
+  box-shadow: none;
+}
+
+.hero-media::before {
+  position: absolute;
+  top: clamp(2rem, 6vh, 5rem);
+  bottom: clamp(2rem, 6vh, 5rem);
+  left: 0;
+  z-index: 3;
+  width: 1px;
+  background: linear-gradient(transparent, var(--pink), transparent);
+  content: '';
+  pointer-events: none;
+}
+
+/* Events and Visit: clean square-edged photography with no fade overlay. */
+.events,
+.visit {
+  position: relative;
+  overflow: hidden;
+}
+
+.events-image,
+.visit-media {
+  position: relative;
+  overflow: hidden;
+  border-radius: 0;
+}
+
+.events-image img,
+.visit-media > img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 0;
+  object-fit: cover;
+}
+
+.events-image::after,
+.visit-media::after {
+  display: none;
+  content: none;
+}
+
+.visit-address {
+  z-index: 2;
+}
+
+/* Stories & Press: use a continuous editorial shelf instead of rounded boxes. */
+.notes-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0;
+  overflow: hidden;
+  border-top: 1px solid rgb(255 255 255 / 24%);
+  border-bottom: 1px solid rgb(255 255 255 / 24%);
+  background: transparent;
+}
+
+.press-feature,
+.press-feature--dark {
+  position: relative;
+  min-height: clamp(23rem, 27vw, 30rem);
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.press-feature {
+  background: var(--pink);
+}
+
+.press-feature:first-child::after {
+  display: none;
+  content: none;
+}
+
+.press-feature--dark {
+  border-left: 0;
+  background: #171717;
+}
+
+.press-feature h3,
+.press-feature--dark h3 {
+  max-width: 16ch;
+  font-size: clamp(2.2rem, 3.15vw, 3.75rem);
+}
+
+.journal {
+  grid-template-columns: minmax(14rem, 0.62fr) repeat(2, minmax(0, 1fr));
+  gap: 0;
+  overflow: hidden;
+  border-top: 1px solid rgb(255 255 255 / 24%);
+  border-bottom: 1px solid rgb(255 255 255 / 24%);
+  background: transparent;
+}
+
+.journal-title,
+.journal > a {
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  background: transparent;
+}
+
+.journal-title {
+  border-right: 1px solid rgb(255 255 255 / 24%);
+  color: var(--white);
+}
+
+.journal-title h3 {
+  color: var(--white);
+}
+
+.journal > a {
+  color: var(--white);
+  border-right: 1px solid rgb(255 255 255 / 24%);
+  transition: color 180ms ease, background 180ms ease;
+}
+
+.journal > a:last-child {
+  border-right: 0;
+}
+
+.journal > a > span {
+  color: var(--pink);
+}
+
+@media (hover: hover) {
+  .journal > a:hover {
+    color: var(--white);
+    background: rgb(255 47 146 / 13%);
+  }
+}
+
+@media (max-width: 1180px) {
+  .header-inner {
+    grid-template-columns: minmax(13rem, 15rem) 1fr auto;
+  }
+
+  .site-header .brand-mark {
+    width: 14rem;
+  }
+}
+
+@media (max-width: 900px) {
+  .header-inner {
+    grid-template-columns: minmax(11rem, 13rem) 1fr auto;
+  }
+
+  .site-header .brand-mark {
+    width: 12.5rem;
+  }
+
+  .hero-media::after,
+  .hero-media::before {
+    display: none;
+  }
+
+  .events-image,
+  .visit-media {
+    overflow: hidden;
+  }
+
+  .notes-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .press-feature:first-child::after {
+    display: none;
+  }
+
+  .press-feature--dark {
+    border-top: 1px solid rgb(255 255 255 / 24%);
+  }
+
+  .journal {
+    grid-template-columns: 1fr;
+  }
+
+  .journal-title,
+  .journal > a {
+    border-right: 0;
+    border-bottom: 1px solid rgb(255 255 255 / 24%);
+  }
+
+  .journal > a:last-child {
+    border-bottom: 0;
+  }
+}
+
+@media (max-width: 620px) {
+  .header-inner {
+    grid-template-columns: minmax(8.75rem, 10rem) 1fr auto;
+  }
+
+  .site-header .brand-mark,
+  .site-header .brand-mark--compact {
+    width: 9.6rem;
+  }
+
+  .site-header .brand-mark img,
+  .site-header .brand-mark--compact img {
+    height: 3.5rem;
+  }
+
+  .press-feature,
+  .press-feature--dark {
+    min-height: 0;
+  }
+}
+
+/* Center only the large homepage story image. */
+.story-image {
+  justify-self: center;
+  width: min(100%, 90rem);
+  margin-inline: auto;
+}
+
+/* Keep the caption below the 1890 experience image fully visible and aligned. */
+.experience-image {
+  min-width: 0;
+  overflow: visible;
+}
+
+.experience-image .editorial-caption {
+  position: static;
+  display: block;
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  padding: 0.9rem 0 0;
+  overflow: visible;
+  color: var(--muted);
+  text-align: left;
+  transform: none;
+}
+
+.experience-image .editorial-caption > span {
+  display: block;
+  margin-bottom: 0.3rem;
+  color: var(--pink);
+  font-family: var(--sans);
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  line-height: 1.3;
+  text-transform: uppercase;
+}
+
+/* Rounded 1890 experience image with its caption placed cleanly underneath. */
+.experience-image {
+  min-width: 0;
+  overflow: visible;
+}
+
+.experience-image img {
+  display: block;
+  width: 100%;
+  border-radius: clamp(1.4rem, 2vw, 2.25rem);
+  overflow: hidden;
+}
+
+.experience-image .editorial-caption {
+  position: static;
+  display: block;
+  width: 100%;
+  max-width: 42rem;
+  margin: 0;
+  padding: 0.9rem 0 0;
+  overflow: visible;
+  color: var(--muted);
+  text-align: left;
+  transform: none;
+}
+
+.experience-image .editorial-caption > span {
+  display: block;
+  margin-bottom: 0.3rem;
+  color: var(--pink);
+  font-family: var(--sans);
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  line-height: 1.3;
+  text-transform: uppercase;
+}
+
+/* Keep this specific image completely still on hover and focus. */
+.experience-image,
+.experience-image:hover,
+.experience-image:focus,
+.experience-image:focus-within,
+.experience-image img,
+.experience-image:hover img,
+.experience-image:focus img,
+.experience-image:focus-within img {
+  animation: none !important;
+  transition: none !important;
+  transform: none !important;
+  scale: 1 !important;
+  filter: none !important;
+}
+
+/* Remove the decorative pink corner from the 1890 Experience section. */
+.experience::before {
+  display: none !important;
+  content: none !important;
+}
+
+/* Give the top-left header logo a little more presence. */
+.header-inner {
+  grid-template-columns: minmax(16rem, 19rem) 1fr auto;
+}
+
+.site-header .brand-mark {
+  width: clamp(16.5rem, 17vw, 18.5rem);
+}
+
+.site-header .brand-mark img {
+  height: 5.3rem;
+}
+
+.site-header .brand-mark--compact {
+  width: 14.75rem;
+}
+
+.site-header .brand-mark--compact img {
+  height: 4.35rem;
+}
+
+@media (max-width: 1180px) {
+  .header-inner {
+    grid-template-columns: minmax(14rem, 16rem) 1fr auto;
+  }
+
+  .site-header .brand-mark {
+    width: 15rem;
+  }
+}
+
+@media (max-width: 900px) {
+  .header-inner {
+    grid-template-columns: minmax(11.5rem, 13.75rem) 1fr auto;
+  }
+
+  .site-header .brand-mark {
+    width: 13rem;
+  }
+}
+
+@media (max-width: 620px) {
+  .site-header .brand-mark,
+  .site-header .brand-mark--compact {
+    width: 10rem;
+  }
+
+  .site-header .brand-mark img,
+  .site-header .brand-mark--compact img {
+    height: 3.65rem;
+  }
+}
+
+/* Keep the original hero styling, but give the headline more weight. */
+.hero h1 {
+  font-weight: 500;
+}
+
+.hero h1 em {
+  font-weight: 600;
+}
+
+/* Strengthen Bodoni display text so its fine strokes remain readable. */
+.hero h1,
+.story-heading h2,
+.experience-intro h2,
+.rooms h2,
+.menu-heading h2,
+.events-copy h2,
+.notes-heading h2,
+.faq h2,
+.visit-details h2,
+.closing-cta h2,
+.page-hero h1,
+.journal-article h1,
+.application-hero h1 {
+  font-weight: 600;
+  -webkit-text-stroke: 0.16px currentColor;
+  text-rendering: geometricPrecision;
+}
+
+.hero h1 em,
+.story h2 em,
+.rooms h2 em {
+  font-weight: 600;
+  -webkit-text-stroke: 0.18px currentColor;
+}
+
+.story-copy .story-lead,
+.story-copy blockquote,
+.experience-grid h3,
+.menu-list-title h3,
+.service-ledger h3,
+.event-types h3,
+.press-feature h3,
+.journal-title h3,
+.journal strong,
+.faq-item > button,
+.visit-address p,
+.hero-image-label span,
+.story-image figcaption span,
+.page-section h2,
+.page-section h3,
+.page-press-content h2,
+.journal-article__body h2,
+.page-related-grid h3 {
+  font-weight: 500;
+  -webkit-text-stroke: 0.08px currentColor;
+  text-rendering: geometricPrecision;
+}
+
+@media (max-width: 620px) {
+  .hero h1,
+  .story-heading h2,
+  .experience-intro h2,
+  .rooms h2,
+  .menu-heading h2,
+  .events-copy h2,
+  .notes-heading h2,
+  .faq h2,
+  .visit-details h2,
+  .closing-cta h2,
+  .page-hero h1,
+  .journal-article h1,
+  .application-hero h1 {
+    -webkit-text-stroke: 0.12px currentColor;
+  }
+}
+
+/* Give routed page covers more breathing room. */
+.page-hero__copy {
+  padding-block: clamp(5rem, 8vw, 7.5rem);
+}
+
+.page-hero__copy .page-eyebrow {
+  margin-bottom: clamp(1.5rem, 2.3vw, 2.25rem);
+}
+
+.page-hero h1 {
+  max-width: 9ch;
+  letter-spacing: -0.035em;
+  line-height: 1.02;
+  text-wrap: balance;
+}
+
+.page-hero__copy > p:not(.page-eyebrow) {
+  max-width: 36rem;
+  margin-top: clamp(1.75rem, 2.6vw, 2.5rem);
+  line-height: 1.8;
+}
+
+@media (max-width: 900px) {
+  .page-hero__copy {
+    padding-block: clamp(4rem, 9vw, 5.5rem);
+  }
+
+  .page-hero h1 {
+    max-width: 10ch;
+    line-height: 1.04;
+  }
+}
+
+/* Use black for the main titles placed on hot-pink image labels. */
+.hero-image-label span,
+.story-image .editorial-caption > span,
+.visit-address p {
+  color: var(--ink) !important;
+  -webkit-text-fill-color: var(--ink);
+}
+
+.story-image figcaption span {
+  color: var(--white) !important;
+  -webkit-text-fill-color: var(--white);
+}
+
+/* Final label color adjustments. */
+.event-types span {
+  color: var(--white) !important;
+  -webkit-text-fill-color: var(--white);
+}
+
+.visit-address span {
+  color: var(--ink) !important;
+  -webkit-text-fill-color: var(--ink);
+}
+
+/* Final service-card hover treatment. */
+@media (hover: hover) {
+  .service-ledger article:hover {
+    color: var(--white);
+    background: var(--pink);
+  }
+
+  .service-ledger article:hover h3 {
+    color: var(--white) !important;
+    -webkit-text-fill-color: var(--white);
+  }
+
+  .service-ledger article:hover > span,
+  .service-ledger article:hover p {
+    color: var(--ink) !important;
+    -webkit-text-fill-color: var(--ink);
+  }
+}
+.experience {
+  align-items: stretch;
+}
+
+.experience-intro {
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+}
+
+.experience-intro-copy {
+  max-width: 35rem;
+}
+
+.experience-intro-lead {
+  margin-top: 1.5rem;
+}
+
+.experience-intro-details {
+  border-top: 1px solid rgba(17, 17, 17, 0.18);
+  display: grid;
+  margin-top: clamp(2.25rem, 4vw, 4rem);
+}
+
+.experience-intro-details article {
+  align-items: start;
+  border-bottom: 1px solid rgba(17, 17, 17, 0.18);
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: 2.25rem minmax(0, 1fr);
+  padding: clamp(1rem, 1.8vw, 1.4rem) 0;
+}
+
+.experience-intro-details article > span {
+  color: var(--pink, #f53d8d);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+}
+
+.experience-intro-details h3 {
+  font-size: clamp(1rem, 1.2vw, 1.22rem);
+  line-height: 1.2;
+  margin: 0 0 0.45rem;
+}
+
+.experience-intro-details p {
+  font-size: 0.88rem;
+  line-height: 1.65;
+  margin: 0;
+  max-width: 34rem;
+}
+
+.experience-intro-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem 2.5rem;
+  margin-top: auto;
+  padding-top: clamp(2rem, 4vw, 4rem);
+}
+
+.experience-image {
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+}
+
+.experience-image img {
+  flex: 1;
+  min-height: 0;
+  object-fit: cover;
+}
+
+@media (max-width: 900px) {
+  .experience-intro {
+    min-height: auto;
+  }
+
+  .experience-intro-actions {
+    margin-top: 0;
+  }
+}
