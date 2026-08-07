@@ -134,7 +134,7 @@ describe('site routing', () => {
     const { container } = renderRoute('/news');
     const cards = container.querySelectorAll('.page-press-grid article');
     const media = container.querySelectorAll('.page-press-media');
-    expect(cards.length).toBeGreaterThan(0);
+    expect(cards.length).toBe(3);
     expect(media.length).toBe(cards.length);
   });
 
@@ -146,7 +146,7 @@ describe('site routing', () => {
     expect(image.getAttribute('height')).toBe('1422');
     expect(
       within(hero)
-        .getByRole('link', { name: /Reserve a Table/i })
+        .getByRole('link', { name: /Reserve 1â€“14 Guests with Toast/i })
         .getAttribute('href'),
     ).toBe(business.reservationUrl);
 

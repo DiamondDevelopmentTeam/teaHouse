@@ -1,43 +1,15 @@
-import teaServiceImage from '../assets/images/migrated/gallery/33.webp';
 import previewImage from '../assets/images/migrated/news/352-preview.webp';
 import todayImage from '../assets/images/migrated/news/352-today.webp';
 import buildingImage from '../assets/images/building.webp';
 
 export const news = [
   {
-    slug: 'the-tea-house-journal-is-now-open',
-    category: 'From 1890',
-    headline: 'The Tea House Journal is now open.',
-    date: '2026-08-06',
-    dateDisplay: 'August 6, 2026',
-    summary:
-      'A new collection of original stories explores tea culture, gracious hospitality, thoughtful gatherings, and the small rituals that make time around a table feel special.',
-    image: teaServiceImage,
-    imageAlt: 'Floral teapots and a teacup arranged for service at 1890 Tea House',
-    width: 800,
-    height: 1422,
-    sections: [
-      {
-        paragraphs: [
-          'The Tea House Journal was created as a place for stories that feel at home at 1890: unhurried, welcoming, and rooted in the pleasure of gathering around a table.',
-          'The Journal is a first-party extension of the Tea House experience, created to share ideas, traditions, gatherings, and stories from 1890.',
-        ],
-      },
-      {
-        heading: 'What you will find inside',
-        paragraphs: [
-          'The Journal explores tea traditions, table styling, food and tea pairings, private celebrations, and the quiet details that help guests feel cared for.',
-        ],
-      },
-    ],
-  },
-  {
     publication: '352 Preview',
     headline: 'Sip, Savor, Relax, Repeat',
     date: '2026-02-02',
     dateDisplay: 'February 2, 2026',
     summary:
-      'A feature on the Queen Anneâ€“style house on Silver Springs Boulevard and its new chapter as 1890 Tea House. The article begins on page 28.',
+      'A feature on the Queen Anne–style house on Silver Springs Boulevard and its new chapter as 1890 Tea House. The article begins on page 28.',
     href: 'https://issuu.com/352preview/docs/ocala_s_352_preview_magazine_02_26',
     image: previewImage,
     imageAlt: '352 Preview magazine feature about 1890 Tea House',
