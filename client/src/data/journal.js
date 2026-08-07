@@ -7,286 +7,6 @@ import pinkTea from '../assets/images/migrated/journal/pink-tea.webp';
 
 export const journalPosts = [
   {
-    slug: 'how-to-build-an-afternoon-tea-that-feels-effortless',
-    title: 'How to Build an Afternoon Tea That Feels Effortless',
-    date: '2026-08-05',
-    dateDisplay: 'August 5, 2026',
-    excerpt:
-      'A memorable tea table does not need to feel complicated. Begin with a gentle rhythm, a balanced menu, and enough room for conversation.',
-    image: teaHouses,
-    imageAlt: 'A tiered afternoon tea spread arranged in a bright gathering room',
-    width: 1461,
-    height: 1043,
-    sections: [
-      {
-        paragraphs: [
-          'The best afternoon teas rarely feel overproduced. They feel considered. Guests notice that the table is welcoming, the food arrives in a natural order, and nobody is being hurried toward the next moment.',
-          'That sense of ease comes from a few thoughtful decisions made before everyone sits down.',
-        ],
-      },
-      {
-        heading: 'Start with the pace, not the decorations',
-        paragraphs: [
-          'Before choosing flowers or folding napkins, decide how you want the gathering to feel. A relaxed tea gives people time to settle in, pour a first cup, and begin talking before food becomes the center of attention.',
-          'Leave breathing room between the welcome, the savory course, and sweets. The pause is part of the experience.',
-        ],
-      },
-      {
-        heading: 'Build a menu with contrast',
-        paragraphs: [
-          'A balanced tea table moves between crisp and creamy, savory and sweet, familiar and slightly surprising.',
-          'A few carefully chosen items often feel more generous than a crowded table because guests can notice each flavor instead of racing through too many choices.',
-        ],
-        list: [
-          'One or two savory bites with different textures',
-          'A warm or freshly prepared element',
-          'A light sweet and a richer sweet',
-          'Tea options that include both bold and delicate profiles',
-        ],
-      },
-      {
-        heading: 'Let the table support conversation',
-        paragraphs: [
-          'Keep centerpieces low enough for guests to see one another and leave space for teapots, cups, and shared plates to move comfortably.',
-          'The goal is not a perfect photograph. It is a table that works beautifully once people begin using it.',
-        ],
-      },
-      {
-        heading: 'Finish with one memorable detail',
-        paragraphs: [
-          'A handwritten place card, a small floral accent, a favorite tea selected for the guest of honor, or a final shared dessert can give the gathering its signature.',
-          'One meaningful detail will usually be remembered longer than a dozen decorative ones.',
-        ],
-      },
-    ],
-  },
-  {
-    slug: 'how-to-plan-the-perfect-birthday-tea-party-in-ocala',
-    title: 'How to Plan the Perfect Birthday Tea Party in Ocala',
-    date: '2026-08-06',
-    dateDisplay: 'August 6, 2026',
-    excerpt:
-      'A birthday tea party turns a familiar celebration into an elegant, relaxed experience filled with beautiful details and meaningful conversation.',
-    image: bridalShower,
-    imageAlt: 'Elegant tea party table prepared for a birthday celebration',
-    width: 1145,
-    height: 763,
-    sections: [
-      {
-        paragraphs: [
-          'A birthday celebration does not need to be loud or complicated to feel special. A thoughtfully planned tea party creates space for conversation, beautiful food, and the small details that guests remember long after the candles are blown out.',
-          'At 1890 Tea House in historic downtown Ocala, a birthday can feel polished and personal without losing the warmth of gathering around a table with the people who matter most.',
-        ],
-      },
-      {
-        heading: 'Choose the Right Guest List',
-        paragraphs: [
-          'Begin by deciding what kind of celebration the guest of honor would enjoy. A smaller gathering can feel intimate and conversational, while a larger party brings together friends and family from different parts of their life.',
-          'Tea parties work especially well for mixed-age groups because guests can enjoy the experience at their own pace.',
-        ],
-      },
-      {
-        heading: 'Build the Celebration Around the Guest of Honor',
-        paragraphs: [
-          'A meaningful theme can come from a favorite color, flower, season, book, or travel memory. The goal is not to cover every surface with decorations, but to choose a few details that make the table feel personal.',
-          'Fresh flowers, handwritten place cards, a framed photograph, or a small keepsake at each setting can make the celebration feel carefully considered.',
-        ],
-      },
-      {
-        heading: 'Plan a Menu with Variety',
-        paragraphs: [
-          'A well-rounded tea party menu offers a balance of savory bites, fresh flavors, warm scones, desserts, and teas that guests can explore throughout the celebration.',
-          'Providing several smaller selections gives everyone a chance to discover a favorite while keeping the meal light, social, and easy to enjoy.',
-        ],
-      },
-      {
-        heading: 'Add One Memorable Activity',
-        paragraphs: [
-          'A single thoughtful activity can bring the group together without making the afternoon feel over-scheduled.',
-        ],
-        list: [
-          'Ask guests to write a birthday wish or favorite memory',
-          'Create a simple photo area near the tea table',
-          'Share a toast before dessert is served',
-          'Choose a tea for the table to taste together',
-          'Present a small group gift or memory book',
-        ],
-      },
-      {
-        heading: 'Celebrate at 1890 Tea House',
-        paragraphs: [
-          'With its historic downtown setting, handcrafted menu, specialty teas, and welcoming atmosphere, 1890 Tea House offers a distinctive place to celebrate birthdays of every kind.',
-          'Whether the occasion is a milestone birthday or simply a reason to gather, afternoon tea gives the day a slower rhythm and a little extra sparkle.',
-        ],
-      },
-    ],
-  },
-  {
-    slug: 'afternoon-tea-etiquette-a-simple-guide-for-first-time-guests',
-    title: 'Afternoon Tea Etiquette: A Simple Guide for First-Time Guests',
-    date: '2026-08-03',
-    dateDisplay: 'August 3, 2026',
-    excerpt:
-      'Afternoon tea is less about strict rules and more about slowing down, sharing the table, and enjoying each course with confidence.',
-    image: teaTradition,
-    imageAlt: 'Traditional afternoon tea service arranged with delicate china and flowers',
-    width: 1600,
-    height: 1600,
-    sections: [
-      {
-        paragraphs: [
-          'Trying afternoon tea for the first time can feel wonderfully exciting, but the beautiful china and tiered trays sometimes make guests wonder whether there are rules they are expected to know.',
-          'The good news is that afternoon tea is meant to be enjoyed. A few simple customs can help you feel comfortable, but thoughtful conversation and a relaxed pace matter far more than perfection.',
-        ],
-      },
-      {
-        heading: 'Start with the Tea',
-        paragraphs: [
-          'Take a moment to explore the tea selection and choose a flavor that fits your mood. Black teas tend to be bold and familiar, while green, floral, herbal, and fruit blends can offer lighter or more aromatic options.',
-          'Allow the tea to steep, then taste it before adding milk, lemon, or sweetener. This gives you a better sense of its natural flavor.',
-        ],
-      },
-      {
-        heading: 'How to Hold the Cup',
-        paragraphs: [
-          'Hold the handle gently rather than wrapping both hands around the cup. There is no need to lift or extend your pinky finger.',
-          'When you take a sip, bring the cup to you and return it to the saucer between sips. The goal is simply to move comfortably and avoid rushing.',
-        ],
-      },
-      {
-        heading: 'Enjoy the Food at Your Own Pace',
-        paragraphs: [
-          'Afternoon tea is often served with savory selections, scones, and sweets. Many guests begin with the savory items, continue with scones, and finish with dessert, but the experience does not need to feel rigid.',
-          'Take small portions, try different pairings, and give yourself time to enjoy the presentation as well as the flavors.',
-        ],
-      },
-      {
-        heading: 'Scones, Jam, and Clotted Cream',
-        paragraphs: [
-          'Break a scone into smaller pieces rather than cutting the entire scone like a sandwich. Add jam and clotted cream to each piece as you enjoy it.',
-          'Whether you prefer jam first or cream first is entirely up to you. The best method is the one that tastes best at your table.',
-        ],
-      },
-      {
-        heading: 'The Most Important Rule',
-        paragraphs: [
-          'Afternoon tea is a social experience. Put the phone away when you can, listen generously, and let the conversation unfold without watching the clock.',
-          'At 1890 Tea House, guests are invited to enjoy the tradition without feeling intimidated by it. Come curious, come comfortable, and let the table do the rest.',
-        ],
-      },
-    ],
-  },
-  {
-    slug: 'a-relaxing-afternoon-in-downtown-ocala-food-shopping-and-tea',
-    title: 'A Relaxing Afternoon in Downtown Ocala: Food, Shopping, and Tea',
-    date: '2026-07-31',
-    dateDisplay: 'July 31, 2026',
-    excerpt:
-      'Historic downtown Ocala offers an easygoing blend of local shopping, welcoming public spaces, and a memorable tea house experience.',
-    image: restaurantsOcala,
-    imageAlt: 'Tea, sandwiches, fruit, and sweets arranged for lunch in downtown Ocala',
-    width: 1145,
-    height: 763,
-    sections: [
-      {
-        paragraphs: [
-          'Some of the best afternoons are not built around a packed itinerary. They begin with a walk, a few interesting storefronts, and enough time to stop when something catches your attention.',
-          'Historic downtown Ocala is well suited for that kind of day. Its local businesses, public spaces, architecture, and dining options make it easy to turn a simple outing into a relaxed experience.',
-        ],
-      },
-      {
-        heading: 'Begin with a Leisurely Walk',
-        paragraphs: [
-          'Start by exploring the downtown area on foot. A slower pace gives you time to notice historic details, browse window displays, and decide where the afternoon should lead.',
-          'Downtown outings are especially enjoyable when the plan leaves room for discovery rather than moving from one reservation to the next.',
-        ],
-      },
-      {
-        heading: 'Browse Local Shops',
-        paragraphs: [
-          'Independent boutiques and specialty shops can make a downtown visit feel more personal than a traditional shopping trip. Look for gifts, clothing, home accents, art, and small treasures that reflect the character of the area.',
-          'Even a short browse can become part of the memory, especially when the day is shared with a friend or visiting family member.',
-        ],
-      },
-      {
-        heading: 'Pause for Lunch or Afternoon Tea',
-        paragraphs: [
-          'A visit to 1890 Tea House adds a distinctive centerpiece to the afternoon. Guests can settle into a welcoming setting and enjoy freshly prepared lunch selections, specialty teas, pastries, desserts, and other thoughtfully presented favorites.',
-          'The experience works equally well for a casual catch-up, a birthday outing, a mother-daughter afternoon, or a quiet break during a day downtown.',
-        ],
-      },
-      {
-        heading: 'Leave Time to Linger',
-        paragraphs: [
-          'The pleasure of a downtown afternoon often comes from not needing to hurry. Let lunch stretch a little longer, order another tea, or take a final walk before heading home.',
-          'A good outing should leave you refreshed rather than exhausted, with a few photographs, a favorite flavor, and a reason to return.',
-        ],
-      },
-      {
-        heading: 'Make 1890 Tea House Part of the Day',
-        paragraphs: [
-          'Located in historic downtown Ocala, 1890 Tea House brings together food, atmosphere, and hospitality in a setting designed for unhurried connection.',
-          'It is a natural stop for visitors exploring the area and for locals who want to rediscover their own downtown one cup at a time.',
-        ],
-      },
-    ],
-  },
-  {
-    slug: 'how-to-pair-tea-with-scones-sandwiches-and-desserts',
-    title: 'How to Pair Tea with Scones, Sandwiches, and Desserts',
-    date: '2026-07-29',
-    dateDisplay: 'July 29, 2026',
-    excerpt:
-      'The right tea pairing can brighten delicate sandwiches, balance rich desserts, and make a warm scone even more satisfying.',
-    image: scones,
-    imageAlt: 'Fresh scones with jam and clotted cream beside a cup of tea',
-    width: 1600,
-    height: 1067,
-    sections: [
-      {
-        paragraphs: [
-          'Tea pairing does not need to be complicated. Much like choosing a sauce or seasoning, the goal is to find flavors that complement one another without letting either the tea or the food disappear.',
-          'A few simple ideas can help you choose a cup that feels just right with savory sandwiches, warm scones, fruit, chocolate, or delicate pastries.',
-        ],
-      },
-      {
-        heading: 'Black Tea with Savory Bites',
-        paragraphs: [
-          'Full-bodied black teas pair naturally with tea sandwiches, cheese, charcuterie, and other savory selections. Their deeper flavor can stand beside richer ingredients without becoming lost.',
-          'English Breakfast and Earl Grey are familiar starting points for guests who want a classic afternoon tea pairing.',
-        ],
-      },
-      {
-        heading: 'Green and Floral Teas with Lighter Flavors',
-        paragraphs: [
-          'Green, jasmine, and floral teas work well with cucumber sandwiches, fruit, lighter pastries, and fresh salads. Their delicate character can brighten subtle ingredients rather than overpowering them.',
-          'These teas are especially refreshing when the menu includes citrus, herbs, berries, or soft cheeses.',
-        ],
-      },
-      {
-        heading: 'Scones Welcome Many Styles of Tea',
-        paragraphs: [
-          'Warm scones, jam, and clotted cream can pair with almost any favorite tea. A bold black tea balances the richness of the cream, while a fruit or floral blend can echo the sweetness of the jam.',
-          'Try a small sip after each bite and notice how the flavors change together. That little experiment is part of the fun.',
-        ],
-      },
-      {
-        heading: 'Dessert Pairings',
-        paragraphs: [
-          'Chocolate desserts often pair well with robust or spiced teas, while vanilla, lemon, and fruit desserts can shine beside lighter black, green, floral, or fruit-forward blends.',
-          'When a dessert is especially sweet, choose a tea with enough character to create contrast instead of adding more sweetness.',
-        ],
-      },
-      {
-        heading: 'Let Curiosity Choose the Cup',
-        paragraphs: [
-          'There is no single correct pairing. Personal taste matters, and sometimes the most memorable combination is the one you did not expect.',
-          'At 1890 Tea House, the table is an invitation to sample, compare, and find a new favorite at your own pace.',
-        ],
-      },
-    ],
-  },
-  {
     slug: 'tea-party-bridal-shower-ideas-create-a-celebration-everyone-will-remember',
     title: 'Tea Party Bridal Shower Ideas: Create a Celebration Everyone Will Remember',
     date: '2026-07-27',
@@ -307,12 +27,12 @@ export const journalPosts = [
       {
         heading: 'Why a Tea Party Makes the Perfect Bridal Shower',
         paragraphs: [
-          'A tea party bridal shower brings together elegance, conversation, and a relaxed atmosphere that is difficult to find at a traditional restaurant. Guests can slow down, enjoy one anotherâ€™s company, and celebrate the bride in a setting that is both intimate and sophisticated.',
+          'A tea party bridal shower brings together elegance, conversation, and a relaxed atmosphere that is difficult to find at a traditional restaurant. Guests can slow down, enjoy one another\u2019s company, and celebrate the bride in a setting that is both intimate and sophisticated.',
           'Whether you are planning a gathering for close family or a larger group of friends, a tea party creates a warm and welcoming environment for every generation.',
         ],
       },
       {
-        heading: 'Beautiful DÃ©cor Creates Lasting Memories',
+        heading: 'Beautiful D\u00E9cor Creates Lasting Memories',
         paragraphs: [
           'One of the best parts of a tea party bridal shower is the atmosphere. Think fresh flowers, vintage china, soft linens, elegant table settings, and beautiful presentation. The setting itself becomes part of the celebration and creates lovely photo opportunities for the bride and her guests.',
           'Simple touches like personalized place cards, floral centerpieces, and pastel colors can transform the event into something truly special.',
@@ -369,10 +89,10 @@ export const journalPosts = [
     sections: [
       {
         paragraphs: [
-          'When people search for restaurants in Ocala, they are often looking for more than a mealâ€”they are looking for an experience. Whether you are a local planning lunch with friends or a visitor exploring downtown Ocala, great food, a welcoming atmosphere, and something a little different can make all the difference.',
+          'When people search for restaurants in Ocala, they are often looking for more than a meal\u2014they are looking for an experience. Whether you are a local planning lunch with friends or a visitor exploring downtown Ocala, great food, a welcoming atmosphere, and something a little different can make all the difference.',
           'Located in the heart of historic downtown Ocala, 1890 Tea House offers a dining experience unlike any other in the area. While many restaurants focus on traditional lunch or dinner menus, 1890 combines fresh, homemade cuisine with an elegant yet comfortable setting that is perfect for relaxing with family and friends.',
           'Our menu features freshly prepared lunches, handcrafted desserts, signature teas, specialty drinks, charcuterie boards, and seasonal favorites. Stop in for a casual lunch, celebrate a birthday, meet friends for afternoon tea, or host a bridal or baby shower.',
-          'Downtown Ocala has become one of Central Floridaâ€™s favorite destinations for dining and shopping, and 1890 Tea House is proud to be part of that growing community. Guests often spend the day exploring local boutiques, parks, and events before enjoying lunch or afternoon tea in our historic setting.',
+          'Downtown Ocala has become one of Central Florida\u2019s favorite destinations for dining and shopping, and 1890 Tea House is proud to be part of that growing community. Guests often spend the day exploring local boutiques, parks, and events before enjoying lunch or afternoon tea in our historic setting.',
         ],
       },
       {
@@ -386,7 +106,7 @@ export const journalPosts = [
   },
   {
     slug: 'why-tea-houses-are-having-a-moment-and-why-it-makes-perfect-sense',
-    title: 'Why Tea Houses Are Having a Momentâ€”and Why It Makes Perfect Sense',
+    title: 'Why Tea Houses Are Having a Moment\u2014and Why It Makes Perfect Sense',
     date: '2026-06-29',
     dateDisplay: 'June 29, 2026',
     excerpt:
@@ -405,7 +125,7 @@ export const journalPosts = [
       {
         heading: 'The Rush Got Old',
         paragraphs: [
-          'There is a version of dining that most of us know too well. Order fast, eat faster, move on. It is efficient, but it does not leave you feeling much of anything except full. What people are reaching for now is the opposite: cozy, unhurried, and intentionalâ€”the kind of afternoon that feels like it actually happened.',
+          'There is a version of dining that most of us know too well. Order fast, eat faster, move on. It is efficient, but it does not leave you feeling much of anything except full. What people are reaching for now is the opposite: cozy, unhurried, and intentional\u2014the kind of afternoon that feels like it actually happened.',
           'A beautifully presented pot of tea and a three-tiered tray of carefully made bites fits that moment perfectly.',
         ],
       },
@@ -420,7 +140,7 @@ export const journalPosts = [
         heading: 'Social Media Loves a Tea Table',
         paragraphs: [
           'A three-tiered afternoon tea stand photographs beautifully: cheesecake-stuffed strawberries, warm scones with lemon curd, tiramisu truffles, delicate cucumber sandwiches, fine china, and a steaming pot of Earl Grey. It is more than food; it is a moment people genuinely want to share.',
-          'A friendâ€™s birthday tea, a Saturday ritual, or a tagged location in a gorgeous historic building can introduce the experience to people who might never have thought to book one.',
+          'A friend\u2019s birthday tea, a Saturday ritual, or a tagged location in a gorgeous historic building can introduce the experience to people who might never have thought to book one.',
         ],
       },
       {
@@ -433,7 +153,7 @@ export const journalPosts = [
       {
         heading: 'Ocala Needed This',
         paragraphs: [
-          'The Tri-County area has no shortage of places to grab food. What it needed was a place to slow down in styleâ€”a spot that feels like an occasion without requiring a two-hour drive. Bring your mother for her birthday, meet a friend you have not seen in months, or take a quiet hour for yourself with a good cup of tea and something sweet.',
+          'The Tri-County area has no shortage of places to grab food. What it needed was a place to slow down in style\u2014a spot that feels like an occasion without requiring a two-hour drive. Bring your mother for her birthday, meet a friend you have not seen in months, or take a quiet hour for yourself with a good cup of tea and something sweet.',
           'Start on the shaded patio for a courtyard-like afternoon, or reserve a private Tea Room and make it a proper occasion. Either way, the goal is to leave feeling that you gave yourself something worth having.',
         ],
       },
@@ -461,8 +181,8 @@ export const journalPosts = [
         heading: 'What Exactly Is a Scone?',
         paragraphs: [
           'Scones have been enjoyed for centuries. Their origins trace back to the United Kingdom, with early versions believed to have come from Scotland.',
-          'Originally, scones were made with oats, cooked on a griddle, and cut into wedgesâ€”more rustic, but just as satisfying. Over time, they evolved into the tender, buttery treats now associated with afternoon tea.',
-          'Even the pronunciation remains debated: some say â€œskone,â€ while others say â€œskoan.â€ Both are widely accepted depending on where you are.',
+          'Originally, scones were made with oats, cooked on a griddle, and cut into wedges\u2014more rustic, but just as satisfying. Over time, they evolved into the tender, buttery treats now associated with afternoon tea.',
+          'Even the pronunciation remains debated: some say \u201Cskone,\u201D while others say \u201Cskoan.\u201D Both are widely accepted depending on where you are.',
         ],
       },
       {
@@ -516,7 +236,7 @@ export const journalPosts = [
       {
         paragraphs: [
           'In a world that moves faster than ever, where meals are rushed, conversations are cut short, and moments slip by unnoticed, a quiet, elegant revival is underway. Tea time, once considered a tradition of the past, is making a comeback.',
-          'But this return is not just about tea. It is about something deeperâ€”something we did not realize we were missing.',
+          'But this return is not just about tea. It is about something deeper\u2014something we did not realize we were missing.',
         ],
       },
       {
@@ -530,7 +250,7 @@ export const journalPosts = [
         heading: 'More Than a Tradition: An Experience',
         paragraphs: [
           'Historically, tea time was rooted in elegance and ritual. It was not simply about what was served, but how it was served: beautiful teacups, carefully prepared bites, and a setting that made the moment feel special.',
-          'Today that spirit is being reimagined as welcoming and accessibleâ€”a chance to step out of the everyday and into something more thoughtful. It is no longer reserved for special occasions; it becomes the occasion.',
+          'Today that spirit is being reimagined as welcoming and accessible\u2014a chance to step out of the everyday and into something more thoughtful. It is no longer reserved for special occasions; it becomes the occasion.',
         ],
       },
       {
@@ -568,7 +288,7 @@ export const journalPosts = [
     date: '2026-01-29',
     dateDisplay: 'January 29, 2026',
     excerpt:
-      'From historic gatherings to Kashmiri Noon Chai and modern cafÃ© culture, pink tea carries stories of connection and community.',
+      'From historic gatherings to Kashmiri Noon Chai and modern caf\u00E9 culture, pink tea carries stories of connection and community.',
     image: pinkTea,
     imageAlt: 'Pink tea served in a glass cup beside flowers',
     width: 1374,
@@ -576,7 +296,7 @@ export const journalPosts = [
     sections: [
       {
         paragraphs: [
-          'Pink tea is more than a pretty drink; it is a symbol of connection, culture, and community. From historical gatherings that shaped womenâ€™s rights to modern bubble tea favorites loved for their color and flavor, pink tea stands out as one of tea cultureâ€™s most distinctive beverages.',
+          'Pink tea is more than a pretty drink; it is a symbol of connection, culture, and community. From historical gatherings that shaped women\u2019s rights to modern bubble tea favorites loved for their color and flavor, pink tea stands out as one of tea culture\u2019s most distinctive beverages.',
           'At 1890 Tea House, we enjoy celebrating tea not only for its taste, but for the stories and traditions behind it.',
         ],
       },
@@ -584,14 +304,14 @@ export const journalPosts = [
         heading: 'What Is Pink Tea?',
         paragraphs: [
           'Pink tea can be fruity, floral, creamy, or beautifully traditional. Depending on the ingredients and style, it may be a hibiscus or berry blend, a floral rose tea, a creamy milk tea with boba, or a traditional drink with deep cultural roots such as Kashmiri Pink Tea, also known as Noon Chai.',
-          'In modern tea houses and cafÃ©s, pink tea often feels comforting, playful, and photo-worthy, but it also carries history and meaning.',
+          'In modern tea houses and caf\u00E9s, pink tea often feels comforting, playful, and photo-worthy, but it also carries history and meaning.',
         ],
       },
       {
-        heading: 'Pink Tea and Womenâ€™s History',
+        heading: 'Pink Tea and Women\u2019s History',
         paragraphs: [
-          'During the womenâ€™s suffrage movement, tea gatherings were often seen as harmless social traditions. In many cases they became something more meaningful: a chance for women to gather, share information, and organize while equal rights were still being fought for.',
-          'Some â€œPink Teaâ€ gatherings were held under the guise of social tea while quietly supporting conversations about womenâ€™s rights and equality. Tea became a setting for community, confidence, and shared purpose.',
+          'During the women\u2019s suffrage movement, tea gatherings were often seen as harmless social traditions. In many cases they became something more meaningful: a chance for women to gather, share information, and organize while equal rights were still being fought for.',
+          'Some \u201CPink Tea\u201D gatherings were held under the guise of social tea while quietly supporting conversations about women\u2019s rights and equality. Tea became a setting for community, confidence, and shared purpose.',
         ],
       },
       {
@@ -603,7 +323,7 @@ export const journalPosts = [
       {
         heading: 'Pink Tea Today',
         paragraphs: [
-          'Today, pink tea often represents something lighthearted and joyfulâ€”a drink that feels welcoming and easy to enjoy. Pink drinks are often made with strawberry, raspberry, rose, lychee, guava, or hibiscus and can be customized with sweetness, milk, and toppings.',
+          'Today, pink tea often represents something lighthearted and joyful\u2014a drink that feels welcoming and easy to enjoy. Pink drinks are often made with strawberry, raspberry, rose, lychee, guava, or hibiscus and can be customized with sweetness, milk, and toppings.',
           'Pink tea has become a symbol of creativity, comfort, and inclusivity while remaining connected to the traditions that came before it.',
         ],
       },
