@@ -152,9 +152,9 @@ function ReservationsHero() {
         <div className="reservations-hero__copy">
           <p className="page-eyebrow">Reservations</p>
           <h1>Choose the gathering you have in mind.</h1>
-          <p>Planning a visit to 1890 Tea House is simple. Parties of 1ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Å“14 guests can choose an available date and time directly through Toast. For groups of 15 or more, use the large-party request form so the Tea House team can review your date, guest count, seating needs, and gathering details.</p>
+          <p>Planning a visit to 1890 Tea House is simple. Parties of 1-14 guests can choose an available date and time directly through Toast. For groups of 15 or more, use the large-party request form so the Tea House team can review your date, guest count, seating needs, and gathering details.</p>
           <nav className="reservations-hero__actions" aria-label="Reservation options">
-            <ExternalLink className="page-button" href={business.reservationUrl} ariaLabel="Reserve a Table for 1ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Å“14 Guests with Toast">Reserve 1ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Å“14 Guests with Toast</ExternalLink>
+            <ExternalLink className="page-button" href={business.reservationUrl} ariaLabel="Reserve a Table for 1-14 Guests with Toast">Reserve 1-14 Guests with Toast</ExternalLink>
             <Link className="page-button reservations-hero__secondary" to="/tea-rooms">Explore Tea Rooms</Link>
             <Link className="page-text-link" to="/reservations#large-party">Plan a Gathering for 15+</Link>
           </nav>
@@ -191,7 +191,7 @@ function CTA() {
       <h2>Tea tastes better when there is time for it.</h2>
       <div className="page-actions">
         <a className="page-button" href={business.reservationUrl} target="_blank" rel="noreferrer">
-          Reserve for 1ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Å“14 guests <span className="sr-only">(opens in a new tab)</span>
+          Reserve for 1-14 guests <span className="sr-only">(opens in a new tab)</span>
         </a>
         <Link className="page-text-link" to="/reservations#large-party">Plan for 15+</Link>
       </div>
@@ -202,7 +202,7 @@ function CTA() {
 function ExternalLink({ href, children, className = '', ariaLabel }) {
   return (
     <a className={className} href={href} target="_blank" rel="noreferrer" aria-label={ariaLabel}>
-      {children} <span aria-hidden="true">ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â€</span><span className="sr-only"> (opens in a new tab)</span>
+      {children}<span className="sr-only"> (opens in a new tab)</span>
     </a>
   );
 }
@@ -229,10 +229,10 @@ function Modal({ children, label, onClose, onPrevious, onNext }) {
     <div className="page-lightbox" role="dialog" aria-modal="true" aria-label={label} onMouseDown={(event) => {
       if (event.target === event.currentTarget) onClose();
     }}>
-      <button ref={closeRef} className="page-lightbox__close" type="button" onClick={onClose} aria-label="Close viewer">ÃƒÆ’Ã¢â‚¬â€</button>
-      {onPrevious ? <button className="page-lightbox__previous" type="button" onClick={onPrevious} aria-label="Previous image">ÃƒÂ¢Ã¢â‚¬Â Ã‚Â</button> : null}
+      <button ref={closeRef} className="page-lightbox__close" type="button" onClick={onClose} aria-label="Close viewer">X</button>
+      {onPrevious ? <button className="page-lightbox__previous" type="button" onClick={onPrevious} aria-label="Previous image">Prev</button> : null}
       {children}
-      {onNext ? <button className="page-lightbox__next" type="button" onClick={onNext} aria-label="Next image">ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢</button> : null}
+      {onNext ? <button className="page-lightbox__next" type="button" onClick={onNext} aria-label="Next image">Next</button> : null}
     </div>
   );
 }
@@ -275,8 +275,8 @@ export function MenusPage() {
   const move = (offset) => setActive(menus[(activeIndex + offset + menus.length) % menus.length]);
   return (
     <PageShell>
-      <Meta title="Menus" description="Explore every current 1890 Tea House menu, including afternoon tea, lunch, charcuterie, tea, coffee, wine, and childrenÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s selections." path="/menus" image={menus[0].image} schema={[breadcrumbSchema([['Home', '/'], ['Menus', '/menus']])]} />
-      <PageHero eyebrow="From the kitchen" title="Simple. Fresh. Beautiful." intro="Our menus are designed to pair with tea, wine, coffee, or a sparkling refreshmentÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Âfresh ingredients, elegant flavors, and a touch of indulgence." image="sandwiches" />
+      <Meta title="Menus" description="Explore every current 1890 Tea House menu, including afternoon tea, lunch, charcuterie, tea, coffee, wine, and children's selections." path="/menus" image={menus[0].image} schema={[breadcrumbSchema([['Home', '/'], ['Menus', '/menus']])]} />
+      <PageHero eyebrow="From the kitchen" title="Simple. Fresh. Beautiful." intro="Our menus are designed to pair with tea, wine, coffee, or a sparkling refreshment - fresh ingredients, elegant flavors, and a touch of indulgence." image="sandwiches" />
       <section className="page-section">
         <SectionTitle eyebrow="Current menu boards" title="Open, enlarge, or download every menu.">
           Select a menu to view it at a readable size. Offerings and prices may change as seasonal specialties and new pairings arrive.
@@ -309,7 +309,7 @@ export function MenusPage() {
         <Modal label={`${active.title} menu viewer`} onClose={() => setActive(null)} onPrevious={() => move(-1)} onNext={() => move(1)}>
           <figure className="page-lightbox__figure page-lightbox__figure--menu">
             <img src={active.image} alt={active.imageAlt} width={active.width} height={active.height} />
-            <figcaption>{active.title} Ãƒâ€šÃ‚Â· Use arrow keys for other menus</figcaption>
+            <figcaption>{active.title}  |  Use arrow keys for other menus</figcaption>
           </figure>
         </Modal>
       ) : null}
@@ -336,7 +336,7 @@ export function EventsPage() {
   return (
     <PageShell>
       <Meta title="Events" description="See current public events and plan a private celebration at 1890 Tea House in downtown Ocala." path="/events" image={events[0].image} schema={[...eventSchemas, breadcrumbSchema([['Home', '/'], ['Events', '/events']])]} />
-      <PageHero eyebrow="Events and catering" title="Bring the occasion. WeÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ll set the scene." intro="From bridal showers and birthdays to book clubs and business meetings, our Tea Rooms and patio make gatherings warm, elegant, and memorable." image={imageLibrary.board} actions={<Link className="page-button" to="/reservations#large-party">Plan a private event</Link>} />
+      <PageHero eyebrow="Events and catering" title="Bring the occasion. We'll set the scene." intro="From bridal showers and birthdays to book clubs and business meetings, our Tea Rooms and patio make gatherings warm, elegant, and memorable." image={imageLibrary.board} actions={<Link className="page-button" to="/reservations#large-party">Plan a private event</Link>} />
       <section className="page-section">
         <SectionTitle eyebrow="Public events" title="Around the tea table." />
         <div className="page-events-grid">
@@ -345,7 +345,7 @@ export function EventsPage() {
               <OptimizedImage src={event.image} alt={event.imageAlt} width={event.width} height={event.height} sizes="(max-width: 800px) 100vw, 45vw" />
               <div>
                 <span className="page-status">{eventStatus(event)}</span>
-                <p>{event.dateDisplay} Ãƒâ€šÃ‚Â· {event.timeDisplay}</p>
+                <p>{event.dateDisplay}  |  {event.timeDisplay}</p>
                 <h2>{event.title}</h2>
                 <p>{event.description}</p>
                 <dl><div><dt>Location</dt><dd>{event.location}</dd></div><div><dt>Special</dt><dd>{event.offer}</dd></div></dl>
@@ -415,7 +415,7 @@ export function LargePartyForm() {
     const form = event.currentTarget;
     if (submittingRef.current || isSubmitting) return;
 
-    setStatus({ type: 'validating', message: 'Checking your requestÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¦', requestId: '' });
+    setStatus({ type: 'validating', message: 'Checking your request\u2026', requestId: '' });
     if (!form.reportValidity()) {
       setStatus({
         type: 'validation-error',
@@ -605,7 +605,7 @@ export function TeaRoomsPage() {
           Meet friends, celebrate a milestone, host a book club or business gathering, or simply take a quiet break.
         </SectionTitle>
         <div className="page-room-grid">
-          {displayRooms.map((room) => <article key={room.id}><OptimizedImage src={room.image} alt={room.imageAlt} width={room.width} height={room.height} sizes="(max-width: 700px) 100vw, 32vw" /><div><h2>{room.label}</h2><p>{room.description}</p><ul>{room.uses.map((use) => <li key={use}>{use}</li>)}</ul><Link className="page-text-link" to="/reservations">Reservation options ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢</Link></div></article>)}
+          {displayRooms.map((room) => <article key={room.id}><OptimizedImage src={room.image} alt={room.imageAlt} width={room.width} height={room.height} sizes="(max-width: 700px) 100vw, 32vw" /><div><h2>{room.label}</h2><p>{room.description}</p><ul>{room.uses.map((use) => <li key={use}>{use}</li>)}</ul><Link className="page-text-link" to="/reservations">Reservation options </Link></div></article>)}
         </div>
         <p className="page-source-note">The source site does not publish individual room names, capacities, pricing, or guaranteed availability, so none are implied here.</p>
       </section>
@@ -619,7 +619,7 @@ export function NewsPage() {
   return (
     <PageShell>
       <Meta title="News" description="Read original announcements and updates from 1890 Tea House." path="/news" image={news[0].image} schema={[breadcrumbSchema([['Home', '/'], ['News', '/news']])]} />
-      <PageHero eyebrow="News from 1890" title="WhatÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s happening around the house." intro="Original announcements, website updates, and thoughtful notes from the Tea House team." image="building" />
+      <PageHero eyebrow="News from 1890" title="What's happening around the house." intro="Original announcements, website updates, and thoughtful notes from the Tea House team." image="building" />
       <section className="page-section page-press-grid">
         {news.map((item, itemIndex) => (
           <article key={item.slug || item.href || `${item.headline || 'news'}-${item.date || itemIndex}`}>
@@ -627,10 +627,10 @@ export function NewsPage() {
               <OptimizedImage src={item.image} alt={item.imageAlt} width={item.width} height={item.height} sizes="(max-width: 720px) 100vw, (max-width: 1000px) 50vw, 33vw" />
             </div>
             <div className="page-press-content">
-              <p>{item.category} Ãƒâ€šÃ‚Â· <time dateTime={item.date}>{item.dateDisplay}</time></p>
+              <p>{item.category}  |  <time dateTime={item.date}>{item.dateDisplay}</time></p>
               <h2>{item.headline}</h2>
               <p>{item.summary}</p>
-              <Link className="page-text-link" to={`/news/${item.slug}`}>Read update ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢</Link>
+              <Link className="page-text-link" to={`/news/${item.slug}`}>Read update </Link>
             </div>
           </article>
         ))}
@@ -731,7 +731,7 @@ export function JournalPage() {
       <Meta title="Tea House Journal" description="Read original 1890 Tea House stories about tea culture, hosting, celebrations, and the art of taking your time." path="/journal" image={posts[0].image} schema={[breadcrumbSchema([['Home', '/'], ['Journal', '/journal']])]} />
       <PageHero eyebrow="The 1890 Journal" title="Original stories for slower moments." intro="First-party notes on tea culture, gracious hosting, thoughtful gatherings, and the pleasure of taking your time." image="service" className="journal-hero" />
       <section className="page-section page-journal-grid">
-        {posts.map((post) => <article key={post.slug}><Link to={`/journal/${post.slug}`}><OptimizedImage src={post.image} alt={post.imageAlt} width={post.width} height={post.height} sizes="(max-width: 700px) 100vw, 31vw" /><div><time dateTime={post.date}>{post.dateDisplay}</time><h2>{post.title}</h2><p>{post.excerpt}</p><strong>Read article ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢</strong></div></Link></article>)}
+        {posts.map((post) => <article key={post.slug}><Link to={`/journal/${post.slug}`}><OptimizedImage src={post.image} alt={post.imageAlt} width={post.width} height={post.height} sizes="(max-width: 700px) 100vw, 31vw" /><div><time dateTime={post.date}>{post.dateDisplay}</time><h2>{post.title}</h2><p>{post.excerpt}</p><strong>Read article </strong></div></Link></article>)}
       </section>
       <CTA />
     </PageShell>
@@ -838,7 +838,7 @@ export function ContactForm() {
     const form = event.currentTarget;
 
     if (submittingRef.current || isSubmitting) return;
-    setStatus({ type: 'validating', message: 'Checking your inquiryÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¦', requestId: '' });
+    setStatus({ type: 'validating', message: 'Checking your inquiry\u2026', requestId: '' });
     if (!form.reportValidity()) {
       setStatus({
         type: 'validation-error',
@@ -964,10 +964,11 @@ export function CareersPage() {
         <div className="page-prose">
           <p>The current application asks about availability, weekend and holiday scheduling, customer-service and food-handling experience, POS familiarity, comfort carrying trays and standing for a shift, certifications, education, references, and work authorization.</p>
           <p>Resume upload and the complete employment certification remain in the current secure application workflow.</p>
+          <p>By submitting this application, you agree to the terms and conditions outlined in the employment contract.</p>
           <Link className="page-button" to={business.applicationUrl}>Open the server application</Link>
         </div>
       </section>
-      <section className="page-section page-note"><h2>Before you apply</h2><p>Have your employment history, availability, two references, certifications, and rÃƒÆ’Ã‚Â©sumÃƒÆ’Ã‚Â© ready. The application also includes consent for a background check and a signed accuracy certification.</p></section>
+      <section className="page-section page-note"><h2>Before you apply</h2><p>Have your employment history, availability, two references, certifications, and resume ready. The application also includes consent for a background check and a signed accuracy certification.</p></section>
     </PageShell>
   );
 }
@@ -983,11 +984,11 @@ export function LegalPage({ type }) {
         {privacy ? <>
           <p>1890 Tea House respects your privacy and is committed to protecting the information you choose to share.</p>
           <h2>Information we collect</h2><p>We may collect your name, email address, phone number, reservation or event details, and messages when you use a contact, reservation, or inquiry form.</p>
-          <h2>How information is used</h2><p>Information is used to confirm reservations, respond to questions, manage event inquiries, andÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Âwhen requestedÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Âsend menu or event updates. 1890 Tea House does not sell, rent, or share personal information except when required by law.</p>
+          <h2>How information is used</h2><p>Information is used to confirm reservations, respond to questions, manage event inquiries, and when requested send menu or event updates. 1890 Tea House does not sell, rent, or share personal information except when required by law.</p>
           <h2>Cookies and analytics</h2><p>The website may use basic cookies or analytics to understand traffic and improve the visitor experience. Third-party reservation, map, and social services have their own privacy practices.</p>
           <h2>Your choices</h2><p>You may unsubscribe from updates or request removal of your information by emailing <a href={`mailto:${business.email}`}>{business.email}</a>.</p>
         </> : <>
-          <h2>Reservations</h2><p>Private Tea Rooms require advance booking. A deposit may be required and may be nonrefundable when a reservation is cancelled with less than 24 hoursÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ notice. Large-party requirements shown on the Reservations page also apply.</p>
+          <h2>Reservations</h2><p>Private Tea Rooms require advance booking. A deposit may be required and may be nonrefundable when a reservation is cancelled with less than 24 hours notice. Large-party requirements shown on the Reservations page also apply.</p>
           <h2>Menu and pricing</h2><p>Menu items and pricing may change seasonally. Applicable taxes and service fees may be added.</p>
           <h2>Allergies and dietary needs</h2><p>Please share allergies or dietary needs in advance. Although the team will do its best to accommodate requests, an allergen-free environment cannot be guaranteed.</p>
           <h2>Website content</h2><p>Text, imagery, branding, and other content on this website are owned by or licensed to 1890 Tea House and may not be reproduced without permission.</p>
