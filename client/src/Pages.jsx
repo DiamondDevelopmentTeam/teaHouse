@@ -150,11 +150,11 @@ function ReservationsHero() {
         <div className="reservations-hero__copy">
           <p className="page-eyebrow">Reservations</p>
           <h1>Choose the gathering you have in mind.</h1>
-          <p>Settle into a cozy Tea Room or the welcoming patio for a birthday, catch-up, small gathering, or an unhurried pot of tea.</p>
+          <p>Planning a visit to 1890 Tea House is simple. Parties of 1–14 guests can choose an available date and time directly through Toast. For groups of 15 or more, use the large-party request form so the Tea House team can review your date, guest count, seating needs, and gathering details.</p>
           <nav className="reservations-hero__actions" aria-label="Reservation options">
-            <ExternalLink className="page-button" href={business.reservationUrl}>Reserve a Table</ExternalLink>
-            <Link className="page-button reservations-hero__secondary" to="/tea-rooms">Reserve a Tea Room</Link>
-            <Link className="page-text-link" to="/reservations#large-party">Plan a Gathering for 12+</Link>
+            <ExternalLink className="page-button" href={business.reservationUrl}>Reserve 1–14 Guests with Toast</ExternalLink>
+            <Link className="page-button reservations-hero__secondary" to="/tea-rooms">Explore Tea Rooms</Link>
+            <Link className="page-text-link" to="/reservations#large-party">Plan a Gathering for 15+</Link>
           </nav>
         </div>
         <figure className="reservations-hero__media">
@@ -189,9 +189,9 @@ function CTA() {
       <h2>Tea tastes better when there is time for it.</h2>
       <div className="page-actions">
         <a className="page-button" href={business.reservationUrl} target="_blank" rel="noreferrer">
-          Reserve for 1–11 guests <span className="sr-only">(opens in a new tab)</span>
+          Reserve for 1–14 guests <span className="sr-only">(opens in a new tab)</span>
         </a>
-        <Link className="page-text-link" to="/reservations#large-party">Plan for 12+</Link>
+        <Link className="page-text-link" to="/reservations#large-party">Plan for 15+</Link>
       </div>
     </section>
   );
@@ -253,21 +253,11 @@ export function AboutPage() {
         <OptimizedImage src={patio} alt="The black, white, and pink Tea House and patio" width={1200} height={1600} sizes="(max-width: 800px) 100vw, 46vw" />
         <div className="page-prose">
           <p className="page-eyebrow">Rooted in history</p>
-
           <h2>A landmark setting with a fresh chapter.</h2>
-          <p>1890 Tea House is located inside Diamond Suites Downtown Ocala, surrounded by history, character, and the unmistakable architecture of the black, white, and pink house on Silver Springs Boulevard.</p>
-          <p>That historic backdrop now frames a modern interpretation of traditional tea service, with thoughtfully prepared food, curated drinks, private rooms, and an outdoor patio that feels like a small garden retreat.</p>
-
-          <h2>A house made for lingering.</h2>
-          <p>Every part of the experience is designed to invite guests to slow down. Settle in with a pot of tea, meet a friend for lunch, share a board over conversation, or stay for dessert without feeling rushed.</p>
-
+          <p>1890 Tea House is located inside the Diamond Suites Downtown Ocala, surrounded by history and character. Timeless architecture frames a modern interpretation of traditional tea service, while the outdoor patio feels like a small garden retreat.</p>
           <h2>For gatherings big and small.</h2>
-          <p>Private Tea Rooms and outdoor spaces welcome bridal showers, birthdays, book clubs, business gatherings, family visits, and the everyday pleasure of meeting someone you have not seen in a while.</p>
-          <p>Guests can build an occasion around tea sandwiches, charcuterie, pastries, desserts, tea service, coffee, wine, and other selections from the current menu.</p>
-
-          <h2>Hospitality with an Ocala point of view.</h2>
-          <p>The experience pairs tea-house tradition with approachable flavor and a warm neighborhood welcome. Thoughtful service, memorable rooms, and a menu made for sharing give each visit its own rhythm.</p>
-          <p>Whether the plan is a quiet cup, a leisurely meal, or a room filled with people worth celebrating, 1890 is a place to arrive, settle in, and take your time.</p>
+          <p>Private Tea Rooms and outdoor spaces welcome bridal showers, birthdays, book clubs, business gatherings, and the everyday pleasure of meeting a friend.</p>
+          <p>The experience pairs tea-house tradition with Ocala flavor: gourmet but approachable plates, boards, pastries, and gracious hospitality.</p>
         </div>
       </section>
       <CTA />
@@ -491,7 +481,7 @@ export function LargePartyForm() {
       <label>Email<input type="email" name="email" autoComplete="email" maxLength="254" required /></label>
       <label>Requested date<input type="date" name="date" required /></label>
       <label>Requested time<input type="time" name="time" required /></label>
-      <label>Number of guests<input type="number" name="guests" min="12" max="22" required /></label>
+      <label>Number of guests<input type="number" name="guests" min="15" max="22" required /></label>
       <label>Occasion or reservation type<select name="occasion" defaultValue="" required><option value="" disabled>Select one</option><option>Tea Room</option><option>Wedding event</option><option>Private event</option><option>Birthday</option><option>Book club</option><option>Business gathering</option><option>Other</option></select></label>
       <fieldset><legend>Optional pre-order interests</legend>
         {['Charcuterie boards', 'Tea sandwiches', 'Desserts', 'Tea service for the table'].map((item) => <label className="page-check" key={item}><input type="checkbox" name="preOrders" value={item} />{item}</label>)}
@@ -535,11 +525,11 @@ export function LargePartyForm() {
 export function ReservationsPage() {
   return (
     <PageShell>
-      <Meta title="Reservations" description="Reserve at 1890 Tea House, review large-party policies, and request Tea Room or patio seating for groups of 12 or more." path="/reservations" image={teaServiceFeature} schema={[breadcrumbSchema([['Home', '/'], ['Reservations', '/reservations']])]} />
+      <Meta title="Reservations" description="Reserve at 1890 Tea House, review large-party policies, and request Tea Room or patio seating for groups of 15 or more." path="/reservations" image={teaServiceFeature} schema={[breadcrumbSchema([['Home', '/'], ['Reservations', '/reservations']])]} />
       <ReservationsHero />
       <section className="page-section page-large-party" id="large-party">
         <div>
-          <SectionTitle eyebrow="Groups of 12 or more" title="Plan the table together.">
+          <SectionTitle eyebrow="Groups of 15 or more" title="Plan the table together.">
             Seating may be arranged in a Tea Room or on the outdoor patio depending on availability. Special requests are welcome.
           </SectionTitle>
           <h3>Pre-order options</h3>
@@ -563,16 +553,57 @@ export function ReservationsPage() {
 
 export function TeaRoomsPage() {
   const rooms = contentService.getTeaRooms();
+
+  const privateTeaRoom = rooms.find((room) => /private.*tea.*room/i.test(room.label))
+    || rooms.find((room) => /private/i.test(room.label));
+  const gatheringSpace = rooms.find((room) => /gather/i.test(room.label));
+
+  const displayRooms = rooms.map((room) => {
+    if (privateTeaRoom && gatheringSpace && room.id === privateTeaRoom.id) {
+      return {
+        ...room,
+        image: gatheringSpace.image,
+        imageAlt: gatheringSpace.imageAlt,
+        width: gatheringSpace.width,
+        height: gatheringSpace.height,
+      };
+    }
+
+    if (privateTeaRoom && gatheringSpace && room.id === gatheringSpace.id) {
+      return {
+        ...room,
+        image: privateTeaRoom.image,
+        imageAlt: privateTeaRoom.imageAlt,
+        width: privateTeaRoom.width,
+        height: privateTeaRoom.height,
+      };
+    }
+
+    if (/outdoor|patio/i.test(room.label)) {
+      return {
+        ...room,
+        image: patio,
+        imageAlt: 'The black, white, and pink 1890 Tea House outdoor patio',
+        width: 1200,
+        height: 1600,
+      };
+    }
+
+    return room;
+  });
+
+  const heroRoom = displayRooms[0] || rooms[0];
+
   return (
     <PageShell>
-      <Meta title="Tea Rooms" description="Explore private Tea Rooms and patio gathering spaces at 1890 Tea House." path="/tea-rooms" image={rooms[0].image} schema={[breadcrumbSchema([['Home', '/'], ['Tea Rooms', '/tea-rooms']])]} />
-      <PageHero eyebrow="Tea Rooms" title="Experience the charm of 1890." intro="Step into a place where tea time becomes an experience. Every room invites guests to slow down, sip, savor, and enjoy a timeless tradition." image={{ src: rooms[0].image, alt: rooms[0].imageAlt, width: rooms[0].width, height: rooms[0].height }} actions={<Link className="page-button" to="/reservations">Reserve a room</Link>} />
+      <Meta title="Tea Rooms" description="Explore private Tea Rooms and patio gathering spaces at 1890 Tea House." path="/tea-rooms" image={heroRoom.image} schema={[breadcrumbSchema([['Home', '/'], ['Tea Rooms', '/tea-rooms']])]} />
+      <PageHero eyebrow="Tea Rooms" title="Experience the charm of 1890." intro="Step into a place where tea time becomes an experience. Every room invites guests to slow down, sip, savor, and enjoy a timeless tradition." image={{ src: heroRoom.image, alt: heroRoom.imageAlt, width: heroRoom.width, height: heroRoom.height }} actions={<Link className="page-button" to="/reservations">Reserve a room</Link>} />
       <section className="page-section">
         <SectionTitle eyebrow="Gather your way" title="Private rooms, cozy spaces, and a welcoming patio.">
           Meet friends, celebrate a milestone, host a book club or business gathering, or simply take a quiet break.
         </SectionTitle>
         <div className="page-room-grid">
-          {rooms.map((room) => <article key={room.id}><OptimizedImage src={room.image} alt={room.imageAlt} width={room.width} height={room.height} sizes="(max-width: 700px) 100vw, 32vw" /><div><h2>{room.label}</h2><p>{room.description}</p><ul>{room.uses.map((use) => <li key={use}>{use}</li>)}</ul><Link className="page-text-link" to="/reservations">Reservation options →</Link></div></article>)}
+          {displayRooms.map((room) => <article key={room.id}><OptimizedImage src={room.image} alt={room.imageAlt} width={room.width} height={room.height} sizes="(max-width: 700px) 100vw, 32vw" /><div><h2>{room.label}</h2><p>{room.description}</p><ul>{room.uses.map((use) => <li key={use}>{use}</li>)}</ul><Link className="page-text-link" to="/reservations">Reservation options →</Link></div></article>)}
         </div>
         <p className="page-source-note">The source site does not publish individual room names, capacities, pricing, or guaranteed availability, so none are implied here.</p>
       </section>
@@ -904,7 +935,7 @@ export function ContactPage() {
       <PageHero eyebrow="Contact" title="Come take your time." intro="Plan a visit, ask a question, or tell the team what you have in mind for your next gathering." image="building" />
       <section className="page-section page-contact-layout">
         <div className="page-contact-details">
-          <h2>Visit 1890</h2>
+          <h2>Visit 1890 Teahouse</h2>
           <address>{business.address.street}<br />{business.address.locality}, {business.address.region} {business.address.postalCode}</address>
           <a href={business.phoneHref}>{business.phone}</a>
           <a href={`mailto:${business.email}`}>{business.email}</a>

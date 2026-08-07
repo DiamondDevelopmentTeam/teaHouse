@@ -4430,237 +4430,908 @@ body,
   }
 }
 
-/* Keep the original hero styling, but give the headline more weight. */
-.hero h1 {
-  font-weight: 500;
+
+
+/* =========================================================
+   TEAM FEEDBACK UPDATE · AUGUST 2026
+   Larger logo, larger type, clearer reservation thresholds,
+   and black text on pink-backed content areas.
+   ========================================================= */
+
+/* Give the header logo substantially more presence on larger screens. */
+.site-header {
+  height: 7.35rem;
 }
 
-.hero h1 em {
-  font-weight: 600;
+.site-header.is-scrolled {
+  height: 5.55rem;
 }
 
-/* Strengthen Bodoni display text so its fine strokes remain readable. */
-.hero h1,
-.story-heading h2,
-.experience-intro h2,
-.rooms h2,
-.menu-heading h2,
-.events-copy h2,
-.notes-heading h2,
-.faq h2,
-.visit-details h2,
-.closing-cta h2,
-.page-hero h1,
-.journal-article h1,
-.application-hero h1 {
-  font-weight: 600;
-  -webkit-text-stroke: 0.16px currentColor;
-  text-rendering: geometricPrecision;
+.header-inner {
+  grid-template-columns: minmax(19rem, 22rem) 1fr auto;
+  gap: clamp(1.25rem, 2.5vw, 3rem);
 }
 
-.hero h1 em,
-.story h2 em,
-.rooms h2 em {
-  font-weight: 600;
-  -webkit-text-stroke: 0.18px currentColor;
+.site-header .brand-mark {
+  width: clamp(20rem, 21vw, 23rem);
 }
 
-.story-copy .story-lead,
-.story-copy blockquote,
+.site-header .brand-mark img {
+  height: 6.45rem;
+}
+
+.site-header .brand-mark--compact {
+  width: 16.75rem;
+}
+
+.site-header .brand-mark--compact img {
+  height: 4.95rem;
+}
+
+.hero {
+  padding-top: 7.35rem;
+}
+
+/* Slightly larger interface type for an older-skewing audience. */
+body {
+  font-size: 18px;
+  line-height: 1.68;
+}
+
+.primary-nav a {
+  font-size: 0.82rem;
+  letter-spacing: 0.085em;
+}
+
+.header-reserve,
+.menu-toggle {
+  font-size: 0.8rem;
+}
+
+.eyebrow,
+.button,
+.text-link,
+.press-feature > span,
+.footer-nav > p,
+.footer-visit > p,
+.footer-socials a {
+  font-size: 0.82rem;
+}
+
+.hero-intro {
+  max-width: 38rem;
+  font-size: clamp(1.14rem, 1.4vw, 1.34rem);
+  line-height: 1.72;
+}
+
+.story-copy > p,
+.experience-intro-lead,
+.experience-grid p,
+.menu-heading > p:last-child,
+.rooms-lead,
+.events-copy > p,
+.event-types p,
+.notes-heading > p,
+.press-feature p,
+.faq-intro > p,
+.faq-answer p,
+.closing-cta-copy > p {
+  font-size: clamp(1.08rem, 1.2vw, 1.2rem);
+  line-height: 1.72;
+}
+
 .experience-grid h3,
-.menu-list-title h3,
-.service-ledger h3,
-.event-types h3,
-.press-feature h3,
-.journal-title h3,
-.journal strong,
-.faq-item > button,
-.visit-address p,
-.hero-image-label span,
+.event-types h3 {
+  font-size: clamp(1.95rem, 2.35vw, 2.55rem);
+}
+
+.rooms-list li,
+.faq-question,
+.visit-grid dt,
+.visit-grid dd,
+.visit-grid a,
+.footer-brand > p,
+.footer-visit address,
+.footer-visit > a {
+  font-size: 1.05rem;
+  line-height: 1.65;
+}
+
+/* Pink-backed content should use black/ink text instead of white. */
+.hero-image-label,
+.story-image figcaption,
+.events,
+.visit-address,
+.press-feature:not(.press-feature--dark) {
+  color: var(--ink);
+}
+
+.hero-image-label p,
 .story-image figcaption span,
-.page-section h2,
-.page-section h3,
-.page-press-content h2,
-.journal-article__body h2,
-.page-related-grid h3 {
-  font-weight: 500;
-  -webkit-text-stroke: 0.08px currentColor;
-  text-rendering: geometricPrecision;
+.events-copy h2,
+.events-copy > p,
+.event-types span,
+.event-types h3,
+.event-types p,
+.events .text-link--light,
+.visit-address span,
+.visit-address p,
+.press-feature:not(.press-feature--dark) > span,
+.press-feature:not(.press-feature--dark) h3,
+.press-feature:not(.press-feature--dark) p,
+.press-feature:not(.press-feature--dark) .text-link {
+  color: var(--ink) !important;
+}
+
+.hero-image-label p,
+.event-types article {
+  border-color: rgba(20, 19, 15, 0.3);
+}
+
+/* Keep this title elegant and on one line on desktop, while the details below are larger. */
+.visit-details h2 {
+  max-width: none;
+  font-size: clamp(2.7rem, 3.35vw, 3.8rem);
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.visit-grid {
+  margin-top: 2.4rem;
+}
+
+@media (max-width: 1180px) {
+  .site-header {
+    height: 6.7rem;
+  }
+
+  .site-header.is-scrolled {
+    height: 5.2rem;
+  }
+
+  .header-inner {
+    grid-template-columns: minmax(15rem, 17.5rem) 1fr auto;
+  }
+
+  .site-header .brand-mark {
+    width: 17rem;
+  }
+
+  .site-header .brand-mark img {
+    height: 5.65rem;
+  }
+
+  .site-header .brand-mark--compact {
+    width: 14.5rem;
+  }
+
+  .site-header .brand-mark--compact img {
+    height: 4.55rem;
+  }
+
+  .hero {
+    padding-top: 6.7rem;
+  }
+
+  .primary-nav a {
+    font-size: 0.76rem;
+  }
+}
+
+@media (max-width: 900px) {
+  .site-header {
+    height: 6rem;
+  }
+
+  .site-header.is-scrolled {
+    height: 5rem;
+  }
+
+  .header-inner {
+    grid-template-columns: minmax(12rem, 14rem) 1fr auto;
+  }
+
+  .site-header .brand-mark,
+  .site-header .brand-mark--compact {
+    width: 13.5rem;
+  }
+
+  .site-header .brand-mark img,
+  .site-header .brand-mark--compact img {
+    height: 4.6rem;
+  }
+
+  .hero {
+    padding-top: 6rem;
+  }
+
+  .visit-details h2 {
+    white-space: normal;
+  }
 }
 
 @media (max-width: 620px) {
-  .hero h1,
-  .story-heading h2,
-  .experience-intro h2,
-  .rooms h2,
-  .menu-heading h2,
-  .events-copy h2,
-  .notes-heading h2,
-  .faq h2,
-  .visit-details h2,
-  .closing-cta h2,
-  .page-hero h1,
-  .journal-article h1,
-  .application-hero h1 {
-    -webkit-text-stroke: 0.12px currentColor;
+  body {
+    font-size: 17px;
+  }
+
+  .site-header,
+  .site-header.is-scrolled {
+    height: 5.5rem;
+  }
+
+  .site-header .brand-mark,
+  .site-header .brand-mark--compact {
+    width: 11rem;
+  }
+
+  .site-header .brand-mark img,
+  .site-header .brand-mark--compact img {
+    height: 4rem;
+  }
+
+  .hero {
+    padding-top: 5.5rem;
+  }
+
+  .button,
+  .text-link,
+  .eyebrow {
+    font-size: 0.78rem;
+  }
+
+  .visit-details h2 {
+    font-size: clamp(2.55rem, 11vw, 3.45rem);
   }
 }
 
-/* Give routed page covers more breathing room. */
-.page-hero__copy {
-  padding-block: clamp(5rem, 8vw, 7.5rem);
+/* =========================================================
+   READABILITY PASS · LARGER SMALL TEXT
+   Increase supporting/interface type for easier reading while
+   keeping display headings visually balanced.
+   ========================================================= */
+
+.primary-nav {
+  gap: clamp(0.8rem, 1.55vw, 1.8rem);
 }
 
-.page-hero__copy .page-eyebrow {
-  margin-bottom: clamp(1.5rem, 2.3vw, 2.25rem);
+.primary-nav a {
+  font-size: 0.9rem;
+  line-height: 1.35;
+  letter-spacing: 0.07em;
 }
 
-.page-hero h1 {
-  max-width: 9ch;
-  letter-spacing: -0.035em;
-  line-height: 1.02;
-  text-wrap: balance;
-}
-
-.page-hero__copy > p:not(.page-eyebrow) {
-  max-width: 36rem;
-  margin-top: clamp(1.75rem, 2.6vw, 2.5rem);
-  line-height: 1.8;
-}
-
-@media (max-width: 900px) {
-  .page-hero__copy {
-    padding-block: clamp(4rem, 9vw, 5.5rem);
-  }
-
-  .page-hero h1 {
-    max-width: 10ch;
-    line-height: 1.04;
-  }
-}
-
-/* Use black for the main titles placed on hot-pink image labels. */
-.hero-image-label span,
-.story-image .editorial-caption > span,
-.visit-address p {
-  color: var(--ink) !important;
-  -webkit-text-fill-color: var(--ink);
-}
-
-.story-image figcaption span {
-  color: var(--white) !important;
-  -webkit-text-fill-color: var(--white);
-}
-
-/* Final label color adjustments. */
-.event-types span {
-  color: var(--white) !important;
-  -webkit-text-fill-color: var(--white);
-}
-
-.visit-address span {
-  color: var(--ink) !important;
-  -webkit-text-fill-color: var(--ink);
-}
-
-/* Final service-card hover treatment. */
-@media (hover: hover) {
-  .service-ledger article:hover {
-    color: var(--white);
-    background: var(--pink);
-  }
-
-  .service-ledger article:hover h3 {
-    color: var(--white) !important;
-    -webkit-text-fill-color: var(--white);
-  }
-
-  .service-ledger article:hover > span,
-  .service-ledger article:hover p {
-    color: var(--ink) !important;
-    -webkit-text-fill-color: var(--ink);
-  }
-}
-.experience {
-  align-items: stretch;
-}
-
-.experience-intro {
-  align-self: stretch;
-  display: flex;
-  flex-direction: column;
-  min-height: 100%;
-}
-
-.experience-intro-copy {
-  max-width: 35rem;
-}
-
-.experience-intro-lead {
-  margin-top: 1.5rem;
-}
-
-.experience-intro-details {
-  border-top: 1px solid rgba(17, 17, 17, 0.18);
-  display: grid;
-  margin-top: clamp(2.25rem, 4vw, 4rem);
-}
-
-.experience-intro-details article {
-  align-items: start;
-  border-bottom: 1px solid rgba(17, 17, 17, 0.18);
-  display: grid;
-  gap: 1rem;
-  grid-template-columns: 2.25rem minmax(0, 1fr);
-  padding: clamp(1rem, 1.8vw, 1.4rem) 0;
-}
-
-.experience-intro-details article > span {
-  color: var(--pink, #f53d8d);
-  font-size: 0.68rem;
-  font-weight: 700;
-  letter-spacing: 0.14em;
-}
-
-.experience-intro-details h3 {
-  font-size: clamp(1rem, 1.2vw, 1.22rem);
+.header-reserve,
+.menu-toggle {
+  font-size: 0.9rem;
   line-height: 1.2;
-  margin: 0 0 0.45rem;
 }
 
-.experience-intro-details p {
-  font-size: 0.88rem;
-  line-height: 1.65;
-  margin: 0;
-  max-width: 34rem;
+.eyebrow,
+.button,
+.text-link,
+.press-feature > span,
+.footer-nav > p,
+.footer-visit > p,
+.footer-socials a {
+  font-size: 0.95rem;
+  line-height: 1.35;
 }
 
-.experience-intro-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1.5rem 2.5rem;
-  margin-top: auto;
-  padding-top: clamp(2rem, 4vw, 4rem);
+.hero-copy-label,
+.hero-kicker,
+.hero-image-label p,
+.scroll-cue span,
+.story-image figcaption,
+.story-image figcaption p,
+.experience-grid span,
+.menu-list-title span,
+.rooms-list span,
+.event-types span,
+.press-feature > span,
+.faq-number,
+.visit-address span,
+.footer-bottom,
+.footer-legal a {
+  font-size: 0.9rem;
+  line-height: 1.45;
 }
 
-.experience-image {
-  align-self: stretch;
-  display: flex;
-  flex-direction: column;
+.hero-note,
+.editorial-caption,
+.experience-grid p,
+.menu-item-meta,
+.rooms-image-detail,
+.press-feature p,
+.notes-grid p,
+.faq-answer p,
+.visit-address p,
+.footer-brand > p,
+.footer-visit address,
+.footer-visit > a {
+  font-size: 1.08rem;
 }
 
-.experience-image img {
-  flex: 1;
-  min-height: 0;
-  object-fit: cover;
+.menu-list li,
+.rooms-list li,
+.faq-question,
+.visit-grid dt,
+.visit-grid dd,
+.visit-grid a {
+  font-size: 1.12rem;
+}
+
+.journal > a > span {
+  font-size: 0.9rem;
+}
+
+.journal > a strong {
+  font-size: clamp(1.8rem, 2.5vw, 2.65rem);
+  line-height: 1.08;
+}
+
+@media (max-width: 1180px) {
+  .primary-nav {
+    gap: clamp(0.65rem, 1.15vw, 1.2rem);
+  }
+
+  .primary-nav a {
+    font-size: 0.86rem;
+  }
 }
 
 @media (max-width: 900px) {
-  .experience-intro {
-    min-height: auto;
+  .menu-panel nav a {
+    font-size: clamp(2.15rem, 8vw, 3rem);
   }
 
-  .experience-intro-actions {
-    margin-top: 0;
+  .menu-panel nav a span {
+    font-size: 0.82rem;
+  }
+}
+
+@media (max-width: 620px) {
+  .button,
+  .text-link,
+  .eyebrow,
+  .header-reserve,
+  .menu-toggle {
+    font-size: 0.9rem;
+  }
+
+  .hero-copy-label,
+  .hero-kicker,
+  .hero-image-label p,
+  .scroll-cue span,
+  .experience-grid span,
+  .menu-list-title span,
+  .rooms-list span,
+  .event-types span,
+  .press-feature > span,
+  .faq-number,
+  .visit-address span,
+  .footer-bottom,
+  .footer-legal a {
+    font-size: 0.86rem;
+  }
+}
+
+/* =========================================================
+   MENU + HEADER READABILITY PASS · AUGUST 2026
+   Keeps existing commented code untouched. This final layer
+   only enlarges the header/logo and compact menu typography.
+   ========================================================= */
+
+/* A modest header/logo increase from the current client-review sizing. */
+.site-header {
+  height: 7.75rem;
+}
+
+.site-header.is-scrolled {
+  height: 5.8rem;
+}
+
+.header-inner {
+  grid-template-columns: minmax(20rem, 23.5rem) 1fr auto;
+}
+
+.site-header .brand-mark {
+  width: clamp(21rem, 22vw, 24.5rem);
+}
+
+.site-header .brand-mark img {
+  height: 6.85rem;
+}
+
+.site-header .brand-mark--compact {
+  width: 17.75rem;
+}
+
+.site-header .brand-mark--compact img {
+  height: 5.2rem;
+}
+
+.hero {
+  padding-top: 7.75rem;
+}
+
+/* Full-screen menu: enlarge the little supporting text. */
+.menu-panel nav a span {
+  font-size: 0.95rem;
+  line-height: 1.35;
+}
+
+.menu-panel-details p,
+.menu-panel-details a,
+.menu-close,
+.menu-panel-body > .eyebrow {
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+/* Homepage menu section: make the small labels, food names, prices,
+   notes, captions, and service descriptions substantially easier to read. */
+.menu-list-title span,
+.service-ledger article > span {
+  font-size: 0.92rem;
+  line-height: 1.35;
+}
+
+.menu-item {
+  padding-block: 0.95rem;
+}
+
+.menu-item h4 {
+  font-size: 1.18rem;
+  line-height: 1.45;
+}
+
+.menu-item p {
+  font-size: 1.4rem;
+  line-height: 1.2;
+}
+
+.menu-note {
+  font-size: 0.98rem;
+  line-height: 1.6;
+}
+
+.menu-image figcaption,
+.menu-image .editorial-caption {
+  font-size: 0.92rem;
+  line-height: 1.45;
+}
+
+.service-ledger p {
+  font-size: 1.04rem;
+  line-height: 1.7;
+}
+
+@media (max-width: 1180px) {
+  .site-header {
+    height: 6.95rem;
+  }
+
+  .site-header.is-scrolled {
+    height: 5.35rem;
+  }
+
+  .header-inner {
+    grid-template-columns: minmax(15.75rem, 18.25rem) 1fr auto;
+  }
+
+  .site-header .brand-mark {
+    width: 17.8rem;
+  }
+
+  .site-header .brand-mark img {
+    height: 5.9rem;
+  }
+
+  .site-header .brand-mark--compact {
+    width: 15rem;
+  }
+
+  .site-header .brand-mark--compact img {
+    height: 4.7rem;
+  }
+
+  .hero {
+    padding-top: 6.95rem;
+  }
+}
+
+@media (max-width: 900px) {
+  .site-header {
+    height: 6.2rem;
+  }
+
+  .site-header.is-scrolled {
+    height: 5.1rem;
+  }
+
+  .header-inner {
+    grid-template-columns: minmax(12.5rem, 14.5rem) 1fr auto;
+  }
+
+  .site-header .brand-mark,
+  .site-header .brand-mark--compact {
+    width: 14rem;
+  }
+
+  .site-header .brand-mark img,
+  .site-header .brand-mark--compact img {
+    height: 4.8rem;
+  }
+
+  .hero {
+    padding-top: 6.2rem;
+  }
+
+  .menu-panel nav a span {
+    font-size: 0.92rem;
+  }
+}
+
+@media (max-width: 620px) {
+  .site-header,
+  .site-header.is-scrolled {
+    height: 5.7rem;
+  }
+
+  .site-header .brand-mark,
+  .site-header .brand-mark--compact {
+    width: 11.5rem;
+  }
+
+  .site-header .brand-mark img,
+  .site-header .brand-mark--compact img {
+    height: 4.15rem;
+  }
+
+  .hero {
+    padding-top: 5.7rem;
+  }
+
+  .menu-item h4 {
+    font-size: 1.12rem;
+  }
+
+  .menu-item p {
+    font-size: 1.3rem;
+  }
+
+  .menu-note,
+  .menu-image figcaption,
+  .menu-image .editorial-caption,
+  .service-ledger p {
+    font-size: 0.96rem;
+  }
+}
+
+/* =========================================================
+   FAQ READABILITY PASS
+   Larger supporting text for easier reading.
+   The large "Before you visit." display title stays unchanged.
+   ========================================================= */
+
+.faq-intro .eyebrow {
+  font-size: 1.08rem;
+  line-height: 1.4;
+  letter-spacing: 0.16em;
+}
+
+.faq-intro > p:not(.eyebrow) {
+  max-width: 29rem;
+  font-size: clamp(1.22rem, 1.35vw, 1.38rem);
+  line-height: 1.7;
+}
+
+.faq-intro .text-link {
+  margin-top: 2.3rem;
+  font-size: 1.02rem;
+  line-height: 1.3;
+}
+
+.faq-item > button {
+  min-height: 5.35rem;
+  padding: 1.65rem 0;
+  grid-template-columns: 3.5rem minmax(0, 1fr) 2rem;
+  gap: 1.15rem;
+}
+
+.faq-item > button .faq-number,
+.faq-number {
+  font-size: 0.92rem;
+  line-height: 1.3;
+}
+
+.faq-question {
+  font-size: clamp(1.32rem, 1.55vw, 1.62rem);
+  line-height: 1.4;
+}
+
+.faq-item > button i {
+  width: 1.55rem;
+  height: 1.55rem;
+}
+
+.faq-item > button i::before,
+.faq-item > button i::after {
+  height: 1.5px;
+}
+
+.faq-answer p {
+  max-width: 46rem;
+  padding: 0 3.5rem 2rem 4.65rem;
+  font-size: clamp(1.18rem, 1.3vw, 1.34rem);
+  line-height: 1.75;
+}
+
+@media (max-width: 900px) {
+  .faq-intro .eyebrow {
+    font-size: 1rem;
+  }
+
+  .faq-intro > p:not(.eyebrow) {
+    font-size: 1.2rem;
+  }
+
+  .faq-question {
+    font-size: 1.28rem;
+  }
+
+  .faq-answer p {
+    font-size: 1.16rem;
+  }
+}
+
+@media (max-width: 620px) {
+  .faq-item > button {
+    grid-template-columns: 2.75rem minmax(0, 1fr) 1.7rem;
+    gap: 0.8rem;
+    min-height: 4.9rem;
+  }
+
+  .faq-item > button .faq-number,
+  .faq-number {
+    font-size: 0.86rem;
+  }
+
+  .faq-question {
+    font-size: 1.2rem;
+  }
+
+  .faq-answer p {
+    padding: 0 1.75rem 1.8rem 3.55rem;
+    font-size: 1.1rem;
+  }
+
+  .faq-intro .text-link {
+    font-size: 0.96rem;
+  }
+}
+
+/* =========================================================
+   STATIC FULL-SIZE HEADER
+   Keep the header/logo at the original large size while
+   scrolling. No shrinking or header-size animation.
+   ========================================================= */
+
+.site-header,
+.site-header.is-scrolled {
+  height: 7.75rem;
+  transition: none;
+}
+
+.site-header.is-scrolled {
+  box-shadow: none;
+}
+
+/* The compact class may still be toggled by React, but it no
+   longer visually shrinks the logo after scrolling. */
+.site-header .brand-mark,
+.site-header .brand-mark--compact {
+  width: clamp(21rem, 22vw, 24.5rem);
+  transition: none;
+}
+
+.site-header .brand-mark img,
+.site-header .brand-mark--compact img {
+  height: 6.85rem;
+  transition: none;
+}
+
+.hero {
+  padding-top: 7.75rem;
+}
+
+@media (max-width: 1180px) {
+  .site-header,
+  .site-header.is-scrolled {
+    height: 6.95rem;
+  }
+
+  .site-header .brand-mark,
+  .site-header .brand-mark--compact {
+    width: 17.8rem;
+  }
+
+  .site-header .brand-mark img,
+  .site-header .brand-mark--compact img {
+    height: 5.9rem;
+  }
+
+  .hero {
+    padding-top: 6.95rem;
+  }
+}
+
+@media (max-width: 900px) {
+  .site-header,
+  .site-header.is-scrolled {
+    height: 6.2rem;
+  }
+
+  .site-header .brand-mark,
+  .site-header .brand-mark--compact {
+    width: 14rem;
+  }
+
+  .site-header .brand-mark img,
+  .site-header .brand-mark--compact img {
+    height: 4.8rem;
+  }
+
+  .hero {
+    padding-top: 6.2rem;
+  }
+}
+
+@media (max-width: 620px) {
+  .site-header,
+  .site-header.is-scrolled {
+    height: 5.7rem;
+  }
+
+  .site-header .brand-mark,
+  .site-header .brand-mark--compact {
+    width: 11.5rem;
+  }
+
+  .site-header .brand-mark img,
+  .site-header .brand-mark--compact img {
+    height: 4.15rem;
+  }
+
+  .hero {
+    padding-top: 5.7rem;
+  }
+}
+
+/* =========================================================
+   FINAL JOURNAL HOVER LOCK
+   Must remain at the END of this file so older hover rules
+   cannot make the journal metadata or arrow disappear.
+   ========================================================= */
+
+.journal > a,
+.journal > a strong {
+  color: var(--white);
+}
+
+.journal > a > span {
+  color: var(--pink);
+}
+
+.journal > a .arrow {
+  color: var(--pink);
+  opacity: 1;
+}
+
+@media (hover: hover) {
+  .journal > a:hover,
+  .journal > a:focus-visible {
+    color: var(--white) !important;
+    background: rgb(185 19 97 / 20%) !important;
+  }
+
+  .journal > a:hover strong,
+  .journal > a:focus-visible strong {
+    color: var(--white) !important;
+    -webkit-text-fill-color: var(--white) !important;
+  }
+
+  .journal > a:hover > span,
+  .journal > a:focus-visible > span {
+    color: var(--pink) !important;
+    -webkit-text-fill-color: var(--pink) !important;
+    opacity: 1 !important;
+  }
+
+  .journal > a:hover .arrow,
+  .journal > a:focus-visible .arrow {
+    color: var(--pink) !important;
+    opacity: 1 !important;
+    transform: translateX(0.25rem);
+  }
+
+  .journal > a:hover .arrow::before,
+  .journal > a:hover .arrow::after,
+  .journal > a:hover .arrow span,
+  .journal > a:focus-visible .arrow::before,
+  .journal > a:focus-visible .arrow::after,
+  .journal > a:focus-visible .arrow span {
+    background: currentColor !important;
+  }
+}
+
+/* =========================================================
+   SITE-WIDE FOOTER READABILITY
+   Larger footer typography for easier reading.
+   ========================================================= */
+
+.footer-brand > p {
+  max-width: 25rem;
+  font-size: 1.08rem;
+  line-height: 1.7;
+}
+
+.footer-nav > p,
+.footer-visit > p {
+  margin-bottom: 0.9rem;
+  font-size: 0.96rem;
+  line-height: 1.35;
+  letter-spacing: 0.13em;
+}
+
+.footer-nav,
+.footer-visit {
+  gap: 0.82rem;
+}
+
+.footer-nav a,
+.footer-visit > a,
+.footer-visit address {
+  font-size: 1.06rem;
+  line-height: 1.65;
+}
+
+.footer-socials a {
+  font-size: 0.94rem;
+  line-height: 1.4;
+}
+
+.footer-bottom {
+  font-size: 0.9rem;
+  line-height: 1.55;
+}
+
+.footer-bottom a,
+.footer-legal a {
+  font-size: 0.9rem;
+}
+
+@media (max-width: 620px) {
+  .footer-brand > p {
+    font-size: 1rem;
+  }
+
+  .footer-nav > p,
+  .footer-visit > p {
+    font-size: 0.9rem;
+  }
+
+  .footer-nav a,
+  .footer-visit > a,
+  .footer-visit address {
+    font-size: 1rem;
+  }
+
+  .footer-socials a,
+  .footer-bottom,
+  .footer-bottom a,
+  .footer-legal a {
+    font-size: 0.86rem;
   }
 }

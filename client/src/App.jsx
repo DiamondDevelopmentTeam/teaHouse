@@ -70,7 +70,7 @@ const faqs = [
   {
     question: 'How do I start an event inquiry?',
     answer:
-      'Use the large-party request form for groups of 12 or more. Your plans are not confirmed until the Tea House follows up with availability and next steps.',
+      'For parties of 1–14 guests, reservations are handled through Toast. For groups of 15 or more, use the large-party request form so the Tea House team can review your date, guest count, and gathering details.',
   },
   {
     question: 'Where can I find current menus and hours?',
@@ -193,9 +193,14 @@ function App() {
           <BrandMark compact={isScrolled} onClick={closeMenu} />
 
           <nav className="primary-nav" aria-label="Primary navigation">
-            {primaryNavigation.map((item) => (
-              <SiteLink key={item.to} item={item} active />
-            ))}
+            {primaryNavigation.map((item) => {
+              const displayItem =
+                item.to === '/contact'
+                  ? { ...item, label: 'Visit 1890 Teahouse' }
+                  : item;
+
+              return <SiteLink key={item.to} item={displayItem} active />;
+            })}
           </nav>
 
           <div className="header-actions">
@@ -360,12 +365,57 @@ function App() {
 
         <section className="experience section-pad" aria-labelledby="experience-title">
           <div className="experience-intro" data-reveal>
-            <SectionEyebrow>The 1890 experience</SectionEyebrow>
-            <h2 id="experience-title">Choose your own kind of pause.</h2>
-            <p>
-The Tea House can be a quiet stop for tea or coffee, a relaxed place to enjoy lunch with sandwiches, charcuterie, and something sweet, or an afternoon destination where conversation is allowed to unfold without feeling rushed. It can also become the setting for a birthday, bridal shower, private gathering, business meeting, or meaningful milestone shared with the people who matter most. Whether you choose an individually styled Tea Room, a table on the patio when available, or a cozy spot for two, each visit offers its own rhythm. Come for a quick cup, stay for dessert, make an afternoon of it, or turn the occasion into a memory. Every experience begins with the same invitation: settle in, savor each detail, and stay awhile.
+            <div className="experience-intro-copy">
+              <SectionEyebrow>The 1890 experience</SectionEyebrow>
+              <h2 id="experience-title">Choose your own kind of pause.</h2>
 
-            </p>
+            </div>
+
+            <div className="experience-intro-details" aria-label="Ways to experience 1890 Tea House">
+              <hr />
+              <p className="experience-intro-lead">
+                Visit for a classic pot of tea, matcha, chai, espresso, a light lunch, or something sweet. Whether you stay for a quick cup or settle in for the afternoon, 1890 is designed to let every table move at its own pace.
+              </p>
+              {/* <article>
+                <span>01</span>
+                <div>
+                  <h3>Tea, lunch, and a sweet finish</h3>
+                  <p>
+                    Pair tea or coffee with sandwiches, light bites, signature charcuterie cups and boards, pastries, or desserts made for sharing around the table.
+                  </p>
+                </div>
+              </article>
+
+              <article>
+                <span>02</span>
+                <div>
+                  <h3>A room for your kind of visit</h3>
+                  <p>
+                    Choose from individually styled private Tea Rooms or enjoy the outdoor patio when available. Walk-ins are welcome, while reservations are recommended for private rooms.
+                  </p>
+                </div>
+              </article>
+
+              <article>
+                <span>03</span>
+                <div>
+                  <h3>Gather here or bring 1890 to you</h3>
+                  <p>
+                    Plan birthdays, bridal showers, meetings, and other celebrations at the Tea House. Groups of 15 or more can submit a large-party request, and catering can be planned around the date, guest count, and menu needs.
+                  </p>
+                </div>
+              </article> */}
+            </div>
+
+            <div className="experience-intro-actions">
+              <Link className="text-link" to="/menus">
+                Explore the menus <Arrow />
+              </Link>
+              <p></p>
+              <Link className="text-link" to="/reservations">
+                Plan your visit <Arrow />
+              </Link>
+            </div>
           </div>
 
           <figure className="experience-image image-reveal" data-reveal>
@@ -516,10 +566,10 @@ The Tea House can be a quiet stop for tea or coffee, a relaxed place to enjoy lu
             </ul>
             <div className="rooms-actions">
               <a className="button button--ink" href={reservationLink} target="_blank" rel="noreferrer">
-                Reserve for 1–11 guests <Arrow />
+                Reserve for 1–14 guests <Arrow />
               </a>
               <Link className="text-link" to={largePartyLink}>
-                Planning for 12+? Send a group inquiry <Arrow />
+                Planning for 15+? Send a group inquiry <Arrow />
               </Link>
             </div>
           </div>
@@ -713,7 +763,7 @@ The Tea House can be a quiet stop for tea or coffee, a relaxed place to enjoy lu
       <footer className="site-footer section-pad">
         <div className="footer-brand">
           <BrandMark />
-          {/* <p>Tea, dining, private rooms, and catering in downtown Ocala.</p> */}
+          <p>Tea, dining, private rooms, and catering in downtown Ocala.</p>
           <img
             className="diamond-logo"
             src={diamondSuites}
@@ -735,7 +785,7 @@ The Tea House can be a quiet stop for tea or coffee, a relaxed place to enjoy lu
         ))}
 
         <div className="footer-visit">
-          <p>Visit</p>
+          <p>Visit 1890 Teahouse</p>
           <address>
             {business.address.street}<br />
             {business.address.locality}, {business.address.region} {business.address.postalCode}

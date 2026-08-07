@@ -121,12 +121,9 @@ a.page-button--dark:visited {
 
 .page-hero {
   display: grid;
-  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  grid-template-columns: minmax(0, 0.82fr) minmax(0, 1.18fr);
   align-items: stretch;
-  width: 100%;
-  height: calc(100svh - 6rem);
-  min-height: 42rem;
-  overflow: hidden;
+  min-height: clamp(38rem, 47vw, 49rem);
   background: var(--paper);
 }
 
@@ -134,10 +131,7 @@ a.page-button--dark:visited {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  min-width: 0;
-  min-height: 0;
-  padding: clamp(4rem, 7vw, 6.5rem) var(--section-x)
-    clamp(3.5rem, 5vw, 5rem);
+  padding: clamp(3.25rem, 5vw, 6rem) var(--section-x);
 }
 
 .page-hero h1,
@@ -166,7 +160,6 @@ a.page-button--dark:visited {
 
 .page-hero__media {
   min-width: 0;
-  min-height: 0;
   height: 100%;
   overflow: hidden;
   background: var(--paper);
@@ -699,28 +692,21 @@ a.page-button--dark:visited {
   }
 }
 
-@media (max-width: 900px) {
+@media (max-width: 800px) {
   .page-hero {
     grid-template-columns: 1fr;
-    height: auto;
     min-height: 0;
-    overflow: visible;
   }
 
   .page-hero__copy {
-    min-height: auto;
-    padding-top: 5rem;
-    padding-bottom: 3.25rem;
+    padding: 3.75rem var(--section-x);
   }
 
   .page-hero__media {
     height: auto;
-    min-height: 56vw;
-    aspect-ratio: 16 / 9;
+    aspect-ratio: 4 / 3;
   }
-}
 
-@media (max-width: 800px) {
   .page-split,
   .page-image-ledger,
   .page-menu-feature,
@@ -752,17 +738,6 @@ a.page-button--dark:visited {
 }
 
 @media (max-width: 620px) {
-  .page-hero__copy {
-    min-height: auto;
-    padding-top: 3.5rem;
-    padding-bottom: 2.75rem;
-  }
-
-  .page-hero__media {
-    min-height: 0;
-    aspect-ratio: 4 / 3;
-  }
-
   .page-site > main {
     padding-top: 4.4rem;
   }
@@ -998,12 +973,9 @@ a.page-button--dark:visited {
 }
 
 .page-event-card img {
-  display: block;
   width: 100%;
-  height: clamp(18rem, 32vw, 30rem);
-  aspect-ratio: 4 / 3;
-  object-fit: cover;
-  object-position: center;
+  max-height: 46rem;
+  object-fit: contain;
   background: #f5efe5;
 }
 
@@ -1205,12 +1177,50 @@ a.page-button--dark:visited {
   text-transform: uppercase;
 }
 
+/* Keep the Journal hero refined without changing the other page heroes. */
+.journal-hero {
+  min-height: clamp(28rem, 36vw, 37rem);
+  grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
+}
+
+.journal-hero .page-hero__copy {
+  padding-top: clamp(3rem, 4vw, 4.5rem);
+  padding-bottom: clamp(3rem, 4vw, 4.5rem);
+}
+
+.journal-hero .page-hero__media {
+  min-height: 0;
+  max-height: clamp(28rem, 36vw, 37rem);
+}
+
+.journal-hero .page-hero__media img {
+  object-fit: cover;
+  object-position: center 42%;
+}
+
 /* Give Journal cards a consistent editorial crop. */
 .page-journal-grid img {
   display: block;
   height: clamp(12rem, 17vw, 17rem);
   aspect-ratio: auto;
   object-position: center;
+}
+
+@media (max-width: 800px) {
+  .journal-hero {
+    grid-template-columns: 1fr;
+    min-height: 0;
+  }
+
+  .journal-hero .page-hero__media {
+    height: clamp(17rem, 62vw, 27rem);
+    max-height: none;
+    aspect-ratio: auto;
+  }
+
+  .journal-hero .page-hero__media img {
+    object-position: center 38%;
+  }
 }
 
 @media (max-width: 720px) {
@@ -1524,23 +1534,14 @@ a.page-button--dark:visited {
 /* Server application */
 .application-hero {
   display: grid;
-  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
-  align-items: stretch;
-  width: 100%;
-  height: calc(100svh - 6rem);
-  min-height: 42rem;
-  overflow: hidden;
+  grid-template-columns: minmax(0, 1.08fr) minmax(22rem, 0.92fr);
+  min-height: 0;
   background: var(--paper);
 }
 
 .application-hero__copy {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  min-width: 0;
-  min-height: 0;
-  padding: clamp(4rem, 7vw, 6.5rem) var(--section-x)
-    clamp(3.5rem, 5vw, 5rem);
+  align-self: center;
+  padding: clamp(3.25rem, 6vw, 6rem) var(--section-x);
 }
 
 .application-hero h1 {
@@ -1563,9 +1564,7 @@ a.page-button--dark:visited {
 .application-hero__media {
   position: relative;
   min-width: 0;
-  min-height: 0;
-  height: 100%;
-  max-height: none;
+  max-height: 36rem;
   overflow: hidden;
   background: var(--sage);
 }
@@ -1596,12 +1595,10 @@ a.page-button--dark:visited {
 }
 
 .application-hero__media img {
-  display: block;
   width: 100%;
   height: 100%;
-  min-height: 100%;
+  min-height: 26rem;
   object-fit: cover;
-  object-position: center;
 }
 
 .application-hero__media > span {
@@ -1997,26 +1994,14 @@ a.page-button--dark:visited {
 @media (max-width: 900px) {
   .application-hero {
     grid-template-columns: 1fr;
-    height: auto;
-    min-height: 0;
-    overflow: visible;
-  }
-
-  .application-hero__copy {
-    min-height: auto;
-    padding-top: 5rem;
-    padding-bottom: 3.25rem;
   }
 
   .application-hero__media {
-    height: auto;
-    min-height: 56vw;
-    max-height: none;
-    aspect-ratio: 16 / 9;
+    max-height: 28rem;
   }
 
   .application-hero__media img {
-    min-height: 100%;
+    min-height: 22rem;
   }
 
   .application-intro,
@@ -2035,16 +2020,6 @@ a.page-button--dark:visited {
 }
 
 @media (max-width: 700px) {
-  .application-hero__copy {
-    padding-top: 3.5rem;
-    padding-bottom: 2.75rem;
-  }
-
-  .application-hero__media {
-    min-height: 0;
-    aspect-ratio: 4 / 3;
-  }
-
   .application-fields,
   .application-check-grid,
   .application-submit {
@@ -2270,270 +2245,483 @@ a.reservations-hero__secondary:visited {
     transform: translate(0.5rem, 0.5rem);
   }
 }
-/* ===========================================================================
-   CLIENT FEEDBACK PASS · ROUTED PAGES
-   Black, white, and hot pink with softer cards and a larger Pink Tea Room.
-   =========================================================================== */
 
-:root {
-  --page-line: rgb(9 9 9 / 13%);
-  --cream: #ffffff;
-}
+
+/* =========================================================
+   TEAM FEEDBACK UPDATE · AUGUST 2026
+   Routed-page readability and reservation accessibility.
+   ========================================================= */
 
 .page-site {
-  background: var(--white);
+  font-size: 1.075rem;
+  line-height: 1.68;
+}
+
+.page-site > main {
+  padding-top: 7.35rem;
 }
 
 .page-button,
 a.page-button:visited {
-  border-radius: 999px;
+  min-height: 3.35rem;
+  padding: 0.95rem 1.3rem;
+  font-size: 0.82rem;
+  letter-spacing: 0.095em;
 }
 
-/* Remove the hard spreadsheet-like card treatment. */
-.page-card-grid,
-.page-image-ledger .page-card-grid,
-.page-menu-viewer-grid,
-.page-menu-sections,
-.page-press-grid,
-.page-journal-grid {
-  gap: clamp(1rem, 2vw, 1.6rem);
-  border: 0;
-  background: transparent;
+.page-text-link,
+.page-eyebrow,
+.page-card span,
+.page-card-grid > article > span,
+.page-journal-grid time,
+.page-journal-grid strong,
+.page-related-grid time,
+.page-status {
+  font-size: 0.82rem;
 }
 
-.page-card,
-.page-card-grid > article,
-.page-menu-document,
-.page-menu-sections > article,
-.page-press-grid article,
-.page-journal-grid article {
-  border: 0;
-  border-radius: 1.35rem;
-  background: #fafafa;
-  box-shadow: 0 1rem 2.5rem rgb(9 9 9 / 6%);
-  overflow: hidden;
+.page-hero__copy > p:not(.page-eyebrow),
+.reservations-hero__copy > p:not(.page-eyebrow),
+.page-section-title > p:last-child,
+.page-prose p,
+.page-card p,
+.page-press-grid p,
+.page-journal-grid p,
+.page-faq-list article > div p,
+.page-large-party li,
+.page-contact-details,
+.page-room-grid p,
+.page-room-grid li {
+  font-size: clamp(1.08rem, 1.2vw, 1.2rem);
+  line-height: 1.72;
 }
 
-.page-image-ledger,
-.page-menu-feature {
-  border-radius: 1.5rem;
-  overflow: hidden;
+.page-form label,
+.page-form legend {
+  font-size: 0.82rem;
+  line-height: 1.25;
 }
 
-.page-event-card {
-  margin-bottom: clamp(1rem, 2vw, 1.5rem);
-  padding: clamp(1.25rem, 2.5vw, 2rem);
-  border: 0;
-  border-radius: 1.5rem;
-  background: #fafafa;
-  box-shadow: 0 1rem 2.5rem rgb(9 9 9 / 6%);
+.page-form input,
+.page-form select,
+.page-form textarea {
+  font-size: 1.08rem;
+  line-height: 1.5;
 }
 
-.page-event-card:last-child {
-  border-bottom: 0;
+.page-form-recaptcha__message,
+.page-form-recaptcha > p,
+.page-form-status {
+  font-size: 0.98rem;
 }
 
-/* Feature the first, pink-accented Tea Room and enlarge all room imagery. */
-.page-room-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: clamp(1.25rem, 2.8vw, 2.25rem);
-  border: 0;
-  background: transparent;
+.page-contact-details address,
+.page-contact-details > a,
+.page-contact-details dt,
+.page-contact-details dd,
+.page-contact-links a {
+  font-size: 1.08rem;
 }
 
-.page-room-grid article {
-  display: grid;
-  grid-template-rows: clamp(25rem, 31vw, 32rem) auto;
-  border-radius: 1.5rem;
-  background: #fafafa;
-  box-shadow: 0 1rem 2.75rem rgb(9 9 9 / 7%);
-  overflow: hidden;
+/* Keep routed-page typography large, but prevent oversized headings from crowding content. */
+.page-section-title h2 {
+  font-size: clamp(2.65rem, 4.4vw, 4.9rem);
+  line-height: 1.02;
 }
 
-.page-room-grid article:first-child {
-  grid-column: 1 / -1;
-  grid-template-columns: minmax(0, 1.35fr) minmax(19rem, 0.65fr);
-  grid-template-rows: clamp(35rem, 44vw, 45rem);
+.page-contact-details h2 {
+  font-size: clamp(2.6rem, 4.25vw, 4.4rem);
 }
 
-.page-room-grid article:first-child img {
-  grid-column: 1;
-  grid-row: 1;
-}
-
-.page-room-grid article:first-child > div {
-  grid-column: 2;
-  grid-row: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  padding: clamp(2rem, 4vw, 4rem);
-  background: var(--ink);
-}
-
-.page-room-grid article:first-child h2,
-.page-room-grid article:first-child p,
-.page-room-grid article:first-child ul,
-.page-room-grid article:first-child .page-text-link {
-  color: var(--white);
-}
-
-.page-room-grid article:first-child h2 {
-  font-size: clamp(2.6rem, 4vw, 4.75rem);
-  line-height: 0.98;
-}
-
-.page-room-grid article:first-child .page-text-link {
-  margin-top: auto;
-  text-decoration-color: var(--pink);
-}
-
-.page-room-grid img {
-  object-position: center;
-}
-
-/* Keep success states inside the requested palette instead of green. */
-.page-form-status.is-success {
-  color: var(--pink-dark);
-}
-
-.application-status.is-success {
-  border-left-color: var(--pink);
+/* Pink chips and active controls also use black text for consistency. */
+.page-status,
+.page-filter button.is-active {
   color: var(--ink);
-  background: rgb(255 47 146 / 10%);
 }
 
-.application-privacy,
-.application-hero__media {
-  background: var(--ink);
-}
-
-.reservations-hero__media,
-.page-lightbox__figure img,
-.journal-article__hero,
-.page-story-grid > .optimized-image {
-  border-radius: 1.35rem;
+@media (max-width: 1180px) {
+  .page-site > main {
+    padding-top: 6.7rem;
+  }
 }
 
 @media (max-width: 900px) {
-  .page-room-grid {
-    grid-template-columns: minmax(0, 1fr);
-  }
-
-  .page-room-grid article:first-child {
-    grid-column: 1;
-    grid-template-columns: minmax(0, 1fr);
-    grid-template-rows: clamp(30rem, 70vw, 40rem) auto;
-  }
-
-  .page-room-grid article:first-child img,
-  .page-room-grid article:first-child > div {
-    grid-column: 1;
-  }
-
-  .page-room-grid article:first-child img {
-    grid-row: 1;
-  }
-
-  .page-room-grid article:first-child > div {
-    grid-row: 2;
+  .page-site > main {
+    padding-top: 6rem;
   }
 }
 
 @media (max-width: 620px) {
-  .page-card,
-  .page-card-grid > article,
-  .page-menu-document,
-  .page-menu-sections > article,
-  .page-event-card,
-  .page-room-grid article,
-  .page-press-grid article,
-  .page-journal-grid article {
-    border-radius: 1rem;
+  .page-site {
+    font-size: 1rem;
   }
 
-  .page-room-grid article,
-  .page-room-grid article:first-child {
-    grid-template-rows: 24rem auto;
+  .page-site > main {
+    padding-top: 5.5rem;
+  }
+
+  .page-button,
+  a.page-button:visited,
+  .page-text-link,
+  .page-eyebrow {
+    font-size: 0.78rem;
   }
 }
 
-/* ===========================================================================
-   ROUTED COVER SEPARATION · HOT PINK DETAIL + SOFT IMAGE TRANSITION
-   =========================================================================== */
+/* =========================================================
+   READABILITY PASS · LARGER SMALL TEXT
+   Routed pages: raise labels, metadata, form hints, filters,
+   buttons, article dates, and compact supporting copy.
+   ========================================================= */
 
-.page-hero,
-.application-hero,
-.reservations-hero {
-  border-bottom: 1px solid rgb(255 47 146 / 26%);
+.page-button,
+a.page-button:visited {
+  min-height: 3.55rem;
+  padding: 1rem 1.4rem;
+  font-size: 0.94rem;
+  line-height: 1.2;
+  letter-spacing: 0.075em;
 }
 
-.page-hero__media {
+.page-text-link,
+.page-eyebrow,
+.page-card span,
+.page-card-grid > article > span,
+.page-journal-grid time,
+.page-journal-grid strong,
+.page-related-grid time,
+.page-status,
+.page-filter button,
+.page-faq-number {
+  font-size: 0.92rem;
+  line-height: 1.4;
+}
+
+.page-form label,
+.page-form legend {
+  font-size: 0.95rem;
+  line-height: 1.35;
+}
+
+.page-form input,
+.page-form select,
+.page-form textarea {
+  font-size: 1.12rem;
+  line-height: 1.5;
+}
+
+.page-form-recaptcha__message,
+.page-form-recaptcha > p,
+.page-form-status,
+.page-source-note,
+.page-policy-list,
+.page-contact-links,
+.page-room-grid li,
+.page-room-grid p,
+.page-press-grid p,
+.page-journal-grid p {
+  font-size: 1.06rem;
+  line-height: 1.7;
+}
+
+.page-contact-details address,
+.page-contact-details > a,
+.page-contact-details dt,
+.page-contact-details dd,
+.page-contact-links a {
+  font-size: 1.12rem;
+  line-height: 1.65;
+}
+
+.page-faq-list button {
+  font-size: clamp(1.14rem, 1.7vw, 1.52rem);
+}
+
+.journal-article time,
+.journal-pagination span,
+.page-related-grid time {
+  font-size: 0.92rem;
+}
+
+@media (max-width: 620px) {
+  .page-button,
+  a.page-button:visited,
+  .page-text-link,
+  .page-eyebrow,
+  .page-card span,
+  .page-card-grid > article > span,
+  .page-journal-grid time,
+  .page-journal-grid strong,
+  .page-related-grid time,
+  .page-status,
+  .page-filter button,
+  .page-faq-number {
+    font-size: 0.88rem;
+  }
+
+  .page-form label,
+  .page-form legend {
+    font-size: 0.92rem;
+  }
+
+  .page-form input,
+  .page-form select,
+  .page-form textarea {
+    font-size: 1.08rem;
+  }
+}
+
+/* =========================================================
+   ROUTED PAGES · SITE-WIDE READABILITY + CROPPED HEROES
+   Applies the larger-text treatment beyond the homepage and
+   keeps standard page hero images cropped inside the viewport.
+   ========================================================= */
+
+/* Match the fixed header height exactly so routed pages begin
+   directly below the large static header. */
+.page-site > main {
+  padding-top: 7.75rem;
+}
+
+/* Standard routed-page hero behaves like the homepage hero:
+   one screen-height composition with a cropped media panel. */
+.page-site .page-hero:not(.page-hero--text):not(.journal-hero) {
+  height: calc(100svh - 7.75rem);
+  min-height: 36rem;
+  max-height: calc(100svh - 7.75rem);
+  overflow: hidden;
+  align-items: stretch;
+}
+
+.page-site .page-hero:not(.page-hero--text):not(.journal-hero) .page-hero__copy {
+  min-height: 0;
+  height: 100%;
+  justify-content: center;
+}
+
+.page-site .page-hero:not(.page-hero--text):not(.journal-hero) .page-hero__media {
   position: relative;
-  isolation: isolate;
+  min-height: 0;
+  height: 100%;
+  overflow: hidden;
 }
 
-.page-hero__media::before {
-  position: absolute;
-  inset: 0 auto 0 0;
-  z-index: 2;
-  width: clamp(3.5rem, 6vw, 7rem);
-  background: linear-gradient(90deg, var(--paper) 0%, rgb(255 255 255 / 60%) 28%, transparent 100%);
-  content: '';
-  pointer-events: none;
+.page-site .page-hero:not(.page-hero--text):not(.journal-hero) .page-hero__media picture,
+.page-site .page-hero:not(.page-hero--text):not(.journal-hero) .page-hero__media .optimized-image {
+  width: 100%;
+  height: 100%;
 }
 
-.page-hero__media::after {
-  position: absolute;
-  top: clamp(2rem, 8%, 4.5rem);
-  bottom: clamp(2rem, 8%, 4.5rem);
-  left: 0;
-  z-index: 3;
-  width: 1px;
-  background: linear-gradient(transparent, var(--pink), transparent);
-  content: '';
-  pointer-events: none;
+.page-site .page-hero:not(.page-hero--text):not(.journal-hero) .page-hero__media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center center;
 }
 
-/* The server-application cover already has corner marks; add a clearer seam. */
-.application-hero__media {
-  box-shadow: inset 2px 0 0 rgb(255 47 146 / 62%);
+/* Tea Rooms has a tall room photograph, so favor the table and
+   room decor instead of allowing the floor to dominate the crop. */
+.page-site .page-hero .page-hero__media img[alt*="tea room" i],
+.page-site .page-hero .page-hero__media img[alt*="Tea Room" i] {
+  object-position: center 38%;
 }
 
-.application-hero__media img {
-  -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 4.5rem, #000 100%);
-  mask-image: linear-gradient(90deg, transparent 0, #000 4.5rem, #000 100%);
+/* Main routed-page readability baseline. */
+.page-site {
+  font-size: 1.16rem;
+  line-height: 1.72;
 }
 
-/* Reservation cover keeps its frame, with a pink underline tying it to other covers. */
-.reservations-hero__inner {
-  position: relative;
+/* Small UI / editorial labels. */
+.page-site .page-eyebrow,
+.page-site .page-text-link,
+.page-site .page-card span,
+.page-site .page-card-grid > article > span,
+.page-site .page-journal-grid time,
+.page-site .page-related-grid time,
+.page-site .page-status,
+.page-site .page-filter button,
+.page-site .page-faq-number,
+.page-site .journal-article time,
+.page-site .journal-pagination span {
+  font-size: 1rem;
+  line-height: 1.4;
 }
 
-.reservations-hero__inner::after {
-  position: absolute;
-  right: 0;
-  bottom: clamp(-2rem, -2vw, -1rem);
-  width: min(11rem, 24vw);
-  height: 2px;
-  background: linear-gradient(90deg, transparent, var(--pink));
-  content: '';
-  pointer-events: none;
+/* Buttons should be immediately readable without becoming huge. */
+.page-site .page-button,
+.page-site a.page-button:visited {
+  min-height: 3.75rem;
+  padding: 1.05rem 1.55rem;
+  font-size: 1rem;
+  line-height: 1.25;
+}
+
+/* Hero/body copy across every routed page. */
+.page-site .page-hero__copy > p:not(.page-eyebrow),
+.page-site .reservations-hero__copy > p:not(.page-eyebrow),
+.page-site .page-section-title > p:last-child,
+.page-site .page-prose p,
+.page-site .page-card p,
+.page-site .page-note p,
+.page-site .page-press-grid p,
+.page-site .page-journal-grid p,
+.page-site .page-related-grid p,
+.page-site .page-faq-list article > div p,
+.page-site .page-large-party li,
+.page-site .page-room-grid p,
+.page-site .page-room-grid li,
+.page-site .page-policy-list,
+.page-site .page-contact-details,
+.page-site .page-contact-links,
+.page-site .page-legal p,
+.page-site .page-legal li,
+.page-site .journal-article__body p,
+.page-site .journal-article__body li {
+  font-size: clamp(1.16rem, 1.3vw, 1.3rem);
+  line-height: 1.75;
+}
+
+/* Generic routed-page lists that do not have their own content class. */
+.page-site main ul:not(.page-filter):not(.page-policy-list) li {
+  line-height: 1.7;
+}
+
+/* Room cards get a little more breathing room and readable copy. */
+.page-site .page-room-grid h2 {
+  font-size: clamp(2rem, 2.5vw, 2.4rem);
+  line-height: 1.12;
+}
+
+.page-site .page-room-grid article > div {
+  padding: clamp(1.5rem, 2.5vw, 2.1rem);
+}
+
+/* Forms and contact information. */
+.page-site .page-form label,
+.page-site .page-form legend {
+  font-size: 1rem;
+  line-height: 1.4;
+}
+
+.page-site .page-form input,
+.page-site .page-form select,
+.page-site .page-form textarea {
+  font-size: 1.16rem;
+  line-height: 1.5;
+}
+
+.page-site .page-form-recaptcha__message,
+.page-site .page-form-recaptcha > p,
+.page-site .page-form-status,
+.page-site .page-source-note {
+  font-size: 1.05rem;
+  line-height: 1.65;
+}
+
+.page-site .page-contact-details address,
+.page-site .page-contact-details > a,
+.page-site .page-contact-details dt,
+.page-site .page-contact-details dd,
+.page-site .page-contact-links a {
+  font-size: 1.18rem;
+  line-height: 1.7;
+}
+
+/* FAQ text on the standalone FAQ page. */
+.page-site .page-faq-list button {
+  font-size: clamp(1.28rem, 1.8vw, 1.6rem);
+  line-height: 1.4;
+}
+
+/* Reservations uses its own hero rather than PageHero, so enlarge
+   its copy as part of the same accessibility/readability pass. */
+.page-site .reservations-hero__copy > p:not(.page-eyebrow) {
+  font-size: clamp(1.18rem, 1.35vw, 1.32rem);
+}
+
+@media (max-width: 1180px) {
+  .page-site > main {
+    padding-top: 6.95rem;
+  }
+
+  .page-site .page-hero:not(.page-hero--text):not(.journal-hero) {
+    height: calc(100svh - 6.95rem);
+    max-height: calc(100svh - 6.95rem);
+  }
 }
 
 @media (max-width: 900px) {
-  .page-hero__media::before,
-  .page-hero__media::after {
-    display: none;
+  .page-site > main {
+    padding-top: 6.2rem;
+  }
+}
+
+@media (max-width: 800px) {
+  /* Stacked mobile/tablet heroes should grow naturally. */
+  .page-site .page-hero:not(.page-hero--text):not(.journal-hero) {
+    height: auto;
+    min-height: 0;
+    max-height: none;
+    overflow: visible;
   }
 
-  .application-hero__media {
-    box-shadow: inset 0 2px 0 rgb(255 47 146 / 62%);
+  .page-site .page-hero:not(.page-hero--text):not(.journal-hero) .page-hero__copy {
+    height: auto;
   }
 
-  .application-hero__media img {
-    -webkit-mask-image: none;
-    mask-image: none;
+  .page-site .page-hero:not(.page-hero--text):not(.journal-hero) .page-hero__media {
+    height: clamp(22rem, 68vw, 34rem);
+    aspect-ratio: auto;
+  }
+}
+
+@media (max-width: 620px) {
+  .page-site {
+    font-size: 1.08rem;
+  }
+
+  .page-site > main {
+    padding-top: 5.7rem;
+  }
+
+  .page-site .page-eyebrow,
+  .page-site .page-text-link,
+  .page-site .page-card span,
+  .page-site .page-card-grid > article > span,
+  .page-site .page-journal-grid time,
+  .page-site .page-related-grid time,
+  .page-site .page-status,
+  .page-site .page-filter button,
+  .page-site .page-faq-number,
+  .page-site .journal-article time,
+  .page-site .journal-pagination span {
+    font-size: 0.92rem;
+  }
+
+  .page-site .page-hero__copy > p:not(.page-eyebrow),
+  .page-site .reservations-hero__copy > p:not(.page-eyebrow),
+  .page-site .page-section-title > p:last-child,
+  .page-site .page-prose p,
+  .page-site .page-card p,
+  .page-site .page-note p,
+  .page-site .page-press-grid p,
+  .page-site .page-journal-grid p,
+  .page-site .page-faq-list article > div p,
+  .page-site .page-large-party li,
+  .page-site .page-room-grid p,
+  .page-site .page-room-grid li,
+  .page-site .page-policy-list,
+  .page-site .page-contact-details,
+  .page-site .page-legal p,
+  .page-site .journal-article__body p,
+  .page-site .journal-article__body li {
+    font-size: 1.1rem;
+  }
+
+  .page-site .page-form input,
+  .page-site .page-form select,
+  .page-site .page-form textarea {
+    font-size: 1.08rem;
   }
 }
