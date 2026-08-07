@@ -2726,3 +2726,11 @@ a.page-button:visited {
   }
 }
 
+/* Optional helper for gallery photos with blank captions. */
+.page-gallery-counter-only {
+  justify-content: flex-end;
+}
+
+.page-gallery-counter-only > span {
+  margin-left: auto;
+}

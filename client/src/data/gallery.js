@@ -34,7 +34,28 @@ const image = (src, width, height, category, caption, alt) => ({
   alt,
 });
 
-export const galleryImages = [
+// Automatically load newly added JPG gallery photos.
+//
+// This intentionally targets files such as:
+// Image (1).jpg
+// Image (2).jpg
+// Image (3).jpg
+// and so on.
+//
+// Source filenames are never displayed on the website.
+//
+// TODO: Gallery captions intentionally left blank for newly imported photos.
+// TODO: Add descriptive captions once the final photo selections are approved.
+const newlyAddedGalleryModules = import.meta.glob(
+  '../assets/images/migrated/gallery/*.jpg',
+  {
+    eager: true,
+    import: 'default',
+    query: '?url',
+  },
+);
+
+const existingGalleryImages = [
   image(birthday3, 768, 1024, 'Private gatherings', 'Birthday celebration at 1890', 'Guests dressed in pink and black outside 1890 Tea House'),
   image(birthday4, 768, 1024, 'Private gatherings', 'Birthday celebration at the historic house', 'Birthday guests gathered on the patio in front of 1890 Tea House'),
   image(birthday0, 768, 1024, 'Private gatherings', 'A birthday in pink', 'Birthday guests gathered at the Tea House entrance'),
@@ -63,4 +84,47 @@ export const galleryImages = [
   image(patio, 1536, 1024, 'Exterior and patio', 'The patio at 1890', 'Pink, white, and black patio tables outside the historic Tea House'),
 ];
 
-export const galleryCategories = ['All', ...new Set(galleryImages.map(({ category }) => category))];
+const newGalleryImages = Object.entries(newlyAddedGalleryModules)
+  .filter(([path]) => /\/Image \(\d+\)\.jpg$/i.test(path))
+  .sort(([pathA], [pathB]) => {
+    const numberA = Number(
+      pathA.match(/Image \((\d+)\)\.jpg$/i)?.[1] || 0,
+    );
+
+    const numberB = Number(
+      pathB.match(/Image \((\d+)\)\.jpg$/i)?.[1] || 0,
+    );
+
+    return numberA - numberB;
+  })
+  .map(([, src], index) => ({
+    src,
+
+    // These new photos have mixed aspect ratios.
+    width: undefined,
+    height: undefined,
+
+    // Keep uncategorized for now so they appear under "All"
+    // without creating a temporary gallery filter.
+    category: '',
+
+    // TODO: Add a descriptive caption for this newly imported gallery image.
+    caption: '',
+
+    // Never expose the source filename as alt text.
+    alt: `1890 Tea House gallery photo ${index + 1}`,
+  }));
+
+export const galleryImages = [
+  ...existingGalleryImages,
+  ...newGalleryImages,
+];
+
+export const galleryCategories = [
+  'All',
+  ...new Set(
+    galleryImages
+      .map(({ category }) => category)
+      .filter(Boolean),
+  ),
+];

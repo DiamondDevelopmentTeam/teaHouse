@@ -782,22 +782,124 @@ export function GalleryPage() {
   const categories = contentService.getGalleryCategories();
   const [category, setCategory] = useState('All');
   const [activeIndex, setActiveIndex] = useState(-1);
-  const images = useMemo(() => category === 'All' ? allImages : allImages.filter((item) => item.category === category), [allImages, category]);
+
+  const images = useMemo(
+    () => (
+      category === 'All'
+        ? allImages
+        : allImages.filter((item) => item.category === category)
+    ),
+    [allImages, category],
+  );
+
   const active = images[activeIndex];
-  const move = (offset) => setActiveIndex((activeIndex + offset + images.length) % images.length);
+
+  const move = (offset) => {
+    setActiveIndex(
+      (activeIndex + offset + images.length) % images.length,
+    );
+  };
+
   return (
     <PageShell>
-      <Meta title="Gallery" description="Explore Tea Rooms, food, tea service, events, the patio, and private gatherings at 1890 Tea House." path="/gallery" image={allImages[0].src} schema={[breadcrumbSchema([['Home', '/'], ['Gallery', '/gallery']])]} />
-      <PageHero eyebrow="Gallery" title="A glimpse inside 1890." intro="Tea Rooms, artful plates, private gatherings, and the historic house that gives every visit its sense of place." image="interior" />
+      <Meta
+        title="Gallery"
+        description="Explore Tea Rooms, food, tea service, events, the patio, and private gatherings at 1890 Tea House."
+        path="/gallery"
+        image={allImages[0]?.src}
+        schema={[
+          breadcrumbSchema([
+            ['Home', '/'],
+            ['Gallery', '/gallery'],
+          ]),
+        ]}
+      />
+
+      <PageHero
+        eyebrow="Gallery"
+        title="A glimpse inside 1890."
+        intro="Tea Rooms, artful plates, private gatherings, and the historic house that gives every visit its sense of place."
+        image="interior"
+      />
+
       <section className="page-section">
         <div className="page-filter" aria-label="Filter gallery">
-          {categories.map((item) => <button type="button" className={item === category ? 'is-active' : ''} aria-pressed={item === category} key={item} onClick={() => { setCategory(item); setActiveIndex(-1); }}>{item}</button>)}
+          {categories.map((item) => (
+            <button
+              type="button"
+              className={item === category ? 'is-active' : ''}
+              aria-pressed={item === category}
+              key={item}
+              onClick={() => {
+                setCategory(item);
+                setActiveIndex(-1);
+              }}
+            >
+              {item}
+            </button>
+          ))}
         </div>
+
         <div className="page-gallery-grid">
-          {images.map((item, index) => <button type="button" key={`${item.src}-${index}`} onClick={() => setActiveIndex(index)} aria-label={`Open image: ${item.caption}`}><OptimizedImage src={item.src} alt={item.alt} width={item.width} height={item.height} sizes="(max-width: 600px) 50vw, (max-width: 1000px) 33vw, 25vw" /><span>{item.caption}</span></button>)}
+          {images.map((item, index) => (
+            <button
+              type="button"
+              key={`${item.src}-${index}`}
+              onClick={() => setActiveIndex(index)}
+              aria-label={
+                item.caption
+                  ? `Open image: ${item.caption}`
+                  : `Open gallery image ${index + 1}`
+              }
+            >
+              <OptimizedImage
+                src={item.src}
+                alt={item.alt}
+                width={item.width}
+                height={item.height}
+                sizes="(max-width: 600px) 50vw, (max-width: 1000px) 33vw, 25vw"
+              />
+
+              {/* TODO: Add captions for the newly imported gallery photos. */}
+              {item.caption ? <span>{item.caption}</span> : null}
+            </button>
+          ))}
         </div>
       </section>
-      {active ? <Modal label="Gallery image viewer" onClose={() => setActiveIndex(-1)} onPrevious={() => move(-1)} onNext={() => move(1)}><figure className="page-lightbox__figure"><img src={active.src} alt={active.alt} width={active.width} height={active.height} /><figcaption>{active.caption}<span>{activeIndex + 1} / {images.length}</span></figcaption></figure></Modal> : null}
+
+      {active ? (
+        <Modal
+          label="Gallery image viewer"
+          onClose={() => setActiveIndex(-1)}
+          onPrevious={() => move(-1)}
+          onNext={() => move(1)}
+        >
+          <figure className="page-lightbox__figure">
+            <img
+              src={active.src}
+              alt={active.alt}
+              width={active.width}
+              height={active.height}
+            />
+
+            <figcaption
+              className={
+                active.caption
+                  ? undefined
+                  : 'page-gallery-counter-only'
+              }
+            >
+              {/* TODO: Add caption once this photo's final caption is approved. */}
+              {active.caption ? <span>{active.caption}</span> : null}
+
+              <span>
+                {activeIndex + 1} / {images.length}
+              </span>
+            </figcaption>
+          </figure>
+        </Modal>
+      ) : null}
+
       <CTA />
     </PageShell>
   );
